@@ -1,0 +1,16 @@
+<template>
+    <div class="slds-grid slds-wrap">
+        <div class="slds-col slds-size_2-of-12" style="height:100%;background-color: chartreuse;">
+            <c-perfumes-list-filters></c-perfumes-list-filters>
+        </div>
+        <div class="slds-col slds-size_10-of-12">
+            <div style="background-color: bisque;">
+                <c-perfume-list-pagination></c-perfume-list-pagination>
+            </div>
+            <div style="background-color: aqua;">
+                <h1>{perfumesList}</h1>
+                <c-perfumes-to-show perfumes-list={perfumesList}></c-perfumes-to-show>
+            </div>
+        </div>
+    </div>
+</template>

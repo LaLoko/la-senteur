@@ -1,0 +1,15 @@
+.slds-carousel__autoplay {
+    display: none;
+}
+.img{
+    object-fit: contain;
+}
+.carusel{
+    height: 504px;
+    /* object-fit: contain; */
+    width: 605px;
+}
+.lightning-carousel-image{
+    height: 100%;
+    width: 100%;
+}

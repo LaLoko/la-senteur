@@ -1,0 +1,6 @@
+<template>
+    <h1>wszystkie perfumy</h1>
+    <template for:each={perfumesList} for:item="perfume">
+        <c-perfume-item key={perfume.Id} item={perfume}></c-perfume-item>
+   </template>
+</template>
