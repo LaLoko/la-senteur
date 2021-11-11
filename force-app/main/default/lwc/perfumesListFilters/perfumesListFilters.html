@@ -1,3 +1,17 @@
 <template>
-    <h1>filters</h1>
+    <div style="padding: 1rem;">
+
+    <lightning-combobox
+    value={productType}
+    placeholder="Order by"
+    options={productTypes}
+    onchange={handleChange} ></lightning-combobox>
+    
+
+      <select class="slds-select" name = "optionSelect" onchange={changeHandler} >
+        <lightning-input-field title="option"></lightning-input-field>
+          <option value="OPTION A">OPTION A</option>
+          <option value="OPTION B">OPTION B</option>
+      </select> 
+   </div>
 </template>

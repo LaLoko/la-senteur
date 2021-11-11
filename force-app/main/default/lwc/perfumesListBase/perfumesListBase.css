@@ -1,0 +1,29 @@
+.slds-carousel__autoplay {
+    display: none;
+}
+.img{
+    object-fit: contain;
+}
+.carusel{
+    height: 500px;
+    width: 460px;
+}
+.carousel-image{
+    height: 100%;
+    width: 100%;
+}
+img{
+    width: 100% !important;
+    height: 500px !important;
+    object-fit: cover !important;
+}
+.slds-carousel {
+    position: absolute;
+    height: 600px;
+    width: 300px;
+}
+.content-container{
+    height: auto;
+    padding: var(--lwc-spacingSmall,0.75rem);
+    text-align: center;
+}

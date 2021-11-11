@@ -1,3 +1,15 @@
 <template>
-    <h1>pagination</h1>
+    <div class="slds-float_left sort">
+        <lightning-combobox
+            value={value}
+            placeholder="Order by"
+            options={options}
+            onchange={handleChange} ></lightning-combobox>
+    </div>
+    <div class="slds-float_right pagination" style="margin-top: 20px; margin-right:20px">
+        <lightning-button variant="brand-outline" label="First" onclick={handleClick} class="slds-m-left_x-small" style="margin-right: 5px;"></lightning-button>
+        <lightning-button variant="brand-outline" label="Prev" onclick={handleClick} class="slds-m-left_x-small" style="margin-right: 5px;"></lightning-button>
+        <lightning-button variant="brand-outline" label="Next" onclick={handleClick} class="slds-m-left_x-small" style="margin-right: 5px;"></lightning-button>
+        <lightning-button variant="brand-outline" label="Last" onclick={handleClick} class="slds-m-left_x-small"></lightning-button>
+    </div>
 </template>

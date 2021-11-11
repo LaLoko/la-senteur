@@ -1,10 +1,12 @@
 <template>
     <div class="container">
         <a onclick={tileClick}>
-            <img class="product-img" src={item.Photo__c}></img>
-            <div>
-                <h1 class="slds-text-title">{item.Designer__c}</h1>
-                <h1 class="slds-text-title">{item.Name__c}</h1>
+            <img class="product-img" src={item.photo}></img>
+            <div class="slds-align_absolute-center" style="margin-top: 5px;">
+                <h1 class="slds-text-title" style="font-size: 14px;">{item.designer}</h1>
+            </div>
+            <div class="slds-align_absolute-center">
+                <h1 class="slds-text-title" style="font-size: 16px;">{item.name}</h1>
             </div>
         </a>
     </div>

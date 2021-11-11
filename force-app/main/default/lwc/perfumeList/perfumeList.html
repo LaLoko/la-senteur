@@ -5,10 +5,9 @@
         </div>
         <div class="slds-col slds-size_10-of-12">
             <div style="background-color: bisque;">
-                <c-perfume-list-pagination></c-perfume-list-pagination>
+                <c-perfume-list-pagination onsort={handleSortSelected}></c-perfume-list-pagination>
             </div>
-            <div style="background-color: aqua;">
-                <h1>{perfumesList}</h1>
+            <div style="margin-top:4rem;">
                 <c-perfumes-to-show perfumes-list={perfumesList}></c-perfumes-to-show>
             </div>
         </div>

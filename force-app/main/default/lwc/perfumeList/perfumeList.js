@@ -11,11 +11,11 @@ export default class PerfumeList extends LightningElement {
         console.log(type)
         console.log(JSON.stringify(link))
 
-            this.getRecords(type);
+            this.getRecords(type,null);
     }  
-    getRecords(type){
+    getRecords(type,sort){
 
-            getAllPerfumes({type: type})
+            getAllPerfumes({type: type,sortType:sort})
                 .then(result => {
                     console.log(JSON.stringify(result));
                     this.perfumesList = result;
@@ -24,5 +24,10 @@ export default class PerfumeList extends LightningElement {
                 .catch(error => {
                     this.error = error;
                 });      
-    }  
+    }
+    handleSortSelected(event){
+        let link = String(window.location.href).split('/');
+        let type = link[link.length-1]
+        this.getRecords(type,event.detail);
+    }
 }
