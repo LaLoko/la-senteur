@@ -4,22 +4,22 @@ import getAllPerfumes from '@salesforce/apex/PerfumesController.getAllPerfumes';
 
 export default class PerfumeList extends LightningElement {
     @track perfumesList = [];
+    @track dataLoaded = false;
+
+    @track perfumesToShow = [];
     
     connectedCallback(){
         let link = String(window.location.href).split('/');
-        let type = link[link.length-1]
-        console.log(type)
-        console.log(JSON.stringify(link))
+        let type = link[link.length-1];
 
-            this.getRecords(type,null);
+        this.getRecords(type,null);
     }  
     getRecords(type,sort){
 
             getAllPerfumes({type: type,sortType:sort})
                 .then(result => {
-                    console.log(JSON.stringify(result));
                     this.perfumesList = result;
-                    
+                    this.dataLoaded = true;
                 })
                 .catch(error => {
                     this.error = error;
@@ -29,5 +29,10 @@ export default class PerfumeList extends LightningElement {
         let link = String(window.location.href).split('/');
         let type = link[link.length-1]
         this.getRecords(type,event.detail);
+    }
+    paginationHandler(event){
+        console.log('event')
+        console.log(event.detail.records)
+        this.perfumesToShow = [...event.detail.records]
     }
 }
