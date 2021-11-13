@@ -1,16 +1,18 @@
 import { api, LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
-export default class PerfumeItem extends LightningElement {
+export default class PerfumeItem extends NavigationMixin(
+    LightningElement
+) {
     @api item;
     tileClick(){
             this[NavigationMixin.Navigate]({
-                type: 'standard__recordPage',
+                type: 'comm__namedPage',
                 attributes: {
-                    recordId: this.item.Id,
-                    objectApiName: 'Account',
-                    actionName: 'view'
+                    pageName: 'perfume-detail'
                 },
+                state: {
+                    'id': this.item.Id
+                }
             });
-        
     }
 }

@@ -4,37 +4,22 @@ public with sharing class PerfumesController {
     public static List<PerfumeWrapper> getAllPerfumes(String type,String sortType) {
         List<Perfume__c> perfumesList = new List<Perfume__c>();
 
-        if(sortType == null || !sortType.contains('Name')){
-            sortType = 'Name__c ASC';
-        }
         String query = 'SELECT Id, Name__c, Photo__c,Score__c,Top_Notes__c,Main_accords__c,Middle_Notes__c,Gender__c,Designer__c,Base_Notes__c'+
                 +' FROM Perfume__c';
         if (type == 'male-perfumes') {
             query += ' WHERE Gender__c LIKE \'MALE\' ';
-//            perfumesList = [
-//                    SELECT Name__c,Photo__c,Score__c,Top_Notes__c,Main_accords__c,Middle_Notes__c,Gender__c,Designer__c,Base_Notes__c
-//                    FROM Perfume__c
-//                    WHERE Gender__c LIKE 'MALE'
-//            ];
         } else if (type == 'female-perfumes') {
             query += ' WHERE Gender__c LIKE \'FEMALE\' ';
-
-//            perfumesList = [
-//                    SELECT Name__c,Photo__c,Score__c,Top_Notes__c,Main_accords__c,Middle_Notes__c,Gender__c,Designer__c,Base_Notes__c
-//                    FROM Perfume__c
-//                    WHERE Gender__c LIKE 'FEMALE'
-//            ];
         } else {
             query += ' WHERE Gender__c LIKE \'UNISEX\' ';
-
-//            perfumesList = [
-//                    SELECT Name__c,Photo__c,Score__c,Top_Notes__c,Main_accords__c,Middle_Notes__c,Gender__c,Designer__c,Base_Notes__c
-//                    FROM Perfume__c
-//                    WHERE Gender__c LIKE 'UNISEX'
-//            ];
         }
-        query += ' ORDER BY '+sortType;
-        System.debug(query);
+
+        if(sortType == null || !sortType.contains('Name')){
+            query += ' ORDER BY Name__c ASC';
+        }else{
+            query += ' ORDER BY '+sortType;
+        }
+
         perfumesList = database.query(query);
 
         List<Id> ids = new List<Id>();
@@ -46,8 +31,6 @@ public with sharing class PerfumesController {
         for (Designer__c designer : designers){
             designersKeys.put(designer.Id,designer.Name);
         }
-        System.debug(designersKeys);
-        System.debug(perfumesList);
 
         List<PerfumeWrapper> out = new List<PerfumeWrapper>();
         for (Perfume__c perfume : perfumesList) {
@@ -63,6 +46,18 @@ public with sharing class PerfumesController {
             wrapper.mainAccords = perfume.Main_Accords__c;
             wrapper.photo = perfume.Photo__c;
             out.add(wrapper);
+        }
+        if(sortType!= null && sortType.contains('Price')){
+            List<Id> perfumeIds = new List<Id>();
+            for (Perfume__c perfume : perfumesList) {
+                perfumeIds.add(perfume.Id);
+            }
+            List<Variant__c> variants;
+                 variants = [SELECT Perfume__c,Price__c FROM Variant__c WHERE Perfume__c IN : perfumeIds ORDER BY Price__c];
+
+            
+            System.debug(variants);
+            out = sortByPrice(out,variants,sortType);
         }
         System.debug(out);
         return out;
@@ -114,10 +109,64 @@ public with sharing class PerfumesController {
                 FROM Perfume__c
                 WHERE Id = :id
         ];
-        return null;
+        Perfume__c perfume = perfumesList.get(0);
+
+        List<Variant__c> variants = [SELECT Price__c,Capacity__c FROM Variant__c WHERE Perfume__c =: perfume.Id ORDER BY Capacity__c];
+        List<String> variantsMap = new List<String>();
+        for(Variant__c variant : variants){
+            variantsMap.add(variant.Capacity__c+' ml - '+variant.Price__c+' €');
+        }
+        System.debug(variantsMap);
+
+        PerfumeWrapper wrapper = new PerfumeWrapper();
+            wrapper.Id = perfume.Id;
+            wrapper.name = perfume.Name__c;
+            wrapper.designer = perfume.Designer__c;
+            wrapper.designerName = [SELECT Name FROM Designer__c WHERE Id =: perfume.Designer__c].get(0).Name;
+            wrapper.score = perfume.Score__c;
+            wrapper.topNotes = perfume.Top_Notes__c;
+            wrapper.middleNotes = perfume.Middle_Notes__c;
+            wrapper.baseNotes = perfume.Base_Notes__c;
+            wrapper.gender = perfume.Gender__c;
+            wrapper.mainAccords = perfume.Main_Accords__c;
+            wrapper.photo = perfume.Photo__c;
+            wrapper.variants = variantsMap;
+
+        return wrapper;
+    }
+    public static List<PerfumeWrapper> sortByPrice(List<PerfumeWrapper> perfumes,List<Variant__c> variants,String type){
+            for (PerfumeWrapper perfume : perfumes) {
+                for (Variant__c variant : variants) {
+                    if(variant.Perfume__c == perfume.Id){
+                        perfume.price = variant.Price__c;
+                        break;
+                    }
+                }
+            }
+            // if(type.contains('ASC')){
+            //     List<PerfumeWrapper> out = new List<PerfumeWrapper>();
+            //     while (out.size()< perfumes.size()) {
+            //         for (PerfumeWrapper perfume : perfumes) {
+
+            //         }
+            //     }
+            // }else{
+
+            // }
+            perfumes.sort();
+            if(type.contains('DESC')){
+                List<PerfumeWrapper> out = new List<PerfumeWrapper>();
+
+                for(Integer i = perfumes.size() - 1; i >= 0; i--){
+                    out.add(perfumes[i]);
+                }
+                return out;
+            }else{
+                return perfumes;
+            }
     }
 
-    class PerfumeWrapper {
+    class PerfumeWrapper implements Comparable{
         @AuraEnabled
         public String Id {get;set;}
         @AuraEnabled
@@ -139,9 +188,32 @@ public with sharing class PerfumesController {
         @AuraEnabled
         public String designer { get; set; }
         @AuraEnabled
+        public String designerName{get;set;}
+        @AuraEnabled
         public String bestsellerName{get;set;}
+        @AuraEnabled
+        public List<String> variants{get;set;}
+        public Decimal price {get;set;}
 
-        PerfumeWrapper() {
+        PerfumeWrapper(){}
+
+        PerfumeWrapper(Perfume__c perfume) {
+            this.Id = perfume.Id;
+            this.name = perfume.Name__c;
+            this.photo = perfume.Photo__c;
+            this.score = perfume.Score__c;
+            this.topNotes = perfume.Top_Notes__c;
+            this.middleNotes = perfume.Middle_Notes__c;
+            this.baseNotes = perfume.Base_Notes__c;
+            this.gender = perfume.Gender__c;
+            this.designer = perfume.Designer__c;
+        }
+
+        public Integer compareTo(Object compareTo) {
+            PerfumeWrapper compareToEmp = (PerfumeWrapper)compareTo;
+            if (price == compareToEmp.price) return 0;
+            if (price > compareToEmp.price) return 1;
+            return -1;        
         }
     }
 }

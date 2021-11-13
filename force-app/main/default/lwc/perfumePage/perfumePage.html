@@ -1,0 +1,71 @@
+<template>
+    <template if:true={perfume}>
+
+        <div class="slds-align_absolute-center">
+            <div class="slds-col slds-size_10-of-12 card">
+                <lightning-card class="card">
+                    <div class="slds-grid slds-gutters">
+                        <div class="slds-col slds-size_1-of-3">
+                            <img class="product-img" src={perfume.photo}></img>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                            <div class="details">
+                                <h1>{perfume.name}</h1>
+                                <h2>{perfume.designerName}</h2>
+
+                                <br />
+                                <h3>Gender: {perfume.gender}</h3>
+                                <br />
+                                <h3>Main accords: {mainAccords}</h3>
+                                <br /><br />
+                                <div>
+                                    <lightning-combobox title="Capacity" value={option} options={options}
+                                        style="float: left;"></lightning-combobox>
+                                    <lightning-button variant="brand" label="Add to Cart" icon-name="utility:cart"
+                                        style="float: left;margin-top: 18px;"></lightning-button>
+                                </div>
+
+
+                            </div>
+                        </div>
+                        <div class="slds-col slds-size_1-of-3">
+                            <div style="float: right;">
+                                <h1 style="margin-right: 20px;">{perfume.score}&nbsp;&nbsp;
+                                    <lightning-icon class="gold-background" icon-name="utility:favorite"
+                                        icon-color="gold"></lightning-icon>
+                                </h1>
+                            </div>
+                            <div style="margin-top: 100px;">
+                                <h3>Top Notes:</h3>
+                                <h3>{topNotes}</h3>
+                                <br />
+                                <h3>Middle Notes:</h3>
+                                <h3>{middleNotes}</h3>
+                                <br />
+                                <h3>Base Notes:</h3>
+                                <h3>{baseNotes}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="height: 40px; margin-bottom:24px">
+                        <h2 style="margin-left: 40px;float:left;margin-top: 20px;">Share your opinion</h2>
+                        <div style="margin-left: 90rem;">
+                            <lightning-combobox style="float: left;width:60px" options={scoreOptions} value={score}>
+                            </lightning-combobox>
+                            <lightning-icon style="float: left;margin-top: 16px;margin-left: 5px;"
+                                class="gold-background" icon-name="utility:favorite" icon-color="gold"></lightning-icon>
+                        </div>
+                    </div>
+                    <div style="margin-top: 10px;">
+                        <lightning-input-rich-text style="margin: 10px;"></lightning-input-rich-text>
+                    </div>
+                    <div style="height: 30px;">
+                        <lightning-button variant="brand" label="Share" icon-name="utility:send" icon-position="right"
+                                        style="float: right;margin-right:40px"></lightning-button>
+                    </div>
+                </lightning-card>
+            </div>
+        </div>
+    </template>
+
+</template>

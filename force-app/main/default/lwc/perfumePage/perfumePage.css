@@ -1,0 +1,22 @@
+.product-img{
+    max-height: 600px;
+    max-width: 500px;
+    margin-left: 30px;
+}
+.details{
+}
+.card{
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+h1{
+    font-size: 30px;
+}
+h2{
+    font-size: 20px;
+}
+h3{
+    font-size: 16px;
+}
+.gold-bacground{
+    background: gold;
+}
