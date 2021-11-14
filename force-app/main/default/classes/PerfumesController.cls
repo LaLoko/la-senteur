@@ -134,6 +134,33 @@ public with sharing class PerfumesController {
 
         return wrapper;
     }
+    @AuraEnabled
+    public static Boolean addReview(String text,Integer score,Id perfume){
+        try {
+            String userId = System.UserInfo.getUserId();
+            User currUser = [SELECT Id, Name FROM User WHERE Id = :userId];
+            System.debug(text);
+            System.debug(score);
+            System.debug(perfume);
+            System.debug(currUser.Name);
+            insert new Perfume_Review__c(Review__c=text,Score__c=score,Username__c=currUser.Name,Perfume__c=perfume);
+
+            List<Perfume_Review__c> reviews = [Select Score__c FROM Perfume_Review__c WHERE Perfume__c =: perfume];
+            List<Perfume__c> perfumeToUpdate = [SELECT Score__c FROM Perfume__c WHERE Id =: perfume];
+            Double newScore = (perfumeToUpdate.get(0).Score__c + score)/reviews.size();
+            perfumeToUpdate.get(0).Score__c = newScore;
+            update perfumeToUpdate;
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+    @AuraEnabled
+    public static List<Perfume_Review__c> getReviews(Id id){
+        return [SELECT Review__c,Score__c,Username__c FROM Perfume_Review__c WHERE Perfume__c =: id];
+    }
+
+
     public static List<PerfumeWrapper> sortByPrice(List<PerfumeWrapper> perfumes,List<Variant__c> variants,String type){
             for (PerfumeWrapper perfume : perfumes) {
                 for (Variant__c variant : variants) {
