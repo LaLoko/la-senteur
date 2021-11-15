@@ -2,10 +2,10 @@ public with sharing class PerfumesController {
 
     @AuraEnabled(cacheable=true)
     public static List<PerfumeWrapper> getAllPerfumes(String type,String sortType) {
-        List<Perfume__c> perfumesList = new List<Perfume__c>();
+        List<Product2> perfumesList = new List<Product2>();
 
-        String query = 'SELECT Id, Name__c, Photo__c,Score__c,Top_Notes__c,Main_accords__c,Middle_Notes__c,Gender__c,Designer__c,Base_Notes__c'+
-                +' FROM Perfume__c';
+        String query = 'SELECT Id, Name, Photo__c,Score__c,Top_Notes__c,Main_accords__c,Middle_Notes__c,Gender__c,Designer__c,Base_Notes__c'+
+                +' FROM Product2';
         if (type == 'male-perfumes') {
             query += ' WHERE Gender__c LIKE \'MALE\' ';
         } else if (type == 'female-perfumes') {
@@ -14,8 +14,10 @@ public with sharing class PerfumesController {
             query += ' WHERE Gender__c LIKE \'UNISEX\' ';
         }
 
+        query += ' AND Family = \'Perfumes\' ';
+
         if(sortType == null || !sortType.contains('Name')){
-            query += ' ORDER BY Name__c ASC';
+            query += ' ORDER BY Name ASC';
         }else{
             query += ' ORDER BY '+sortType;
         }
@@ -23,7 +25,7 @@ public with sharing class PerfumesController {
         perfumesList = database.query(query);
 
         List<Id> ids = new List<Id>();
-        for (Perfume__c perfume : perfumesList) {
+        for (Product2 perfume : perfumesList) {
             ids.add(perfume.Designer__c);
         }
         List<Designer__c> designers = [SELECT Id, Name FROM Designer__c WHERE Id IN : ids];
@@ -32,12 +34,20 @@ public with sharing class PerfumesController {
             designersKeys.put(designer.Id,designer.Name);
         }
 
+        List<AggregateResult> allPrices = [SELECT MIN(Price__c),Product__c FROM Variant__c GROUP BY Product__c];
+        System.debug(allPrices);
+        Map<Id,Decimal> prices = new Map<Id, Decimal>();
+        for (AggregateResult variant : allPrices){
+            prices.put((Id)variant.get('Product__c') ,(Decimal)variant.get('expr0'));
+        }
+        System.debug(prices);
+
         List<PerfumeWrapper> out = new List<PerfumeWrapper>();
-        for (Perfume__c perfume : perfumesList) {
+        for (Product2 perfume : perfumesList) {
             PerfumeWrapper wrapper = new PerfumeWrapper();
             wrapper.Id = perfume.Id;
-            wrapper.name = perfume.Name__c;
-            wrapper.designer = designersKeys.get(perfume.Designer__c);
+            wrapper.name = perfume.Name;
+            wrapper.designerName = designersKeys.get(perfume.Designer__c);
             wrapper.score = perfume.Score__c;
             wrapper.topNotes = perfume.Top_Notes__c;
             wrapper.middleNotes = perfume.Middle_Notes__c;
@@ -45,15 +55,16 @@ public with sharing class PerfumesController {
             wrapper.gender = perfume.Gender__c;
             wrapper.mainAccords = perfume.Main_Accords__c;
             wrapper.photo = perfume.Photo__c;
+            wrapper.price = prices.get(perfume.Id);
             out.add(wrapper);
         }
         if(sortType!= null && sortType.contains('Price')){
             List<Id> perfumeIds = new List<Id>();
-            for (Perfume__c perfume : perfumesList) {
+            for (Product2 perfume : perfumesList) {
                 perfumeIds.add(perfume.Id);
             }
             List<Variant__c> variants;
-                 variants = [SELECT Perfume__c,Price__c FROM Variant__c WHERE Perfume__c IN : perfumeIds ORDER BY Price__c];
+                 variants = [SELECT Perfume__c,Price__c FROM Variant__c WHERE Product__c IN : perfumeIds ORDER BY Price__c];
 
             
             System.debug(variants);
@@ -64,17 +75,18 @@ public with sharing class PerfumesController {
     }
     @AuraEnabled
     public static List<PerfumeWrapper> getBestsellers(){
-        List<Perfume__c> perfumesList = new List<Perfume__c>();
+        List<Product2> perfumesList = new List<Product2>();
 
         perfumesList = [
-                SELECT Id, Name__c,Photo__c,Score__c,Top_Notes__c,Main_accords__c,Middle_Notes__c,Gender__c,Designer__c,Base_Notes__c
-                FROM Perfume__c
+                SELECT Id, Name,Photo__c,Score__c,Top_Notes__c,Main_accords__c,Middle_Notes__c,Gender__c,Designer__c,Base_Notes__c
+                FROM Product2
+                WHERE Family = 'Perfumes'
                 ORDER BY Score__c
                 LIMIT 5
         ];
 
         List<Id> ids = new List<Id>();
-        for (Perfume__c perfume : perfumesList) {
+        for (Product2 perfume : perfumesList) {
             ids.add(perfume.Designer__c);
         }
         List<Designer__c> designers = [SELECT Id, Name FROM Designer__c WHERE Id IN : ids];
@@ -84,10 +96,10 @@ public with sharing class PerfumesController {
         }
 
         List<PerfumeWrapper> out = new List<PerfumeWrapper>();
-        for (Perfume__c perfume : perfumesList) {
+        for (Product2 perfume : perfumesList) {
             PerfumeWrapper wrapper = new PerfumeWrapper();
             wrapper.Id = perfume.Id;
-            wrapper.name = perfume.Name__c;
+            wrapper.name = perfume.Name;
             wrapper.designer = designersKeys.get(perfume.Designer__c);
             wrapper.score = perfume.Score__c;
             wrapper.topNotes = perfume.Top_Notes__c;
@@ -104,14 +116,14 @@ public with sharing class PerfumesController {
 
     @AuraEnabled(cacheable=true)
     public static PerfumeWrapper getDetailPerfume(String id) {
-        List<Perfume__c> perfumesList = [
-                SELECT Id, Name__c,Photo__c,Score__c,Top_Notes__c,Main_accords__c,Middle_Notes__c,Gender__c,Designer__c,Base_Notes__c
-                FROM Perfume__c
+        List<Product2> perfumesList = [
+                SELECT Id, Name,Photo__c,Score__c,Top_Notes__c,Main_accords__c,Middle_Notes__c,Gender__c,Designer__c,Base_Notes__c
+                FROM Product2
                 WHERE Id = :id
         ];
-        Perfume__c perfume = perfumesList.get(0);
+        Product2 perfume = perfumesList.get(0);
 
-        List<Variant__c> variants = [SELECT Price__c,Capacity__c FROM Variant__c WHERE Perfume__c =: perfume.Id ORDER BY Capacity__c];
+        List<Variant__c> variants = [SELECT Price__c,Capacity__c FROM Variant__c WHERE Product__c =: perfume.Id ORDER BY Capacity__c];
         List<String> variantsMap = new List<String>();
         for(Variant__c variant : variants){
             variantsMap.add(variant.Capacity__c+' ml - '+variant.Price__c+' €');
@@ -120,7 +132,7 @@ public with sharing class PerfumesController {
 
         PerfumeWrapper wrapper = new PerfumeWrapper();
             wrapper.Id = perfume.Id;
-            wrapper.name = perfume.Name__c;
+            wrapper.name = perfume.Name;
             wrapper.designer = perfume.Designer__c;
             wrapper.designerName = [SELECT Name FROM Designer__c WHERE Id =: perfume.Designer__c].get(0).Name;
             wrapper.score = perfume.Score__c;
@@ -143,10 +155,10 @@ public with sharing class PerfumesController {
             System.debug(score);
             System.debug(perfume);
             System.debug(currUser.Name);
-            insert new Perfume_Review__c(Review__c=text,Score__c=score,Username__c=currUser.Name,Perfume__c=perfume);
+            insert new Perfume_Review__c(Review__c=text,Score__c=score,Username__c=currUser.Name,Product__c=perfume);
 
-            List<Perfume_Review__c> reviews = [Select Score__c FROM Perfume_Review__c WHERE Perfume__c =: perfume];
-            List<Perfume__c> perfumeToUpdate = [SELECT Score__c FROM Perfume__c WHERE Id =: perfume];
+            List<Perfume_Review__c> reviews = [Select Score__c FROM Perfume_Review__c WHERE Product__c =: perfume];
+            List<Product2> perfumeToUpdate = [SELECT Score__c FROM Product2 WHERE Id =: perfume];
             Double newScore = (perfumeToUpdate.get(0).Score__c + score)/reviews.size();
             perfumeToUpdate.get(0).Score__c = newScore;
             update perfumeToUpdate;
@@ -157,14 +169,14 @@ public with sharing class PerfumesController {
     }
     @AuraEnabled
     public static List<Perfume_Review__c> getReviews(Id id){
-        return [SELECT Review__c,Score__c,Username__c FROM Perfume_Review__c WHERE Perfume__c =: id];
+        return [SELECT Review__c,Score__c,Username__c FROM Perfume_Review__c WHERE Product__c =: id];
     }
 
 
     public static List<PerfumeWrapper> sortByPrice(List<PerfumeWrapper> perfumes,List<Variant__c> variants,String type){
             for (PerfumeWrapper perfume : perfumes) {
                 for (Variant__c variant : variants) {
-                    if(variant.Perfume__c == perfume.Id){
+                    if(variant.Product__c == perfume.Id){
                         perfume.price = variant.Price__c;
                         break;
                     }
@@ -220,13 +232,14 @@ public with sharing class PerfumesController {
         public String bestsellerName{get;set;}
         @AuraEnabled
         public List<String> variants{get;set;}
+        @AuraEnabled
         public Decimal price {get;set;}
 
         PerfumeWrapper(){}
 
         PerfumeWrapper(Perfume__c perfume) {
             this.Id = perfume.Id;
-            this.name = perfume.Name__c;
+            this.name = perfume.Name;
             this.photo = perfume.Photo__c;
             this.score = perfume.Score__c;
             this.topNotes = perfume.Top_Notes__c;
