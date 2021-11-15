@@ -4,8 +4,9 @@ public with sharing class PerfumesController {
     public static List<PerfumeWrapper> getAllPerfumes(String type,String sortType) {
         List<Product2> perfumesList = new List<Product2>();
 
-        String query = 'SELECT Id, Name, Photo__c,Score__c,Top_Notes__c,Main_accords__c,Middle_Notes__c,Gender__c,Designer__c,Base_Notes__c'+
+        String query = 'SELECT Id, Name, Photo__c,Score__c,Top_Notes__c,Main_accords__c,Middle_Notes__c,Gender__c,Designer__c,Base_Notes__c, minPrice__c'+
                 +' FROM Product2';
+
         if (type == 'male-perfumes') {
             query += ' WHERE Gender__c LIKE \'MALE\' ';
         } else if (type == 'female-perfumes') {
@@ -16,13 +17,22 @@ public with sharing class PerfumesController {
 
         query += ' AND Family = \'Perfumes\' ';
 
-        if(sortType == null || !sortType.contains('Name')){
+        if(sortType != null && sortType.contains('Name ASC')){
             query += ' ORDER BY Name ASC';
+        }else if(sortType != null && sortType.contains('Name ASC')){
+            query += ' ORDER BY Name DESC';
+        }else if(sortType!= null && sortType.contains('Price ASC')){
+            query += ' ORDER BY minPrice__c ASC';
+        }else if(sortType!= null && sortType.contains('Price DESC')){
+            query += ' ORDER BY minPrice__c DESC';
+        }else if(sortType!= null && sortType.contains('Score')){
+            query += ' ORDER BY Score__c ASC';
         }else{
-            query += ' ORDER BY '+sortType;
+            query += ' ORDER BY Name ASC';
         }
-
+     
         perfumesList = database.query(query);
+        System.debug(perfumesList);
 
         List<Id> ids = new List<Id>();
         for (Product2 perfume : perfumesList) {
@@ -33,14 +43,6 @@ public with sharing class PerfumesController {
         for (Designer__c designer : designers){
             designersKeys.put(designer.Id,designer.Name);
         }
-
-        List<AggregateResult> allPrices = [SELECT MIN(Price__c),Product__c FROM Variant__c GROUP BY Product__c];
-        System.debug(allPrices);
-        Map<Id,Decimal> prices = new Map<Id, Decimal>();
-        for (AggregateResult variant : allPrices){
-            prices.put((Id)variant.get('Product__c') ,(Decimal)variant.get('expr0'));
-        }
-        System.debug(prices);
 
         List<PerfumeWrapper> out = new List<PerfumeWrapper>();
         for (Product2 perfume : perfumesList) {
@@ -55,21 +57,10 @@ public with sharing class PerfumesController {
             wrapper.gender = perfume.Gender__c;
             wrapper.mainAccords = perfume.Main_Accords__c;
             wrapper.photo = perfume.Photo__c;
-            wrapper.price = prices.get(perfume.Id);
+            wrapper.price = perfume.minPrice__c;
             out.add(wrapper);
         }
-        if(sortType!= null && sortType.contains('Price')){
-            List<Id> perfumeIds = new List<Id>();
-            for (Product2 perfume : perfumesList) {
-                perfumeIds.add(perfume.Id);
-            }
-            List<Variant__c> variants;
-                 variants = [SELECT Perfume__c,Price__c FROM Variant__c WHERE Product__c IN : perfumeIds ORDER BY Price__c];
 
-            
-            System.debug(variants);
-            out = sortByPrice(out,variants,sortType);
-        }
         System.debug(out);
         return out;
     }
@@ -167,45 +158,22 @@ public with sharing class PerfumesController {
             return false;
         }
     }
+
     @AuraEnabled
     public static List<Perfume_Review__c> getReviews(Id id){
         return [SELECT Review__c,Score__c,Username__c FROM Perfume_Review__c WHERE Product__c =: id];
     }
+    
+    // @AuraEnabled
+    // public static Boolean UserCreatedComment(Id id){
+    //     try {
+            
+    //     } catch (Exception e) {
+    //         throw new AuraHandledException(e.getMessage());
+    //     }
+    // }
 
-
-    public static List<PerfumeWrapper> sortByPrice(List<PerfumeWrapper> perfumes,List<Variant__c> variants,String type){
-            for (PerfumeWrapper perfume : perfumes) {
-                for (Variant__c variant : variants) {
-                    if(variant.Product__c == perfume.Id){
-                        perfume.price = variant.Price__c;
-                        break;
-                    }
-                }
-            }
-            // if(type.contains('ASC')){
-            //     List<PerfumeWrapper> out = new List<PerfumeWrapper>();
-            //     while (out.size()< perfumes.size()) {
-            //         for (PerfumeWrapper perfume : perfumes) {
-
-            //         }
-            //     }
-            // }else{
-
-            // }
-            perfumes.sort();
-            if(type.contains('DESC')){
-                List<PerfumeWrapper> out = new List<PerfumeWrapper>();
-
-                for(Integer i = perfumes.size() - 1; i >= 0; i--){
-                    out.add(perfumes[i]);
-                }
-                return out;
-            }else{
-                return perfumes;
-            }
-    }
-
-    class PerfumeWrapper implements Comparable{
+    class PerfumeWrapper{
         @AuraEnabled
         public String Id {get;set;}
         @AuraEnabled
@@ -247,13 +215,6 @@ public with sharing class PerfumesController {
             this.baseNotes = perfume.Base_Notes__c;
             this.gender = perfume.Gender__c;
             this.designer = perfume.Designer__c;
-        }
-
-        public Integer compareTo(Object compareTo) {
-            PerfumeWrapper compareToEmp = (PerfumeWrapper)compareTo;
-            if (price == compareToEmp.price) return 0;
-            if (price > compareToEmp.price) return 1;
-            return -1;        
         }
     }
 }

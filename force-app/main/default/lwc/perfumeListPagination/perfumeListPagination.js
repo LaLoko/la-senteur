@@ -28,11 +28,11 @@ export default class PerfumeListPagination extends LightningElement {
 
     get options() {
         return [
-            { label: 'Price Ascending', value: 'Price__c ASC' },
-            { label: 'Price Descending', value: 'Price__c DESC' },
-            { label: 'Name Ascending', value: 'Name__c ASC' },
-            { label: 'Name Descending', value: 'Name__c DESC' },
-            { label: 'Score', value: 'Score__c' },
+            { label: 'Price Ascending', value: 'Price ASC' },
+            { label: 'Price Descending', value: 'Price DESC' },
+            { label: 'Name Ascending', value: 'Name ASC' },
+            { label: 'Name Descending', value: 'Name DESC' },
+            { label: 'Score', value: 'Score' },
             { label: 'Most popular', value: 'Most popular' },
         ];
     }
