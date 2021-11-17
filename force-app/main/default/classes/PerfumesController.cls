@@ -106,9 +106,9 @@ public with sharing class PerfumesController {
     }
 
     @AuraEnabled
-    public static List<PerfumeWrapper> getBestsellers(){
+    public static List<BestsellerWrapper> getBestsellers(){
         List<Product2> perfumesList = [
-                SELECT Id, Name,Photo__c,Score__c,Top_Notes__c,Main_accords__c,Middle_Notes__c,Gender__c,Designer__c,Base_Notes__c
+                SELECT Id, Name,Photo__c,Designer__c, minPrice__c
                 FROM Product2
                 WHERE Family = 'Perfumes'
                 ORDER BY Score__c
@@ -125,20 +125,15 @@ public with sharing class PerfumesController {
             designersKeys.put(designer.Id,designer.Name);
         }
 
-        List<PerfumeWrapper> out = new List<PerfumeWrapper>();
+        List<BestsellerWrapper> out = new List<BestsellerWrapper>();
         for (Product2 perfume : perfumesList) {
-            PerfumeWrapper wrapper = new PerfumeWrapper();
+            BestsellerWrapper wrapper = new BestsellerWrapper();
             wrapper.Id = perfume.Id;
             wrapper.name = perfume.Name;
             wrapper.designer = designersKeys.get(perfume.Designer__c);
-            wrapper.score = perfume.Score__c;
-            wrapper.topNotes = perfume.Top_Notes__c;
-            wrapper.middleNotes = perfume.Middle_Notes__c;
-            wrapper.baseNotes = perfume.Base_Notes__c;
-            wrapper.gender = perfume.Gender__c;
-            wrapper.mainAccords = perfume.Main_Accords__c;
             wrapper.photo = perfume.Photo__c;
             wrapper.bestsellerName = wrapper.designer +' '+wrapper.name;
+            wrapper.price = perfume.minPrice__c + ' €';
             wrapper.URL = 'https://lasenteur-developer-edition.eu40.force.com/s/perfume-detail?id='+perfume.Id;
             out.add(wrapper);
         }
@@ -297,13 +292,9 @@ public with sharing class PerfumesController {
         @AuraEnabled
         public String designerName{get;set;}
         @AuraEnabled
-        public String bestsellerName{get;set;}
-        @AuraEnabled
         public List<String> variants{get;set;}
         @AuraEnabled
         public Decimal price {get;set;}
-        @AuraEnabled
-        public String URL {get;set;}
 
         PerfumeWrapper(){}
 
@@ -318,5 +309,25 @@ public with sharing class PerfumesController {
             this.gender = perfume.Gender__c;
             this.designer = perfume.Designer__c;
         }
+    }
+    class BestsellerWrapper{
+        @AuraEnabled
+        public String Id {get;set;}
+        @AuraEnabled
+        public String name { get; set; }
+        @AuraEnabled
+        public String photo { get; set; }
+        @AuraEnabled
+        public String designer { get; set; }
+        @AuraEnabled
+        public String designerName{get;set;}
+        @AuraEnabled
+        public String bestsellerName{get;set;}
+        @AuraEnabled
+        public String price {get;set;}
+        @AuraEnabled
+        public String URL {get;set;}
+
+        BestsellerWrapper(){}
     }
 }
