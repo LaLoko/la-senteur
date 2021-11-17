@@ -27,6 +27,11 @@ export default class PerfumePage extends LightningElement {
     @api commentToEdit;
     @track editScore;
 
+    currPhoto;
+    photoIndex = 0;
+    disableNextPhoto = false;
+    disablePrevPhoto = true;
+
     @track isDialogVisible = false;
     @track originalMessage;
     @track displayMessage = 'Click on the \'Open Confirmation\' button to test the dialog.';
@@ -39,13 +44,15 @@ export default class PerfumePage extends LightningElement {
     }
 
     getDetails(){
-
         getDetailPerfume({id:this.id})
             .then(result => {
                 this.perfume = result;
                 console.log(JSON.stringify(result))
                 this.setNotes(this.perfume);
                 this.getAllReviews();
+                if(this.currPhoto === undefined){
+                    this.currPhoto = this.perfume.images[this.photoIndex].URL__c;
+                }
             })
             .catch(error => {
                 this.error = error;
@@ -226,6 +233,28 @@ export default class PerfumePage extends LightningElement {
             this.isDialogVisible = false;
         }
     }
+    nextPhoto(){
+        if(this.photoIndex + 1 <= this.perfume.images.length){
+            this.photoIndex += 1;
+            this.currPhoto = this.perfume.images[this.photoIndex].URL__c;
+            if(this.photoIndex == this.perfume.images.length-1){
+                this.disableNextPhoto = true;
+            }
+            this.disablePrevPhoto = false;
+        }
+    }
+
+    prevPhoto(){
+        if(this.photoIndex - 1 >= 0){
+            this.photoIndex -= 1;
+            this.currPhoto = this.perfume.images[this.photoIndex].URL__c;
+            if(this.photoIndex == 0){
+                this.disablePrevPhoto = true;
+            }
+            this.disableNextPhoto = false;
+        }
+    }
+
     addToCart(){
         let message = this.perfume.designerName +' ' + this.perfume.name + ' ' + this.option + ' added to cart';
         const evt = new ShowToastEvent({
@@ -236,4 +265,5 @@ export default class PerfumePage extends LightningElement {
         });
         this.dispatchEvent(evt);
     }
+
 }

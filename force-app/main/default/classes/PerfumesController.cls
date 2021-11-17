@@ -169,6 +169,7 @@ public with sharing class PerfumesController {
             wrapper.mainAccords = perfume.Main_Accords__c;
             wrapper.photo = perfume.Photo__c;
             wrapper.variants = variantsMap;
+            wrapper.images = [SELECT Id, URL__c FROM Product_Image__c WHERE Product__c =: id ORDER BY Id];
 
         return wrapper;
     }
@@ -193,7 +194,7 @@ public with sharing class PerfumesController {
 
     @AuraEnabled
     public static List<Perfume_Review__c> getReviews(Id id){
-        return [SELECT Review__c,Score__c,Username__c FROM Perfume_Review__c WHERE Product__c =: id];
+        return [SELECT Review__c,Score__c,Username__c,Created_date__c FROM Perfume_Review__c WHERE Product__c =: id];
     }
     
     @AuraEnabled
@@ -240,6 +241,7 @@ public with sharing class PerfumesController {
             Perfume_Review__c review = [SELECT Id,Review__c,Score__c  FROM Perfume_Review__c WHERE CreatedById =: userId AND Product__c =: perfumeId].get(0);
             review.Review__c = text;
             review.Score__c = score;
+            review.Created_date__c = Datetime.now();
             update review;
 
             Product2 perfumeToUpdate = [SELECT Score__c FROM Product2 WHERE Id =: perfumeId].get(0);
@@ -295,6 +297,9 @@ public with sharing class PerfumesController {
         public List<String> variants{get;set;}
         @AuraEnabled
         public Decimal price {get;set;}
+        @AuraEnabled
+        public List<Product_Image__c> images {get;set;}
+
 
         PerfumeWrapper(){}
 
