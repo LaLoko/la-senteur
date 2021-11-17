@@ -2,12 +2,17 @@ import { LightningElement,api,track } from 'lwc';
 import getDetailPerfume from '@salesforce/apex/PerfumesController.getDetailPerfume';
 import addReview from '@salesforce/apex/PerfumesController.addReview';
 import getReviews from '@salesforce/apex/PerfumesController.getReviews';
+import userCreatedComment from '@salesforce/apex/PerfumesController.userCreatedComment';
+import removeComment from '@salesforce/apex/PerfumesController.removeComment';
+import getReviewToEdit from '@salesforce/apex/PerfumesController.getReviewToEdit';
+import updateReview from '@salesforce/apex/PerfumesController.updateReview';
+
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 
 export default class PerfumePage extends LightningElement {
     id;
-    @api perfume;
+    @track perfume;
     @track reviews = [];
     reviesExists;
     topNotes = []
@@ -17,19 +22,28 @@ export default class PerfumePage extends LightningElement {
     option = "";
     @track score = '1';
     @track reviewText = "";
+    @track comentCreated = false;
+    editingComment = false;
+    @api commentToEdit;
+    @track editScore;
+
+    @track isDialogVisible = false;
+    @track originalMessage;
+    @track displayMessage = 'Click on the \'Open Confirmation\' button to test the dialog.';
 
     connectedCallback(){
         let incomeURL = window.location.href;
         let paramsFromURL = new URL(incomeURL).searchParams;
         this.id = paramsFromURL.get('id');
-        this.getDetails(this.id);
+        this.getDetails();
     }
 
-    getDetails(id){
+    getDetails(){
 
-        getDetailPerfume({id:id})
+        getDetailPerfume({id:this.id})
             .then(result => {
                 this.perfume = result;
+                console.log(JSON.stringify(result))
                 this.setNotes(this.perfume);
                 this.getAllReviews();
             })
@@ -44,12 +58,22 @@ export default class PerfumePage extends LightningElement {
         this.mainAccords = perfume.mainAccords.split(';')
     }
     getAllReviews(){
-        console.log('wchodzi')
         getReviews({id:this.id})
             .then(result => {
                 this.reviews = result;
                 this.reviesExists = result.length > 0;
-                console.log(JSON.stringify(result))
+                if(result.length > 0){
+                    this.isCommentCreated();
+                }
+            })
+            .catch(error => {
+                this.error = error;
+            });   
+    }
+    isCommentCreated(){
+        userCreatedComment({id:this.id})
+            .then(result => {
+                this.comentCreated = result;
             })
             .catch(error => {
                 this.error = error;
@@ -75,6 +99,16 @@ export default class PerfumePage extends LightningElement {
         ];
     }
 
+    get perfumeScore(){
+        return this.perfume.score;
+    }
+    get reviewsExist(){
+        return this.reviesExists;
+    }
+    optionChange(event){
+        this.option= event.target.value;
+    }
+
     scoreChange(event) {
         this.score= event.target.value;
     }
@@ -84,12 +118,10 @@ export default class PerfumePage extends LightningElement {
     }
 
     addReview(){
-        console.log(this.reviewText)
-        console.log(this.score)
         if(this.reviewText != ""){
             addReview({text:this.reviewText,score:this.score,perfume:this.id})
             .then(result => {
-                if(result == true){
+                if(result){
                     const evt = new ShowToastEvent({
                         title: 'Success',
                         message: 'Review added succesfully',
@@ -97,8 +129,10 @@ export default class PerfumePage extends LightningElement {
                         mode: 'dismissable'
                     });
                     this.dispatchEvent(evt);
-                    this.getDetails(this.id);
+                    this.getDetails();
                     this.getAllReviews();
+                    console.log(JSON.stringify(this.perfume))
+
                 }else{
                     const evt = new ShowToastEvent({
                         title: 'Error',
@@ -121,5 +155,85 @@ export default class PerfumePage extends LightningElement {
             });
             this.dispatchEvent(evt);
         }
+    }
+
+    removeComment(){
+        removeComment({perfumeId:this.id})
+            .then(result => {
+                this.comentCreated = false;
+                this.getDetails();
+                console.log(JSON.stringify(this.perfume))
+            })
+            .catch(error => {
+                this.error = error;
+            });   
+    }
+
+    editScoreChange(event) {
+        this.editScore= event.target.value;
+    }
+
+    editReviewChange(event) {
+        this.commentToEdit.Review__c= event.target.value;
+    }
+
+    editComment(){
+        getReviewToEdit({perfumeId:this.id})
+        .then(result => {
+            console.log(JSON.stringify(result))
+            this.commentToEdit = result;
+            this.editingComment = true;
+            this.editScore = result.Score__c.toString();
+        })
+        .catch(error => {
+            this.error = error;
+        });   
+    }
+
+    cancelEdit(){
+        this.editingComment = false;
+    }
+    
+    editReview(event){
+        console.log(this.commentToEdit.Review__c)
+        updateReview({text:this.commentToEdit.Review__c,score:this.editScore,perfumeId:this.id})
+        .then(result => {
+            this.getAllReviews();
+            this.getDetails();
+            this.editingComment = false;
+        })
+        .catch(error => {
+            this.error = error;
+        }); 
+    }
+
+    openDialog(event){
+        if(event.target.name === 'openConfirmation'){
+            this.originalMessage = 'test message';
+            this.isDialogVisible = true;
+        }else if(event.target.name === 'confirmModal'){
+
+            if(event.detail !== 1){
+                this.displayMessage = 'Status: ' + event.detail.status + '. Event detail: ' + JSON.stringify(event.detail.originalMessage) + '.';
+
+                if(event.detail.status === 'confirm') {
+                    this.removeComment();
+                    event.detail = 1;
+                }else if(event.detail.status === 'cancel'){
+                    event.detail = 1;
+                }
+            }
+            this.isDialogVisible = false;
+        }
+    }
+    addToCart(){
+        let message = this.perfume.designerName +' ' + this.perfume.name + ' ' + this.option + ' added to cart';
+        const evt = new ShowToastEvent({
+            title: 'Product added to cart',
+            message: message,
+            variant: 'info',
+            mode: 'dismissable'
+        });
+        this.dispatchEvent(evt);
     }
 }

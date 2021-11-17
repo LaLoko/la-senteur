@@ -4,12 +4,18 @@
             <c-perfumes-list-filters></c-perfumes-list-filters>
         </div>
         <div class="slds-col slds-size_10-of-12">
-                <div>
-                    <c-perfume-list-pagination onsort={handleSortSelected} records={perfumesList} onupdate={paginationHandler}></c-perfume-list-pagination>
-                </div>
+            <div>
+                <c-perfume-list-pagination onsort={handleSortSelected} records={perfumesList}
+                    onupdate={paginationHandler}></c-perfume-list-pagination>
+            </div>
 
             <div style="margin-top:4rem;">
-                <c-perfumes-to-show perfumes-list={perfumesToShow}></c-perfumes-to-show>
+                <template if:true={recordsFound}>
+                    <c-perfumes-to-show perfumes-list={perfumesToShow}></c-perfumes-to-show>
+                </template>
+                <template if:false={recordsFound}>
+                    <h1 class="perfumesNotFound">Cannot found any perfumes</h1>
+                </template>
             </div>
         </div>
     </div>

@@ -64,11 +64,50 @@ public with sharing class PerfumesController {
         System.debug(out);
         return out;
     }
+
+    @AuraEnabled
+    public static List<PerfumeWrapper> getPerfumesByKey(String key){
+        key = '%'+key+'%';
+        List<Product2> perfumesList = [
+                SELECT Id, Name,Photo__c,Score__c,Top_Notes__c,Main_accords__c,Middle_Notes__c,Gender__c,Designer__c,Base_Notes__c, minPrice__c
+                FROM Product2
+                WHERE Family = 'Perfumes' AND Name LIKE :key
+        ];
+        System.debug(perfumesList);
+        List<Id> ids = new List<Id>();
+        for (Product2 perfume : perfumesList) {
+            ids.add(perfume.Designer__c);
+        }
+        List<Designer__c> designers = [SELECT Id, Name FROM Designer__c WHERE Id IN : ids];
+        Map<Id,String> designersKeys = new Map<Id, String>();
+        for (Designer__c designer : designers){
+            designersKeys.put(designer.Id,designer.Name);
+        }
+
+        List<PerfumeWrapper> out = new List<PerfumeWrapper>();
+        for (Product2 perfume : perfumesList) {
+            PerfumeWrapper wrapper = new PerfumeWrapper();
+            wrapper.Id = perfume.Id;
+            wrapper.name = perfume.Name;
+            wrapper.designerName = designersKeys.get(perfume.Designer__c);
+            wrapper.score = perfume.Score__c;
+            wrapper.topNotes = perfume.Top_Notes__c;
+            wrapper.middleNotes = perfume.Middle_Notes__c;
+            wrapper.baseNotes = perfume.Base_Notes__c;
+            wrapper.gender = perfume.Gender__c;
+            wrapper.mainAccords = perfume.Main_Accords__c;
+            wrapper.photo = perfume.Photo__c;
+            wrapper.price = perfume.minPrice__c;
+            out.add(wrapper);
+        }
+
+        System.debug(out);
+        return out;
+    }
+
     @AuraEnabled
     public static List<PerfumeWrapper> getBestsellers(){
-        List<Product2> perfumesList = new List<Product2>();
-
-        perfumesList = [
+        List<Product2> perfumesList = [
                 SELECT Id, Name,Photo__c,Score__c,Top_Notes__c,Main_accords__c,Middle_Notes__c,Gender__c,Designer__c,Base_Notes__c
                 FROM Product2
                 WHERE Family = 'Perfumes'
@@ -100,12 +139,13 @@ public with sharing class PerfumesController {
             wrapper.mainAccords = perfume.Main_Accords__c;
             wrapper.photo = perfume.Photo__c;
             wrapper.bestsellerName = wrapper.designer +' '+wrapper.name;
+            wrapper.URL = 'https://lasenteur-developer-edition.eu40.force.com/s/perfume-detail?id='+perfume.Id;
             out.add(wrapper);
         }
         return out;
     }
 
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled(cacheable=false)
     public static PerfumeWrapper getDetailPerfume(String id) {
         List<Product2> perfumesList = [
                 SELECT Id, Name,Photo__c,Score__c,Top_Notes__c,Main_accords__c,Middle_Notes__c,Gender__c,Designer__c,Base_Notes__c
@@ -119,7 +159,7 @@ public with sharing class PerfumesController {
         for(Variant__c variant : variants){
             variantsMap.add(variant.Capacity__c+' ml - '+variant.Price__c+' €');
         }
-        System.debug(variantsMap);
+        System.debug(perfume);
 
         PerfumeWrapper wrapper = new PerfumeWrapper();
             wrapper.Id = perfume.Id;
@@ -138,24 +178,21 @@ public with sharing class PerfumesController {
         return wrapper;
     }
     @AuraEnabled
-    public static Boolean addReview(String text,Integer score,Id perfume){
+    public static PerfumeWrapper addReview(String text,Integer score,Id perfume){
         try {
             String userId = System.UserInfo.getUserId();
             User currUser = [SELECT Id, Name FROM User WHERE Id = :userId];
-            System.debug(text);
-            System.debug(score);
-            System.debug(perfume);
-            System.debug(currUser.Name);
+
             insert new Perfume_Review__c(Review__c=text,Score__c=score,Username__c=currUser.Name,Product__c=perfume);
 
             List<Perfume_Review__c> reviews = [Select Score__c FROM Perfume_Review__c WHERE Product__c =: perfume];
             List<Product2> perfumeToUpdate = [SELECT Score__c FROM Product2 WHERE Id =: perfume];
-            Double newScore = (perfumeToUpdate.get(0).Score__c + score)/reviews.size();
-            perfumeToUpdate.get(0).Score__c = newScore;
+
+            perfumeToUpdate.get(0).Score__c = getNewPerfumeScore(perfume)/reviews.size();
             update perfumeToUpdate;
-            return true;
+            return getDetailPerfume(perfume);
         } catch (Exception e) {
-            return false;
+            return null;
         }
     }
 
@@ -164,14 +201,77 @@ public with sharing class PerfumesController {
         return [SELECT Review__c,Score__c,Username__c FROM Perfume_Review__c WHERE Product__c =: id];
     }
     
-    // @AuraEnabled
-    // public static Boolean UserCreatedComment(Id id){
-    //     try {
+    @AuraEnabled
+    public static Boolean userCreatedComment(Id id){
+        String userId = System.UserInfo.getUserId();
+        return [SELECT Id FROM Perfume_Review__c WHERE CreatedById =: userId AND Product__c =: id].size() > 0;
+    }
+    @AuraEnabled
+    public static PerfumeWrapper removeComment(Id perfumeId){
+        try {
+            String userId = System.UserInfo.getUserId();
+
+            delete [SELECT Id FROM Perfume_Review__c WHERE CreatedById =: userId AND Product__c =: perfumeId];
+
+            Product2 perfumeToUpdate = [SELECT Score__c FROM Product2 WHERE Id =: perfumeId].get(0);
+       
+            Integer reviewsSize = [Select Score__c FROM Perfume_Review__c WHERE Product__c =: perfumeId].size();
+            if(reviewsSize == 0){
+                perfumeToUpdate.Score__c = 0;
+            }else{
+                perfumeToUpdate.Score__c = getNewPerfumeScore(perfumeId)/reviewsSize;
+            }
+            update perfumeToUpdate;
+            System.debug(perfumeToUpdate);
+
+            return getDetailPerfume(perfumeId);
+        
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @AuraEnabled
+    public static Perfume_Review__c getReviewToEdit(Id perfumeId){
+        String userId = System.UserInfo.getUserId();
+        return [SELECT Id,Review__c,Score__c  FROM Perfume_Review__c WHERE CreatedById =: userId AND Product__c =: perfumeId].get(0);
+    }
+
+    @AuraEnabled
+    public static PerfumeWrapper updateReview(String text,Integer score,Id perfumeId){
+        try {
+            String userId = System.UserInfo.getUserId();
+
+            Perfume_Review__c review = [SELECT Id,Review__c,Score__c  FROM Perfume_Review__c WHERE CreatedById =: userId AND Product__c =: perfumeId].get(0);
+            review.Review__c = text;
+            review.Score__c = score;
+            update review;
+
+            Product2 perfumeToUpdate = [SELECT Score__c FROM Product2 WHERE Id =: perfumeId].get(0);
+       
+           perfumeToUpdate.Score__c = getNewPerfumeScore(perfumeId)/[Select Score__c FROM Perfume_Review__c WHERE Product__c =: perfumeId].size();
+           update perfumeToUpdate;
+
+            return getDetailPerfume(perfumeId);
             
-    //     } catch (Exception e) {
-    //         throw new AuraHandledException(e.getMessage());
-    //     }
-    // }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    public static Decimal getNewPerfumeScore(Id perfumeId){
+        List<Perfume_Review__c> reviews = [Select Score__c FROM Perfume_Review__c WHERE Product__c =: perfumeId];
+
+        Double newScore;
+        if(reviews.size() == 0){
+             return 0;
+        }else{
+        Double scoreSum = 0;
+        for(Perfume_Review__c review : reviews){
+            scoreSum += review.Score__c;
+        }
+        return scoreSum;
+        }
+    }
 
     class PerfumeWrapper{
         @AuraEnabled
@@ -202,6 +302,8 @@ public with sharing class PerfumesController {
         public List<String> variants{get;set;}
         @AuraEnabled
         public Decimal price {get;set;}
+        @AuraEnabled
+        public String URL {get;set;}
 
         PerfumeWrapper(){}
 

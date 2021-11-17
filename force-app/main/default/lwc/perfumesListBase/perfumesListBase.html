@@ -1,12 +1,13 @@
 <template>
     <div class="slds-size_1-of-6 slds-align_absolute-center" style="height: 520px;width:300px">
         <lightning-carousel class="carusel">
-            <template for:each={bestsellers} for:item="perfume">
+            <template for:each={bestsellers} for:item="perfume" for:index="index">
                 <lightning-carousel-image 
                 key={perfume.Id}
                 class="carousel-image"
                 src={perfume.photo}
-                header={perfume.bestsellerName} href="javascript:void(0);">
+                header={perfume.bestsellerName} 
+                href={perfume.URL}>
             </lightning-carousel-image>           
         </template>
         </lightning-carousel>

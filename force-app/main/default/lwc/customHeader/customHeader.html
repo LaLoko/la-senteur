@@ -1,0 +1,37 @@
+<template>
+    <div class="slds-grid_align-spread slds-wrap base">
+        <div class="slds-col slds-size_2-of-12 slds-float_left iamge">
+            <img style="margin-top: -20px;" onclick={home}
+                src="https://britenet-bb-dev-ed--c.documentforce.com/servlet/servlet.ImageServer?id=01509000001RVyx&oid=00D09000007z4Sw&lastMod=1636989683000">
+        </div>
+        <div class="slds-col slds-size_5-of-12 slds-float_left">
+            <div class="slds-grid_align-spread pages">
+                <div class="slds-col slds-size_1-of-4 slds-float_left page">
+                    <span onclick={home}>Home</span>
+                </div>
+                <div class="slds-col slds-size_1-of-4 slds-float_left page">
+                    <span onclick={male}>Male Perfumes</span>
+                </div>
+                <div class="slds-col slds-size_1-of-4 slds-float_left page">
+                    <span onclick={female}>Female Perfumes</span>
+                </div>
+                <div class="slds-col slds-size_1-of-4 slds-float_left page">
+                    <span onclick={unisex}>Unisex Perfumes</span>
+                </div>
+            </div>
+        </div>
+        <div class="slds-col slds-size_3-of-12 slds-align_absolute-center search">
+            <div class="slds-float_left">
+                <lightning-input type="search" onchange={keyChanged} class="slds-m-bottom_small" style="width: 22rem;"
+                value={searchKey}></lightning-input>
+            </div>
+            <div class="slds-float_left" style="margin-top: 7px;">
+                <lightning-button variant="brand-outline" label="Search" onclick={search} class="slds-m-left_x-small"></lightning-button>
+            </div>
+        </div>
+        <div class="slds-col slds-size_2-of-12 slds-float_right" style="margin-right: -12rem;margin-top: -40px;">
+            <lightning-icon icon-name="utility:cart" class="slds-m-left_xx-small" title="Cart"></lightning-icon>
+        </div>
+    </div>
+    <div class="bottom"></div>
+</template>
