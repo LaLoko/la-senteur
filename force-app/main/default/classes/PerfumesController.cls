@@ -51,7 +51,7 @@ public with sharing class PerfumesController {
 
         if(sortType != null && sortType.contains('Name ASC')){
             query += ' ORDER BY Name ASC';
-        }else if(sortType != null && sortType.contains('Name ASC')){
+        }else if(sortType != null && sortType.contains('Name DESC')){
             query += ' ORDER BY Name DESC';
         }else if(sortType!= null && sortType.contains('Price ASC')){
             query += ' ORDER BY minPrice__c ASC';
@@ -381,7 +381,7 @@ public with sharing class PerfumesController {
     public static List<CartItem> getCart(){
         Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
         List<CartItem> cart = (List<CartItem>)sessionPart.get('cart');
-
+        System.debug(cart);
         return cart;
     }
 
@@ -402,6 +402,12 @@ public with sharing class PerfumesController {
         Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
 
         return (ShippmentInfo)sessionPart.get('shippmentInfo');
+    }
+    @AuraEnabled
+    public static string getCartItemId(Integer index){
+        Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
+        List<CartItem> cart = (List<CartItem>)sessionPart.get('cart');
+        return cart.get(index).id;
     }
 
     @AuraEnabled
@@ -439,6 +445,47 @@ public with sharing class PerfumesController {
 		}     
 		return pickListValuesList;
     }
+
+    // @AuraEnabled
+    // public static Boolean createOrder(){
+    //     Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
+    //     List<CartItem> cart = (List<CartItem>)sessionPart.get('cart');
+    //     ShippmentInfo shippmentInfo = (ShippmentInfo)sessionPart.get('shippmentInfo');
+
+
+    //     Order order = new Order(
+	//       AccountId = acc.Id,
+	//       EffectiveDate = System.today(),
+	//       Status = 'Draft',
+	//       PriceBook2Id = Test.getStandardPricebookId()
+    //   );
+    //   insert order;
+
+
+    //   For(CartItem item : cart){
+    //       Decimal price = getPriceFromVariant(item.variant);
+    //     PricebookEntry standardPrice = new PricebookEntry();
+    //     standardPrice.Pricebook2Id = Test.getStandardPricebookId();
+    //     standardPrice.Product2Id = item.id;
+    //     standardPrice.UnitPrice = price;
+    //     standardPrice.IsActive = true;
+    //     standardPrice.UseStandardPrice = false;
+    //     insert standardPrice ;
+
+    //     OrderItem lineItem = new OrderItem();
+    //     lineItem.OrderId = order.id;
+    //     lineItem.Quantity = 1;
+    //     lineItem.UnitPrice = price;
+    //     lineItem.Product2id = item.id;
+    //     lineItem.PricebookEntryId=standardPrice.id;
+    //     insert lineItem;
+    //   }
+
+    //   order.Status = 'Activated';
+    //   update order;
+    // }
+
+
     class CartItem{
         @AuraEnabled
         public Id id {get;set;}

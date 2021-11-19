@@ -117,6 +117,10 @@ export default class PerfumePage extends LightningElement {
     get reviewsExist(){
         return this.reviesExists;
     }
+    // get notFirstReview(event){
+    //     return event.target.dataset.index != 1;
+    // }
+
     optionChange(event){
         this.option= event.target.value;
     }

@@ -1,9 +1,13 @@
 import { LightningElement,track } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
+
 import getCart from '@salesforce/apex/PerfumesController.getCart';
 import getCartTotalPrice from '@salesforce/apex/PerfumesController.getCartTotalPrice';
 import getShippingInfo from '@salesforce/apex/PerfumesController.getShippingInfo';
-
-export default class OrderSummary extends LightningElement {
+import getCartItemId from '@salesforce/apex/PerfumesController.getCartItemId';
+export default class OrderSummary extends NavigationMixin(
+    LightningElement
+) {
     @track cart;
     @track total;
     @track shippingInfo;
@@ -45,6 +49,25 @@ export default class OrderSummary extends LightningElement {
         .catch(error => {
             this.error = error;
         }); 
+    }
+    goToPerfume(event){
+        let index = event.target.dataset.index;
+        console.log(index);
+            getCartItemId({index:index})
+            .then(result => {
+                this[NavigationMixin.Navigate]({
+                    type: 'comm__namedPage',
+                    attributes: {
+                        pageName: 'perfume-detail'
+                    },
+                    state: {
+                        'id': result
+                    }
+                });
+            })
+            .catch(error => {
+                this.error = error;
+            });
     }
 
     order(){
