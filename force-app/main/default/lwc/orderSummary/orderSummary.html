@@ -1,0 +1,50 @@
+<template>
+    <div class="slds-grid slds-gutters">
+        <div class="slds-col slds-size_3-of-4" style="margin-left: 15rem;">
+            <div class="slds-col slds-size_2-of-4" style="float: left;margin-top: 3rem;">
+                <h1 style="font-size: x-large;margin-bottom:1rem;">Items :</h1>
+                <div class="slds-scrollable_y" style="height: 26rem;margin:1rem">
+                    <template for:each={cart} for:item="cartItem" for:index="index">
+                        <div key={cartItem.Id} style="height: 2rem;">
+                            <div class="slds-grid slds-gutters slds-align_absolute-center" style="height: 100%;">
+                                <div class="slds-col slds-size_1-of-3">
+                                    <h3>{cartItem.designer} </h3>
+                                </div>
+                                <div class="slds-col slds-size_1-of-3">
+                                    <h3>{cartItem.perfumeName} </h3>
+                                </div>
+                                <div class="slds-col slds-size_1-of-3">
+                                    <h3>{cartItem.variant} </h3>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <h2 style="margin-left: 20rem;font-size: x-large;">Total : {total}</h2>
+            </div>
+            <div class="slds-col slds-size_2-of-4" style="float: left;margin-top: 3rem;">
+                <h1 style="font-size: x-large;margin-bottom:1rem;">Shipping Info :</h1>
+                <template if:true={shippingInfo}>
+                    <p style="font-weight: bold;">Shipping Street</p>
+                    <h1>{shippingInfo.street}</h1>
+                    <br />
+                    <p style="font-weight: bold;">Shipping City</p>
+                    <h1>{shippingInfo.city}</h1>
+                    <br />
+                    <p style="font-weight: bold;">Shipping State/Province</p>
+                    <h1>{shippingInfo.state}</h1>
+                    <br />
+                    <p style="font-weight: bold;">Shipping Zip/Postal Code</p>
+                    <h1>{shippingInfo.zip}</h1>
+                    <br />
+                    <p style="font-weight: bold;">Shipping Country</p>
+                    <h1>{shippingInfo.country}</h1>
+                </template>
+                <div style="margin-top: 166px;">
+                <lightning-button label="Order" onclick={order} style="width: 10rem;font-size: 1rem;"></lightning-button>
+            </div>
+
+            </div>
+        </div>
+    </div>
+</template>

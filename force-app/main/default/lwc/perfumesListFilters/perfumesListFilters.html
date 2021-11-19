@@ -1,17 +1,34 @@
 <template>
     <div style="padding: 1rem;">
+      <h1 style="padding-bottom: 3rem;font-size:25px">Filters</h1>
 
-    <lightning-combobox
-    value={productType}
-    placeholder="Order by"
-    options={productTypes}
-    onchange={handleChange} ></lightning-combobox>
-    
+      <div style="margin-bottom: 2rem;">
+        <c-multi-pick-list label="Designer" options={allDesigners}  showclearbutton='true' showfilterinput='true' showrefreshbutton='true' onitemselected={handleDesignerSelect}></c-multi-pick-list>
+      </div>
+      <div style="margin-bottom: 2rem;">
+        <c-multi-pick-list label="Main accords" options={msOptions}  showclearbutton='true' showfilterinput='true' showrefreshbutton='true' onitemselected={handleAccordSelect}></c-multi-pick-list>
+      </div>
+      <div style="margin-bottom: 2rem;">
+        <c-multi-pick-list label="Top notes" options={msOptions}  showclearbutton='true' showfilterinput='true' showrefreshbutton='true' onitemselected={handleTopNoteSelect}></c-multi-pick-list>
+      </div>
+      <div style="margin-bottom: 2rem;">
+        <c-multi-pick-list label="Middle notes" options={msOptions}  showclearbutton='true' showfilterinput='true' showrefreshbutton='true' onitemselected={handleMiddleNoteSelect}></c-multi-pick-list>
+      </div>
+      <div style="margin-bottom: 2rem;">
+      <c-multi-pick-list label="Base Notes" options={msOptions}  showclearbutton='true' showfilterinput='true' showrefreshbutton='true' onitemselected={handleBaseNoteSelect}></c-multi-pick-list>
+      </div>
+      
+      <div>
+        <lightning-button variant="brand-outline" label="Clear" onclick={clear} class="slds-m-left_x-small"></lightning-button>
+        <lightning-button style="margin-left: 3rem;" variant="brand-outline" label="Filter" onclick={filter} class="slds-m-left_x-small"></lightning-button>
+      </div>
+      {designers}
+      {accords}
+      {selectedDesigner}
+      {selectedAccords}
+      {selectedTopNotes}
+      {selectedMiddleNotes}
+      {selectedBaseNotes}
 
-      <select class="slds-select" name = "optionSelect" onchange={changeHandler} >
-        <lightning-input-field title="option"></lightning-input-field>
-          <option value="OPTION A">OPTION A</option>
-          <option value="OPTION B">OPTION B</option>
-      </select> 
    </div>
 </template>

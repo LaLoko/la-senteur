@@ -4,6 +4,7 @@ export default class PerfumeListPagination extends LightningElement {
     page = 1; 
     allPerfumes; 
     toShow = [];
+    @api searchsucces;
 
     @api
     set records(data){
@@ -77,8 +78,6 @@ export default class PerfumeListPagination extends LightningElement {
     updateRecords(){
         const start = (this.page-1)*this.pageSize;
         const end = this.pageSize*this.page;
-        console.log(start)
-        console.log(end)
         this.toShow = this.allPerfumes.slice(start,end);
 
         this.dispatchEvent(new CustomEvent('update',{

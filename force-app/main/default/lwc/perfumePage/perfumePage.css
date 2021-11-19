@@ -32,3 +32,12 @@ h3{
     z-index: 3;
     background-color: rgba(0, 0, 0, 0.5);
 }
+.comentDivider{
+    width: 60%;
+    height: 1px;
+    position: inherit;
+    top: 100%;
+    z-index: 3;
+    background-color: rgb(0 0 0 / 23%);
+    margin-left: 19rem;
+}

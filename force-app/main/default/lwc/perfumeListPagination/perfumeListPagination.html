@@ -1,22 +1,22 @@
 <template>
-    <div class="slds-float_left sort">
-        <lightning-combobox
-            value={value}
-            placeholder="Order by"
-            options={options}
-            onchange={handleChange} ></lightning-combobox>
-    </div>
+    <template if:false={searchsucces}>
+        <div class="slds-float_left sort">
+            <lightning-combobox value={value} placeholder="Order by" options={options} onchange={handleChange}>
+            </lightning-combobox>
+        </div>
+    </template>
     <div class="slds-float_right pagination" style="margin-top: 20px; margin-right:20px">
         <lightning-button variant="brand-outline" label="First" onclick={toFirst} icon-name="utility:jump_to_left"
-        class="slds-m-left_x-small" style="margin-right: 5px;" disabled={disablePrev}></lightning-button>
-        <lightning-button variant="brand-outline" label="Prev" onclick={toPrev} 
-        class="slds-m-left_x-small" style="margin-right: 5px;" icon-name="utility:chevronleft" disabled={disablePrev}></lightning-button>
+            class="slds-m-left_x-small" style="margin-right: 5px;" disabled={disablePrev}></lightning-button>
+        <lightning-button variant="brand-outline" label="Prev" onclick={toPrev} class="slds-m-left_x-small"
+            style="margin-right: 5px;" icon-name="utility:chevronleft" disabled={disablePrev}></lightning-button>
         <lightning-layout-item flexibility="auto">
             Page {page} of {totalPage}
         </lightning-layout-item>
-        <lightning-button variant="brand-outline" label="Next" onclick={toNext} 
-        class="slds-m-left_x-small" style="margin-right: 5px;" icon-name="utility:chevronright" icon-position="right" disabled={disableNext}></lightning-button>
-        <lightning-button variant="brand-outline" label="Last" onclick={toLast} icon-name="utility:jump_to_right" icon-position="right"
-        class="slds-m-left_x-small" disabled={disableNext}></lightning-button>
+        <lightning-button variant="brand-outline" label="Next" onclick={toNext} class="slds-m-left_x-small"
+            style="margin-right: 5px;" icon-name="utility:chevronright" icon-position="right" disabled={disableNext}>
+        </lightning-button>
+        <lightning-button variant="brand-outline" label="Last" onclick={toLast} icon-name="utility:jump_to_right"
+            icon-position="right" class="slds-m-left_x-small" disabled={disableNext}></lightning-button>
     </div>
 </template>

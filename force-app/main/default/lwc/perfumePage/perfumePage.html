@@ -7,13 +7,18 @@
                     <div class="slds-grid slds-gutters">
                         <div class="slds-col slds-size_1-of-3">
                             <img class="product-img" src={currPhoto}></img>
-                            <div style="margin-left: 12rem;margin-bottom:1rem">
-                                <template if:false={disablePrevPhoto}>
+                            <div style="margin-left: 8rem;margin-bottom:1rem">
+                                <lightning-button variant="brand-outline" label="Prev" onclick={prevPhoto} class="slds-m-left_x-small"
+                                style="margin-right: 84px;" icon-name="utility:chevronleft" disabled={disablePrevPhoto}></lightning-button>
+                            <lightning-button variant="brand-outline" label="Next" onclick={nextPhoto} class="slds-m-left_x-small"
+                                style="margin-right: 5px;" icon-name="utility:chevronright" icon-position="right" disabled={disableNextPhoto}>
+                            </lightning-button>
+                                <!-- <template if:false={disablePrevPhoto}>
                                     <lightning-icon icon-name="utility:back" onclick={prevPhoto}></lightning-icon>
                                 </template>
                                 <template if:false={disableNextPhoto}>
                                     <lightning-icon style="margin-left: 5rem;" icon-name="utility:forward" onclick={nextPhoto}></lightning-icon>
-                                </template>
+                                </template> -->
                             </div>
                         </div>
                         <div class="slds-col slds-size_1-of-3">
@@ -28,9 +33,9 @@
                                 <br /><br />
                                 <div>
                                     <lightning-combobox title="Capacity" value={option} options={options} onchange={optionChange}
-                                        style="float: left;"></lightning-combobox>
+                                        style="float: left;margin-right:1rem"></lightning-combobox>
                                     <lightning-button variant="brand" label="Add to Cart" icon-name="utility:cart" onclick={addToCart}
-                                        style="float: left;margin-top: 18px;"></lightning-button>
+                                        style="float: left;margin-top: 18px;" disabled={optionSelected}></lightning-button>
                                 </div>
                             </div>
                         </div>
@@ -64,17 +69,16 @@
                                 </div>
                                 <div style="width: 100%;max-height: 200px" class="slds-scrollable--y">
                                     <template for:each={reviews} for:item="review" for:index="index">
-                                        <div style="margin-top: 10px; margin-bottom:10px" key={review.Username__c}>
+                                        
+                                        <div style="margin-top: 10px; margin-bottom:10px" key={review.username}>
+                                            <div class="comentDivider"></div>
+
                                             <div style="height: 40px;">
                                                 <div style="margin-left:30px">
-                                                    <h3>{review.Username__c}</h3>
-                                                    <h3 style="margin-left: 12rem;margin-top: -35px;">{review.Score__c}&nbsp;&nbsp;
-                                                        <lightning-icon class="gold-background"
-                                                            icon-name="utility:favorite" icon-color="gold">
-                                                        </lightning-icon>
-                                                    </h3>
-                                                    <p><lightning-formatted-date-time value={review.Created_date__c} year="numeric" month="numeric" day="numeric" hour="numeric"
+                                                    <h3 style="font-weight: bold;">{review.username}</h3>
+                                                    <p><lightning-formatted-date-time value={review.createdTime} year="numeric" month="numeric" day="numeric" hour="numeric"
                                                         minute="2-digit" hour12="false"></lightning-formatted-date-time></p>
+                                                        <h3 style="font-size: 14px;"><b>Score :</b>{review.scoreName}</h3>
                                                 </div>
                                                 <div style="float: right; margin-right: 41px; margin-top: -28px;">
                                                     <lightning-button-icon data-id={review.Id} icon-name="utility:edit" title="edit" onclick={editComment}>
@@ -84,8 +88,8 @@
                                                         onclick={openDialog}></lightning-button-icon>
                                                 </div>
                                             </div>
-                                            <div style="margin-top: 10px;margin-left:30px;margin-right:20px">
-                                                <lightning-formatted-rich-text value={review.Review__c}>
+                                            <div style="margin-top: 30px;margin-left:30px;margin-right:20px">
+                                                <lightning-formatted-rich-text value={review.text}>
                                                 </lightning-formatted-rich-text>
                                             </div>
                                         </div>
@@ -98,12 +102,9 @@
                             <div style="height: 40px; margin-bottom:24px">
                                 <h2 style="margin-left: 40px;float:left;margin-top: 20px;">Share your opinion</h2>
                                 <div style="margin-left: 90rem;">
-                                    <lightning-combobox style="float: left;width:60px" options={scoreOptions}
+                                    <lightning-combobox style="float: left;width:155px;margin-left:-3rem" options={scoreOptions} label="Score"
                                         value={score} onchange={scoreChange}>
                                     </lightning-combobox>
-                                    <lightning-icon style="float: left;margin-top: 16px;margin-left: 5px;"
-                                        class="gold-background" icon-name="utility:favorite" icon-color="gold">
-                                    </lightning-icon>
                                 </div>
                             </div>
                             <div style="margin-top: 10px;">
@@ -113,7 +114,7 @@
                             </div>
                             <div style="height: 30px;">
                                 <lightning-button variant="brand" label="Share" icon-name="utility:send"
-                                    icon-position="right" style="float: right;margin-right:40px;width:130px"
+                                    icon-position="right" style="float: right;margin-right:-25px;width:130px"
                                     onclick={addReview}></lightning-button>
                             </div>
                         </template>
@@ -122,14 +123,13 @@
                     <template if:true={editingComment}>
                         <div style="height: 40px; margin-bottom:24px">
                             <div style="margin-left: 90rem;">
-                                <lightning-combobox style="float: left;width:60px" options={scoreOptions} value={editScore} onchange={editScoreChange}>
+                                <lightning-combobox style="float: left;width:155px;margin-left:-3rem" options={scoreOptions} label="Score"
+                                    value={editScore} onchange={scoreChange}>
                                 </lightning-combobox>
-                                <lightning-icon style="float: left;margin-top: 16px;margin-left: 5px;" class="gold-background"
-                                    icon-name="utility:favorite" icon-color="gold"></lightning-icon>
                             </div>
                         </div>
                         <div style="margin-top: 10px;">
-                            <lightning-input-rich-text style="margin: 10px;" value={commentToEdit.Review__c} onchange={editReviewChange}>
+                            <lightning-input-rich-text style="margin: 10px;" value={commentToEdit.text} onchange={editReviewChange}>
                             </lightning-input-rich-text>
                         </div>
                         <div style="height: 30px;">

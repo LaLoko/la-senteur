@@ -1,16 +1,25 @@
 <template>
     <div class="slds-grid slds-wrap">
-        <div class="slds-col slds-size_2-of-12" style="height:100%;background-color: chartreuse;">
-            <c-perfumes-list-filters></c-perfumes-list-filters>
-        </div>
+        <template if:false={searchSucces}>
+            <div class="slds-col slds-size_2-of-12" style="height:100%;">
+                <c-perfumes-list-filters designers={allDesigners} accords='kupa' notes={allNotes}></c-perfumes-list-filters>
+            </div>
+        </template>
+        <template if:false={searchSucces}>
         <div class="slds-col slds-size_10-of-12">
             <div>
                 <c-perfume-list-pagination onsort={handleSortSelected} records={perfumesList}
-                    onupdate={paginationHandler}></c-perfume-list-pagination>
+                    searchsucces={searchSucces} onupdate={paginationHandler}></c-perfume-list-pagination>
             </div>
 
             <div style="margin-top:4rem;">
                 <template if:true={recordsFound}>
+                    <template if:true={searchSucces}>
+                        <div style="margin-bottom: 2rem;">
+                            <h1 style="font-size: 32px;">Search result :</h1>
+                        </div>
+                    </template>
+
                     <c-perfumes-to-show perfumes-list={perfumesToShow}></c-perfumes-to-show>
                 </template>
                 <template if:false={recordsFound}>
@@ -18,5 +27,31 @@
                 </template>
             </div>
         </div>
+        </template>
+
+
+        <template if:true={searchSucces}>
+       <div class="slds-col slds-size_10-of-12" style="margin-left: 16rem;">
+            <div>
+                <c-perfume-list-pagination onsort={handleSortSelected} records={perfumesList}
+                    searchsucces={searchSucces} onupdate={paginationHandler}></c-perfume-list-pagination>
+            </div>
+
+            <div style="margin-top:4rem;">
+                <template if:true={recordsFound}>
+                    <template if:true={searchSucces}>
+                        <div style="margin-bottom: 2rem;">
+                            <h1 style="font-size: 32px;">Search result :</h1>
+                        </div>
+                    </template>
+
+                    <c-perfumes-to-show perfumes-list={perfumesToShow}></c-perfumes-to-show>
+                </template>
+                <template if:false={recordsFound}>
+                    <h1 class="perfumesNotFound">Cannot found any perfumes</h1>
+                </template>
+            </div>
+        </div>
+        </template>
     </div>
 </template>

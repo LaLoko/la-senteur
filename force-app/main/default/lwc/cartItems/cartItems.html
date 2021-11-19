@@ -1,0 +1,41 @@
+<template>
+    <template if:false={cartExist}>
+        <h1 class="slds-align_absolute-center" style="font-size: xx-large;margin-top: 18rem;">There is no
+            item in cart</h1>
+    </template>
+
+    <template if:true={cartExist}>
+        <div class="slds-grid slds-gutters">
+            <div class="slds-col slds-size_2-of-4" style="margin-left: 24rem;">
+                <div class="slds-scrollable_y" style="height: 500px;margin:1rem">
+                    <template for:each={cart} for:item="cartItem" for:index="index">
+                        <div key={cartItem.Id} style="height: 8rem;">
+                            <div class="slds-grid slds-gutters slds-align_absolute-center" style="height: 100%;">
+                                <div class="slds-col slds-size_1-of-6" style="height: 100%;">
+                                    <img src={cartItem.perfumePhoto} style="height: 6rem;" />
+                                </div>
+                                <div class="slds-col slds-size_1-of-6">
+                                    <h3>{cartItem.designer} </h3>
+                                </div>
+                                <div class="slds-col slds-size_1-of-6">
+                                    <h3>{cartItem.perfumeName} </h3>
+                                </div>
+                                <div class="slds-col slds-size_1-of-5">
+                                    <h3>{cartItem.variant} </h3>
+                                </div>
+                                <div class="slds-col slds-size_1-of-6">
+                                    <lightning-icon style="float: right;" data-index={index} icon-name="utility:close"
+                                        title="Delete item form cart" onclick={deleteItemFormCart}></lightning-icon>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                <h2 class="total">Total : {total}</h2>
+                <lightning-button variant="brand-outline" style="float: right; margin-top: 4rem;"
+                    label="Shipping Details" onclick={goToShippment}>
+                </lightning-button>
+            </div>
+        </div>
+    </template>
+</template>

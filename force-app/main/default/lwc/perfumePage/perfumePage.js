@@ -6,6 +6,7 @@ import userCreatedComment from '@salesforce/apex/PerfumesController.userCreatedC
 import removeComment from '@salesforce/apex/PerfumesController.removeComment';
 import getReviewToEdit from '@salesforce/apex/PerfumesController.getReviewToEdit';
 import updateReview from '@salesforce/apex/PerfumesController.updateReview';
+import addItemToCart from '@salesforce/apex/PerfumesController.addItemToCart';
 
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
@@ -20,7 +21,7 @@ export default class PerfumePage extends LightningElement {
     baseNotes = []
     mainAccords;
     option = "";
-    @track score = '1';
+    @track score = '3';
     @track reviewText = "";
     @track comentCreated = false;
     editingComment = false;
@@ -47,7 +48,6 @@ export default class PerfumePage extends LightningElement {
         getDetailPerfume({id:this.id})
             .then(result => {
                 this.perfume = result;
-                console.log(JSON.stringify(result))
                 this.setNotes(this.perfume);
                 this.getAllReviews();
                 if(this.currPhoto === undefined){
@@ -64,6 +64,7 @@ export default class PerfumePage extends LightningElement {
         this.baseNotes = perfume.baseNotes.split(';')
         this.mainAccords = perfume.mainAccords.split(';')
     }
+
     getAllReviews(){
         getReviews({id:this.id})
             .then(result => {
@@ -77,6 +78,7 @@ export default class PerfumePage extends LightningElement {
                 this.error = error;
             });   
     }
+
     isCommentCreated(){
         userCreatedComment({id:this.id})
             .then(result => {
@@ -95,14 +97,17 @@ export default class PerfumePage extends LightningElement {
         
         return returnOptions;
     }
+    get optionSelected(){
+        return this.option == "";
+    }
 
     get scoreOptions() {
         return [
-            { label: '1', value: '1' },
-            { label: '2', value: '2' },
-            { label: '3', value: '3' },
-            { label: '4', value: '4' },
-            { label: '5', value: '5' },
+            { label: 'Terrible', value: '1' },
+            { label: 'Bad', value: '2' },
+            { label: 'OK', value: '3' },
+            { label: 'Nice one', value: '4' },
+            { label: 'Gorgeous', value: '5' },
         ];
     }
 
@@ -138,8 +143,6 @@ export default class PerfumePage extends LightningElement {
                     this.dispatchEvent(evt);
                     this.getDetails();
                     this.getAllReviews();
-                    console.log(JSON.stringify(this.perfume))
-
                 }else{
                     const evt = new ShowToastEvent({
                         title: 'Error',
@@ -190,7 +193,8 @@ export default class PerfumePage extends LightningElement {
             console.log(JSON.stringify(result))
             this.commentToEdit = result;
             this.editingComment = true;
-            this.editScore = result.Score__c.toString();
+            this.editScore = result.score.toString();
+            
         })
         .catch(error => {
             this.error = error;
@@ -202,7 +206,6 @@ export default class PerfumePage extends LightningElement {
     }
     
     editReview(event){
-        console.log(this.commentToEdit.Review__c)
         updateReview({text:this.commentToEdit.Review__c,score:this.editScore,perfumeId:this.id})
         .then(result => {
             this.getAllReviews();
@@ -257,13 +260,31 @@ export default class PerfumePage extends LightningElement {
 
     addToCart(){
         let message = this.perfume.designerName +' ' + this.perfume.name + ' ' + this.option + ' added to cart';
-        const evt = new ShowToastEvent({
-            title: 'Product added to cart',
-            message: message,
-            variant: 'info',
-            mode: 'dismissable'
-        });
-        this.dispatchEvent(evt);
-    }
 
+        addItemToCart({perfumeId:this.id,variant:this.option,designer:this.perfume.designerName,perfumeName:this.perfume.name,perfumePhoto:this.perfume.photo})
+        .then(result => {
+            if(result){
+                const evt = new ShowToastEvent({
+                    title: 'Product added to cart',
+                    message: message,
+                    variant: 'info',
+                    mode: 'dismissable'
+                });
+                this.dispatchEvent(evt);
+            }else{
+                const evt = new ShowToastEvent({
+                    title: 'Error',
+                    message: 'Cannot add product to cart',
+                    variant: 'error',
+                    mode: 'dismissable'
+                });
+                this.dispatchEvent(evt);
+            }
+        })
+        .catch(error => {
+            this.error = error;
+        }); 
+
+ 
+    }
 }

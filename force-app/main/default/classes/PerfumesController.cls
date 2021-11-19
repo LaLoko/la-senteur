@@ -193,8 +193,21 @@ public with sharing class PerfumesController {
     }
 
     @AuraEnabled
-    public static List<Perfume_Review__c> getReviews(Id id){
-        return [SELECT Review__c,Score__c,Username__c,Created_date__c FROM Perfume_Review__c WHERE Product__c =: id];
+    public static List<ReviewWrapper> getReviews(Id id){
+        List<Perfume_Review__c> reviews = [SELECT Review__c,Score__c,Username__c,Created_date__c FROM Perfume_Review__c WHERE Product__c =: id];
+        List<ReviewWrapper> out = new List<ReviewWrapper>();
+
+        for(Perfume_Review__c review : reviews){
+            ReviewWrapper wrapper = new ReviewWrapper();
+            wrapper.Id = review.Id;
+            wrapper.score = review.Score__c;
+            wrapper.scoreName = wrapper.scoreNames.get(review.Score__c);
+            wrapper.text = review.Review__c;
+            wrapper.username = review.Username__c;
+            wrapper.createdTime = review.Created_date__c;
+            out.add(wrapper);
+        }
+        return out;
     }
     
     @AuraEnabled
@@ -228,9 +241,18 @@ public with sharing class PerfumesController {
     }
 
     @AuraEnabled
-    public static Perfume_Review__c getReviewToEdit(Id perfumeId){
+    public static ReviewWrapper getReviewToEdit(Id perfumeId){
         String userId = System.UserInfo.getUserId();
-        return [SELECT Id,Review__c,Score__c  FROM Perfume_Review__c WHERE CreatedById =: userId AND Product__c =: perfumeId].get(0);
+        Perfume_Review__c review = [SELECT Id,Review__c,Score__c  FROM Perfume_Review__c WHERE CreatedById =: userId AND Product__c =: perfumeId].get(0);
+        List<ReviewWrapper> out = new List<ReviewWrapper>();
+
+            ReviewWrapper wrapper = new ReviewWrapper();
+            wrapper.Id = review.Id;
+            wrapper.score = review.Score__c;
+            wrapper.scoreName = wrapper.scoreNames.get(review.Score__c);
+            wrapper.text = review.Review__c;
+        
+        return wrapper;
     }
 
     @AuraEnabled
@@ -255,6 +277,7 @@ public with sharing class PerfumesController {
             return null;
         }
     }
+
     public static Decimal getNewPerfumeScore(Id perfumeId){
         List<Perfume_Review__c> reviews = [Select Score__c FROM Perfume_Review__c WHERE Product__c =: perfumeId];
 
@@ -267,6 +290,156 @@ public with sharing class PerfumesController {
             scoreSum += review.Score__c;
         }
         return scoreSum;
+        }
+    }
+
+    @AuraEnabled
+    public static Boolean addItemToCart(Id perfumeId,String variant,String designer,String perfumeName,String perfumePhoto){
+        Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
+        try{
+        if (!sessionPart.contains('cart')) {
+            List<CartItem> cart = new List<CartItem>();
+            cart.add(new CartItem(perfumeId,variant,designer,perfumeName,perfumePhoto));
+            sessionPart.put('cart', cart);
+            Decimal currPrice = getPriceFromVariant(variant);
+            System.debug(currPrice);
+            sessionPart.put('total', currPrice);
+        }else{
+            List<CartItem> cart = (List<CartItem>)sessionPart.get('cart');
+            cart.add(new CartItem(perfumeId,variant,designer,perfumeName,perfumePhoto));
+            sessionPart.put('cart', cart);
+            Decimal currPrice = getPriceFromVariant(variant) + (Decimal)sessionPart.get('total');
+            sessionPart.put('total', currPrice);
+            System.debug(currPrice);
+        }
+        return true;
+    }catch(Exception e){
+        return false;
+    }
+    }
+
+    @AuraEnabled
+    public static void deleteFromCart(Integer id){
+        Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
+
+        List<CartItem> currCart = (List<CartItem>)sessionPart.get('cart');
+        System.debug(id);
+
+        Decimal total = (Decimal)sessionPart.get('total') - getPriceFromVariant(currCart.get(id).variant);
+        currCart.remove(id);
+
+        sessionPart.put('cart', currCart);
+        sessionPart.put('total',total);
+    }
+
+    @AuraEnabled
+    public static Decimal getCartTotalPrice(){
+        Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
+        return (Decimal)sessionPart.get('total');
+    }
+    
+    @AuraEnabled
+    public static List<CartItem> getCart(){
+        Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
+        List<CartItem> cart = (List<CartItem>)sessionPart.get('cart');
+
+        return cart;
+    }
+
+    public static Decimal getPriceFromVariant(String variant){
+        String str1 = variant.split('-')[1];
+        String str2 = str1.substring(1,str1.length()-1);
+        return decimal.valueOf(str2.deleteWhitespace());
+    }
+    @AuraEnabled
+    public static void addShippmentInfo(String state,String city,String country, String zip, String street){
+        Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
+
+        ShippmentInfo info = new ShippmentInfo(state,city,country,zip,street);
+        sessionPart.put('shippmentInfo',info);
+    }
+    @AuraEnabled
+    public static ShippmentInfo getShippingInfo(){
+        Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
+
+        return (ShippmentInfo)sessionPart.get('shippmentInfo');
+    }
+
+    @AuraEnabled
+    public static List<String> getAllDesigners(){
+        List<Designer__c> designers = [Select Name FROM Designer__c];
+        
+        List<String> out = new List<String>();
+        
+        for(Designer__c designer : designers){
+            out.add(designer.Name);
+        }
+
+		return out;
+    }
+
+    @AuraEnabled
+    public static List<String> getAllAccords(){
+        Schema.DescribeFieldResult fieldResult = Product2.Main_accords__c.getDescribe();
+
+		return getPicklistValues(fieldResult);
+    }
+    
+    @AuraEnabled
+    public static List<String> getAllNotes(){
+        Schema.DescribeFieldResult fieldResult = Product2.Top_Notes__c.getDescribe();
+
+		return getPicklistValues(fieldResult);
+    }
+
+    public static List<String> getPicklistValues(Schema.DescribeFieldResult fieldResult){
+        List<String> pickListValuesList = new List<String>();
+		List<Schema.PicklistEntry> ple = fieldResult.getPicklistValues();
+		for( Schema.PicklistEntry pickListVal : ple){
+			pickListValuesList.add(pickListVal.getLabel());
+		}     
+		return pickListValuesList;
+    }
+    class CartItem{
+        @AuraEnabled
+        public Id id {get;set;}
+        @AuraEnabled
+        public String variant {get;set;}
+        @AuraEnabled
+        public String designer {get;set;}
+        @AuraEnabled
+        public String perfumeName {get;set;}
+        @AuraEnabled
+        public String perfumePhoto {get;set;}
+
+        CartItem(){}
+        CartItem(Id id,String variant,String designer,String perfumeName,String perfumePhoto){
+            this.id = id;
+            this.variant = variant;
+            this.designer = designer;
+            this.perfumeName = perfumeName;
+            this.perfumePhoto = perfumePhoto;
+        }
+    }
+    class ShippmentInfo{
+        @AuraEnabled
+        public String state;
+        @AuraEnabled
+        public String city;
+        @AuraEnabled
+        public String country;
+        @AuraEnabled
+        public String zip;
+        @AuraEnabled
+        public String street;
+
+        ShippmentInfo(){}
+        ShippmentInfo(String state,String city,String country, String zip, String street){
+            this.state = state;
+            this.city = city;
+            this.country = country;
+            this.zip = zip;
+            this.street = street;
         }
     }
 
@@ -334,5 +507,31 @@ public with sharing class PerfumesController {
         public String URL {get;set;}
 
         BestsellerWrapper(){}
+    }
+
+    class ReviewWrapper{
+        Map<Decimal,String> scoreNames;
+        @AuraEnabled
+        public String Id {get;set;}
+        @AuraEnabled
+        public String username {get;set;}
+        @AuraEnabled
+        public String scoreName {get;set;}
+        @AuraEnabled
+        public Decimal score {get;set;}
+        @AuraEnabled
+        public String text {get;set;}
+        @AuraEnabled
+        public Datetime createdTime {get;set;}
+
+
+        ReviewWrapper(){
+            scoreNames = new Map<Decimal,String>();
+            scoreNames.put(1 ,'Terrible');
+            scoreNames.put(2 ,'Bad');
+            scoreNames.put(3 ,'OK');
+            scoreNames.put(4 ,'Nice one');
+            scoreNames.put(5 ,'Gorgeous');
+        }
     }
 }

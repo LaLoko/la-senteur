@@ -3,7 +3,9 @@ import { getRecord } from 'lightning/uiRecordApi';
 import getAllPerfumes from '@salesforce/apex/PerfumesController.getAllPerfumes';
 import getPerfumesByKey from '@salesforce/apex/PerfumesController.getPerfumesByKey';
 
-
+import getAllAccords from '@salesforce/apex/PerfumesController.getAllAccords';
+import getAllDesigners from '@salesforce/apex/PerfumesController.getAllDesigners';
+import getAllNotes from '@salesforce/apex/PerfumesController.getAllNotes';
 export default class PerfumeList extends LightningElement {
     @track perfumesList = [];
     @track dataLoaded = false;
@@ -11,6 +13,11 @@ export default class PerfumeList extends LightningElement {
     @track perfumesToShow = [];
     @api searchKey;
     recordsFound;
+    searchSucces = false;
+
+    @track allDesigners = []
+    @track allAccords = [];
+    @track allNotes = [];
     
     connectedCallback(){
         let link = String(window.location.href).split('/');
@@ -21,7 +28,7 @@ export default class PerfumeList extends LightningElement {
         this.searchKey = paramsFromURL.get('key');
 
         this.getRecords(type,null,this.searchKey);
-        
+        this.setFilters();
     }  
     getRecords(type,sort,searchKey){
 
@@ -31,6 +38,9 @@ export default class PerfumeList extends LightningElement {
                             this.perfumesList = result;
                             this.dataLoaded = true;
                             this.recordsFound = this.perfumesList.length>0;
+                            if(this.recordsFound === true){
+                                this.searchSucces = true;
+                            }
                          })
                          .catch(error => {
                             this.error = error;
@@ -53,8 +63,48 @@ export default class PerfumeList extends LightningElement {
         this.getRecords(type,event.detail);
     }
     paginationHandler(event){
-        console.log('event')
-        console.log(event.detail.records)
         this.perfumesToShow = [...event.detail.records]
     }
+    setFilters(){
+        this.getDesigners();
+        this.getAccords();
+        this.getNotes();
+    }
+    getDesigners(){
+        getAllDesigners()
+        .then(result => {
+            var returnOptions = [];
+            result.forEach(ele =>{
+                returnOptions.push({key:index , value:ele});
+                index++;
+            }); 
+            this.allDesigners = returnOptions;
+
+            console.log(JSON.stringify(returnOptions))
+        })
+        .catch(error => {
+            this.error = error;
+        });   
+      }
+      
+      getAccords(){
+        getAllAccords()
+          .then(result => {
+            this.allAccords = result;
+
+            })
+                  .catch(error => {
+                      this.error = error;
+                  });    
+      }
+      
+      getNotes(){
+        getAllNotes()
+          .then(result => {
+            this.allNotes = result;
+            })
+                  .catch(error => {
+                      this.error = error;
+                  });    
+      }
 }

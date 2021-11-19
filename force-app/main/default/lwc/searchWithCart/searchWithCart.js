@@ -18,4 +18,12 @@ export default class SearchWithCart extends NavigationMixin(
 keyChanged(event) {
     this.searchKey= event.target.value;
 }
+toCart(){
+    this[NavigationMixin.Navigate]({
+        type: 'comm__namedPage',
+        attributes: {
+            pageName: 'cart'
+        }
+    });
+}
 }
