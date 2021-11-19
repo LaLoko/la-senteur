@@ -1,7 +1,8 @@
 public with sharing class PerfumesController {
 
     @AuraEnabled(cacheable=true)
-    public static List<PerfumeWrapper> getAllPerfumes(String type,String sortType) {
+    public static List<PerfumeWrapper> getAllPerfumes(String type,String sortType,String designersFilter,
+                String accords,String topNotes,String middleNotes, String baseNotes) {
         List<Product2> perfumesList = new List<Product2>();
 
         String query = 'SELECT Id, Name, Photo__c,Score__c,Top_Notes__c,Main_accords__c,Middle_Notes__c,Gender__c,Designer__c,Base_Notes__c, minPrice__c'+
@@ -16,6 +17,37 @@ public with sharing class PerfumesController {
         }
 
         query += ' AND Family = \'Perfumes\' ';
+
+        if(designersFilter != null){
+            List<String> desginersList = designersFilter.deleteWhitespace().split(',');
+            List<Id> designersIds = new List<Id>();
+            List<Designer__c> allDesigners = [SELECT Id,Name FROM Designer__c];
+            
+            for(String item : desginersList){
+                for(Designer__c designer : allDesigners){
+                    if(item == designer.Name.deleteWhitespace()){
+                        designersIds.add(designer.Id);
+                    }
+                }
+            }
+            query += ' AND Designer__c IN :designersIds ';
+        }
+        if(accords != null){
+            String condition = conditionFromList(accords.split(','));
+            query += ' AND Main_accords__c INCLUDES ('+condition+') ';
+        }
+        if(topNotes != null){
+            String condition = conditionFromList(topNotes.split(','));
+            query += ' AND Top_Notes__c INCLUDES ('+condition+') ';
+        }
+        if(middleNotes != null){
+            String condition = conditionFromList(middleNotes.split(','));
+            query += ' AND Middle_Notes__c INCLUDES ('+condition+') ';
+        }
+        if(baseNotes != null){
+            String condition = conditionFromList(baseNotes.split(','));
+            query += ' AND Base_Notes__c INCLUDES ('+condition+') ';
+        }
 
         if(sortType != null && sortType.contains('Name ASC')){
             query += ' ORDER BY Name ASC';
@@ -64,6 +96,13 @@ public with sharing class PerfumesController {
         System.debug(out);
         return out;
     }
+    public static String conditionFromList(List<String> toConvert){
+        String condition = '';
+        for(string val : toConvert) {
+            condition += ',\'' + val + '\'';
+         }
+         return condition.substring(1, condition.length());
+    }
 
     @AuraEnabled
     public static List<PerfumeWrapper> getPerfumesByKey(String key){
@@ -78,9 +117,9 @@ public with sharing class PerfumesController {
         for (Product2 perfume : perfumesList) {
             ids.add(perfume.Designer__c);
         }
-        List<Designer__c> designers = [SELECT Id, Name FROM Designer__c WHERE Id IN : ids];
+        List<Designer__c> currDesigners = [SELECT Id, Name FROM Designer__c WHERE Id IN : ids];
         Map<Id,String> designersKeys = new Map<Id, String>();
-        for (Designer__c designer : designers){
+        for (Designer__c designer : currDesigners){
             designersKeys.put(designer.Id,designer.Name);
         }
 

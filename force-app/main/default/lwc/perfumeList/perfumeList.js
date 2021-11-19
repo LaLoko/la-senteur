@@ -1,11 +1,6 @@
 import { LightningElement, api, wire,track } from 'lwc';
-import { getRecord } from 'lightning/uiRecordApi';
 import getAllPerfumes from '@salesforce/apex/PerfumesController.getAllPerfumes';
 import getPerfumesByKey from '@salesforce/apex/PerfumesController.getPerfumesByKey';
-
-import getAllAccords from '@salesforce/apex/PerfumesController.getAllAccords';
-import getAllDesigners from '@salesforce/apex/PerfumesController.getAllDesigners';
-import getAllNotes from '@salesforce/apex/PerfumesController.getAllNotes';
 export default class PerfumeList extends LightningElement {
     @track perfumesList = [];
     @track dataLoaded = false;
@@ -27,10 +22,9 @@ export default class PerfumeList extends LightningElement {
         let paramsFromURL = new URL(incomeURL).searchParams;
         this.searchKey = paramsFromURL.get('key');
 
-        this.getRecords(type,null,this.searchKey);
-        this.setFilters();
+        this.getRecords(type,null,this.searchKey,null,null,null,null,null);
     }  
-    getRecords(type,sort,searchKey){
+    getRecords(type,sort,searchKey,designers,accords,topNotes,middleNotes,baseNotes){
 
         if(searchKey){
             getPerfumesByKey({key:searchKey})
@@ -46,7 +40,7 @@ export default class PerfumeList extends LightningElement {
                             this.error = error;
                         }); 
         }else{
-            getAllPerfumes({type: type,sortType:sort})
+            getAllPerfumes({type: type,sortType:sort,designersFilter:designers,accords:accords,topNotes,topNotes,middleNotes:middleNotes,baseNotes,baseNotes})
                 .then(result => {
                     this.perfumesList = result;
                     this.dataLoaded = true;
@@ -60,51 +54,22 @@ export default class PerfumeList extends LightningElement {
     handleSortSelected(event){
         let link = String(window.location.href).split('/');
         let type = link[link.length-1]
-        this.getRecords(type,event.detail);
+        this.getRecords(type,event.detail,null,null,null,null,null);
     }
     paginationHandler(event){
         this.perfumesToShow = [...event.detail.records]
     }
-    setFilters(){
-        this.getDesigners();
-        this.getAccords();
-        this.getNotes();
+    handleFilters(event){
+        let link = String(window.location.href).split('/');
+        let type = link[link.length-1]
+
+        console.log(JSON.stringify(event.detail));
+        this.getRecords(type,null,null,
+            event.detail.designers,event.detail.accords,event.detail.topNotes,event.detail.middleNotes,event.detail.baseNotes);
     }
-    getDesigners(){
-        getAllDesigners()
-        .then(result => {
-            var returnOptions = [];
-            result.forEach(ele =>{
-                returnOptions.push({key:index , value:ele});
-                index++;
-            }); 
-            this.allDesigners = returnOptions;
-
-            console.log(JSON.stringify(returnOptions))
-        })
-        .catch(error => {
-            this.error = error;
-        });   
-      }
-      
-      getAccords(){
-        getAllAccords()
-          .then(result => {
-            this.allAccords = result;
-
-            })
-                  .catch(error => {
-                      this.error = error;
-                  });    
-      }
-      
-      getNotes(){
-        getAllNotes()
-          .then(result => {
-            this.allNotes = result;
-            })
-                  .catch(error => {
-                      this.error = error;
-                  });    
-      }
+    clearFilters(){
+        let link = String(window.location.href).split('/');
+        let type = link[link.length-1]
+        this.getRecords(type);
+    }
 }

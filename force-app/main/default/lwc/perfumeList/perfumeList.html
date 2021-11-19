@@ -2,7 +2,7 @@
     <div class="slds-grid slds-wrap">
         <template if:false={searchSucces}>
             <div class="slds-col slds-size_2-of-12" style="height:100%;">
-                <c-perfumes-list-filters designers={allDesigners} accords='kupa' notes={allNotes}></c-perfumes-list-filters>
+                <c-perfumes-list-filters onfilter={handleFilters} onclear={clearFilters}></c-perfumes-list-filters>
             </div>
         </template>
         <template if:false={searchSucces}>

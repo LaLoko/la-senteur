@@ -80,6 +80,7 @@ export default class MultiPickList extends LightningElement {
       this.closeAllDropDown();
     }
   }
+  @api
   onRefreshClick(event) {
     this._filterValue = "";
     this.initArray(this);

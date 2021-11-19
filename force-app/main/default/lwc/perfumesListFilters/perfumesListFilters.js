@@ -1,4 +1,7 @@
-import { LightningElement,track } from 'lwc';
+import { LightningElement,track, wire, api } from 'lwc';
+import getAllAccords from '@salesforce/apex/PerfumesController.getAllAccords';
+import getAllDesigners from '@salesforce/apex/PerfumesController.getAllDesigners';
+import getAllNotes from '@salesforce/apex/PerfumesController.getAllNotes';
 export default class PerfumesListFilters extends LightningElement {
 
 @track selectedDesigner;
@@ -11,67 +14,72 @@ export default class PerfumesListFilters extends LightningElement {
 @track accords;
 @track notes;
 
-// get allAccords() {
-//   var returnOptions = [];
-//   var index = 1;
+@track isLoading = true;
 
-//   this.accords.forEach(ele =>{
-//       returnOptions.push({key:index , value:ele});
-//       index++;
-//   }); 
-
-//  return returnOptions;
-// }
 connectedCallback(){
-  console.log(this.accords)
-  console.log(this.notes);
+  this.getDesigners();
+  this.getAccords();
+  this.getNotes();
 }
-get allDesigners(){
-  return [
-    { key: 1, value: "Dior" },
-    { key: 2, value: "Prada" },
-    { key: 3, value: "Yves Saint Laurent" },
-    { key: 4, value: "Banglore" },
-    { key: 5, value: "Giorgio Armani" },
-    { key: 6, value: "Dolce&Gabbana" },
-    { key: 7, value: "Chanel" },
-  ];
-}
-  get msOptions() {
 
-    var ala = [
-      { key: 1, value: "Jaipur" },
-      { key: 2, value: "Pune" },
-      { key: 3, value: "Hyderabad" },
-      { key: 4, value: "Banglore" },
-      { key: 5, value: "Gurgaon" },
-      { key: 6, value: "Mumbai" },
-      { key: 7, value: "Chennai" },
-      { key: 8, value: "Noida" },
-      { key: 9, value: "Delhi" },
-    ];
-
-    // var returnOptions = [];
-    
-    // var index = 1;
-    // this.designers.forEach(ele =>{
-    //     returnOptions.push({ key: index, value: ele },);
-    //     index++;
-    // }); 
-    // console.log(returnOptions);
-
-   return ala;
+getDesigners(){
+    getAllDesigners()
+    .then(result => {
+      this.designers = result;
+    })
+    .catch(error => {
+        this.error = error;
+    });   
   }
 
-  getSelectedDesigners() {
-    this.selectedDesigner = "";
-    let self = this;
-    this.template
-      .querySelector("c-multi-pick-list")
-      .getSelectedItems()
-      .forEach(function (eachItem) {
-        self.selectedDesigner += eachItem.value + ", ";
-      });
+  get designersOptions(){
+    var returnOptions = [];
+    var index = 1;
+    this.designers.forEach(ele =>{
+        returnOptions.push({key:index , value:ele});
+        index++;
+    }); 
+    return returnOptions;
+  }
+  
+  getAccords(){
+    getAllAccords()
+      .then(result => {
+        this.accords = result;
+        })
+        .catch(error => {
+            this.error = error;
+     });    
+  }
+
+  get accordsOptions(){
+    var returnOptions = [];
+    var index = 1;
+    this.accords.forEach(ele =>{
+        returnOptions.push({key:index , value:ele});
+        index++;
+    }); 
+    return returnOptions;
+  }
+  
+  getNotes(){
+    getAllNotes()
+      .then(result => {
+        this.notes = result;
+        this.isLoading = false;
+        })
+      .catch(error => {
+           this.error = error;
+      });    
+  }
+  get notesOptions(){
+    var returnOptions = [];
+    var index = 1;
+    this.notes.forEach(ele =>{
+        returnOptions.push({key:index , value:ele});
+        index++;
+    }); 
+    return returnOptions;
   }
 
   handleDesignerSelect(event) {
@@ -85,37 +93,15 @@ get allDesigners(){
     }
   }
 
-  getSelectedAccords() {
-    this.selectedAccords = "";
-    let self = this;
-    this.template
-      .querySelector("c-multi-pick-list")
-      .getSelectedItems()
-      .forEach(function (eachItem) {
-        self.selectedAccords += eachItem.value + ", ";
-      });
-  }
-
   handleAccordSelect(event) {
     if (event.detail) {
       this.selectedAccords = "";
       let self = this;
 
       event.detail.forEach(function (eachItem) {
-        self.selectedAccords += eachItem.value + ", ";
+        self.selectedAccords += eachItem.value + ",";
       });
     }
-  }
-
-  getSelectedTopNotes() {
-    this.selectedTopNotes = "";
-    let self = this;
-    this.template
-      .querySelector("c-multi-pick-list")
-      .getSelectedItems()
-      .forEach(function (eachItem) {
-        self.selectedTopNotes += eachItem.value + ", ";
-      });
   }
 
   handleTopNoteSelect(event) {
@@ -124,20 +110,9 @@ get allDesigners(){
       let self = this;
 
       event.detail.forEach(function (eachItem) {
-        self.selectedTopNotes += eachItem.value + ", ";
+        self.selectedTopNotes += eachItem.value + ",";
       });
     }
-  }
-
-  getSelectedMiddleNotes() {
-    this.selectedMiddleNotes = "";
-    let self = this;
-    this.template
-      .querySelector("c-multi-pick-list")
-      .getSelectedItems()
-      .forEach(function (eachItem) {
-        self.selectedMiddleNotes += eachItem.value + ", ";
-      });
   }
 
   handleMiddleNoteSelect(event) {
@@ -146,20 +121,9 @@ get allDesigners(){
       let self = this;
 
       event.detail.forEach(function (eachItem) {
-        self.selectedMiddleNotes += eachItem.value + ", ";
+        self.selectedMiddleNotes += eachItem.value + ",";
       });
     }
-  }
-
-  getSelectedBaseNotes() {
-    this.selectedBaseNotes = "";
-    let self = this;
-    this.template
-      .querySelector("c-multi-pick-list")
-      .getSelectedItems()
-      .forEach(function (eachItem) {
-        self.selectedBaseNotes += eachItem.value + ", ";
-      });
   }
 
   handleBaseNoteSelect(event) {
@@ -168,11 +132,42 @@ get allDesigners(){
       let self = this;
 
       event.detail.forEach(function (eachItem) {
-        self.selectedBaseNotes += eachItem.value + ", ";
+        self.selectedBaseNotes += eachItem.value + ",";
       });
     }
   }
-  filter(){
 
+  filter(){
+    var filters = {designers:this.selectedDesigner,
+      accords:this.selectedAccords,
+      topNotes:this.selectedTopNotes,
+      middleNotes:this.selectedMiddleNotes,
+      baseNotes:this.selectedBaseNotes
+    };
+
+    this.dispatchEvent(new CustomEvent('filter',{detail:filters}));
   }
+  clear(){
+    this.clearComboboxes();
+    this.dispatchEvent(new CustomEvent('clear'));
+  }
+  clearComboboxes(){
+    this.template
+      .querySelector(".picklist1")
+       .onRefreshClick();
+
+       this.template
+       .querySelector(".picklist2")
+        .onRefreshClick();
+        this.template
+        .querySelector(".picklist3")
+         .onRefreshClick();
+         this.template
+         .querySelector(".picklist4")
+          .onRefreshClick();
+          this.template
+          .querySelector(".picklist5")
+           .onRefreshClick();
+  }
+
 }

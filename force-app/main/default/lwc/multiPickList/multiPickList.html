@@ -33,10 +33,12 @@
 										class="slds-m-left_xx-small" onclick={onRefreshClick}></lightning-button-icon>
 								</template>
 
+								<div class="slds-scrollable_y" style="height: 13rem;">
 								<template for:each={_mOptions} for:item="item">
 									<c-pick-list-item key={item.key} item={item} onitems={handleItemSelected}>
 									</c-pick-list-item>
 								</template>
+							</div>
 						</ul>
 					</div>
 				</div>
