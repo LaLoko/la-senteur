@@ -10,7 +10,6 @@ import addItemToCart from '@salesforce/apex/PerfumesController.addItemToCart';
 
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
-
 export default class PerfumePage extends LightningElement {
     id;
     @track perfume;

@@ -446,45 +446,66 @@ public with sharing class PerfumesController {
 		return pickListValuesList;
     }
 
-    // @AuraEnabled
-    // public static Boolean createOrder(){
-    //     Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
-    //     List<CartItem> cart = (List<CartItem>)sessionPart.get('cart');
-    //     ShippmentInfo shippmentInfo = (ShippmentInfo)sessionPart.get('shippmentInfo');
+    @AuraEnabled
+    public static Boolean createOrder(){
+        try{
+        Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
+        List<CartItem> cart = (List<CartItem>)sessionPart.get('cart');
+        ShippmentInfo shippmentInfo = (ShippmentInfo)sessionPart.get('shippmentInfo');
+        String userId = System.UserInfo.getUserId();
+
+        
+       List<Contact> contacts = [SELECT Id,AccountId FROM Contact WHERE OwnerId =: userId ORDER BY Id LIMIT 1];
+
+    //    List<Account> accounts = [SELECT Id FROM Account WHERE Id = : contacts.get(0).AccountId];
+    Pricebook2 priceBook = [SELECT Id FROM Pricebook2 WHERE isStandard=true].get(0);
+  
+
+        Order order = new Order(
+	      AccountId = contacts.get(0).AccountId,
+        //   ShipToContactId = contacts.get(0).Id,
+	      EffectiveDate = System.today(),
+	      Status = 'Draft',
+	      PriceBook2Id = priceBook.Id
+      );
+      insert order;
+      System.debug(order.Id);
 
 
-    //     Order order = new Order(
-	//       AccountId = acc.Id,
-	//       EffectiveDate = System.today(),
-	//       Status = 'Draft',
-	//       PriceBook2Id = Test.getStandardPricebookId()
-    //   );
-    //   insert order;
+      List<PricebookEntry> pricebookEntries = [SELECT Id,Product2Id FROM PricebookEntry];
+      For(CartItem item : cart){
+          Decimal price = getPriceFromVariant(item.variant);
+          for(PricebookEntry entry : pricebookEntries){
+              if(entry.Product2Id == item.id){
+                OrderItem lineItem = new OrderItem();
+                lineItem.OrderId = order.id;
+                lineItem.Quantity = 1;
+                lineItem.UnitPrice = price;
+                lineItem.Product2id = item.id;
+                lineItem.PricebookEntryId=entry.id;
+                insert lineItem;
+              }
+          }
+        // PricebookEntry standardPrice = new PricebookEntry();
+        // standardPrice.Pricebook2Id = priceBook.Id;
+        // standardPrice.Product2Id = item.id;
+        // standardPrice.UnitPrice = price;
+        // standardPrice.IsActive = true;
+        // standardPrice.UseStandardPrice = false;
+        // insert standardPrice ;
 
+  
+      }
+      System.debug('dodalo produkty');
 
-    //   For(CartItem item : cart){
-    //       Decimal price = getPriceFromVariant(item.variant);
-    //     PricebookEntry standardPrice = new PricebookEntry();
-    //     standardPrice.Pricebook2Id = Test.getStandardPricebookId();
-    //     standardPrice.Product2Id = item.id;
-    //     standardPrice.UnitPrice = price;
-    //     standardPrice.IsActive = true;
-    //     standardPrice.UseStandardPrice = false;
-    //     insert standardPrice ;
-
-    //     OrderItem lineItem = new OrderItem();
-    //     lineItem.OrderId = order.id;
-    //     lineItem.Quantity = 1;
-    //     lineItem.UnitPrice = price;
-    //     lineItem.Product2id = item.id;
-    //     lineItem.PricebookEntryId=standardPrice.id;
-    //     insert lineItem;
-    //   }
-
-    //   order.Status = 'Activated';
-    //   update order;
-    // }
-
+      order.Status = 'Activated';
+      update order;
+      System.debug(order.Status);
+      return true;
+    }catch(Exception e){
+        return false;
+    }
+    }
 
     class CartItem{
         @AuraEnabled

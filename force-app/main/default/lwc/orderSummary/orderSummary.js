@@ -1,10 +1,13 @@
 import { LightningElement,track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 import getCart from '@salesforce/apex/PerfumesController.getCart';
 import getCartTotalPrice from '@salesforce/apex/PerfumesController.getCartTotalPrice';
 import getShippingInfo from '@salesforce/apex/PerfumesController.getShippingInfo';
 import getCartItemId from '@salesforce/apex/PerfumesController.getCartItemId';
+import createOrder from '@salesforce/apex/PerfumesController.createOrder';
+
 export default class OrderSummary extends NavigationMixin(
     LightningElement
 ) {
@@ -71,6 +74,29 @@ export default class OrderSummary extends NavigationMixin(
     }
 
     order(){
-        this.dispatchEvent(new CustomEvent('next'));
+        createOrder()
+        .then(result => {
+            if(result == true){
+                this.dispatchEvent(new CustomEvent('next'));
+            }else{
+                const evt = new ShowToastEvent({
+                    title: 'Error',
+                    message: 'Cannot place an order',
+                    variant: 'error',
+                    mode: 'dismissable'
+                });
+                this.dispatchEvent(evt);
+            }
+        })
+        .catch(error => {
+            const evt = new ShowToastEvent({
+                title: 'Error',
+                message: 'Cannot place an order',
+                variant: 'error',
+                mode: 'dismissable'
+            });
+            this.dispatchEvent(evt);
+            this.error = error;
+        });
     }
 }
