@@ -381,7 +381,6 @@ public with sharing class PerfumesController {
     public static List<CartItem> getCart(){
         Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
         List<CartItem> cart = (List<CartItem>)sessionPart.get('cart');
-        System.debug(cart);
         return cart;
     }
 
@@ -390,6 +389,12 @@ public with sharing class PerfumesController {
         String str2 = str1.substring(1,str1.length()-1);
         return decimal.valueOf(str2.deleteWhitespace());
     }
+    public static Integer getCapacityFromVariant(String variant){
+        String str1 = variant.split('-')[0];
+        String str2 = str1.split(' ')[0];
+        return Integer.valueOf(str2.deleteWhitespace());
+    }
+
     @AuraEnabled
     public static void addShippmentInfo(String state,String city,String country, String zip, String street){
         Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
@@ -454,16 +459,17 @@ public with sharing class PerfumesController {
         ShippmentInfo shippmentInfo = (ShippmentInfo)sessionPart.get('shippmentInfo');
         String userId = System.UserInfo.getUserId();
 
-        
-       List<Contact> contacts = [SELECT Id,AccountId FROM Contact WHERE OwnerId =: userId ORDER BY Id LIMIT 1];
+        User user = [SELECT Id,ContactId FROM User WHERE Id =: userId].get(0);
 
-    //    List<Account> accounts = [SELECT Id FROM Account WHERE Id = : contacts.get(0).AccountId];
-    Pricebook2 priceBook = [SELECT Id FROM Pricebook2 WHERE isStandard=true].get(0);
+       Contact contact = [SELECT Id,AccountId FROM Contact WHERE Id =: user.ContactId].get(0);
+
+       Account accounts = [SELECT Id FROM Account WHERE Id = : contact.AccountId].get(0);
+      Pricebook2 priceBook = [SELECT Id FROM Pricebook2 WHERE isStandard=true LIMIT 1];
   
 
         Order order = new Order(
-	      AccountId = contacts.get(0).AccountId,
-        //   ShipToContactId = contacts.get(0).Id,
+	      AccountId = contact.AccountId,
+          ShipToContactId = contact.Id,
 	      EffectiveDate = System.today(),
 	      Status = 'Draft',
 	      PriceBook2Id = priceBook.Id
@@ -472,9 +478,11 @@ public with sharing class PerfumesController {
       System.debug(order.Id);
 
 
-      List<PricebookEntry> pricebookEntries = [SELECT Id,Product2Id FROM PricebookEntry];
+      List<PricebookEntry> pricebookEntries = [SELECT Id,Product2Id FROM PricebookEntry WHERE Pricebook2Id =: priceBook.Id];
       For(CartItem item : cart){
           Decimal price = getPriceFromVariant(item.variant);
+          Integer capacity = getCapacityFromVariant(item.variant);
+          System.debug(capacity);
           for(PricebookEntry entry : pricebookEntries){
               if(entry.Product2Id == item.id){
                 OrderItem lineItem = new OrderItem();
@@ -483,24 +491,15 @@ public with sharing class PerfumesController {
                 lineItem.UnitPrice = price;
                 lineItem.Product2id = item.id;
                 lineItem.PricebookEntryId=entry.id;
+                lineItem.Capacity__c = capacity;
                 insert lineItem;
               }
           }
-        // PricebookEntry standardPrice = new PricebookEntry();
-        // standardPrice.Pricebook2Id = priceBook.Id;
-        // standardPrice.Product2Id = item.id;
-        // standardPrice.UnitPrice = price;
-        // standardPrice.IsActive = true;
-        // standardPrice.UseStandardPrice = false;
-        // insert standardPrice ;
 
-  
       }
-      System.debug('dodalo produkty');
 
       order.Status = 'Activated';
       update order;
-      System.debug(order.Status);
       return true;
     }catch(Exception e){
         return false;
