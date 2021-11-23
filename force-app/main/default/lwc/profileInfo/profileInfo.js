@@ -29,7 +29,7 @@ export default class ProfileInfo extends LightningElement {
     }
     saveEdit(){
         console.log(JSON.stringify(this.editUser))
-        updateProfile({profile:this.editUser})
+        updateProfile({pro:JSON.stringify(this.editUser)})
         .then(result => {
             this.user = result;
             this.editMode = false;

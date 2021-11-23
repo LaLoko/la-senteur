@@ -1,6 +1,113 @@
 <template>
     <div class="slds-scrollable_y" style="height: 75vh;">
-        <template for:each={orders} for:item="order" for:index="index">
+        <div class="slds-box slds-theme_default">
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                <thead>
+                    <tr>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Order Number">Order Number</div>
+                          </th>
+                          <th class="" scope="col">
+                            <div class="slds-truncate" title="Amount">Amount</div>
+                          </th>
+                          <th class="" scope="col">
+                              <div class="slds-truncate" title="Created Date">Created Date</div>
+                            </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template iterator:it={orders}>
+                        <tr class="slds-hint-parent" key={it.value.objOrder.Id} style="cursor: pointer;">                        
+                            <td>
+                                <a onclick={hideAndShow}  data-record-id={it.index} style="display:block;text-decoration:none;color:black;">                 
+                                    {it.value.objOrder.OrderNumber}
+                                </a>
+                            </td>
+                            <td>
+                                <a onclick={hideAndShow}  data-record-id={it.index} style="display:block;text-decoration:none;color:black;">                 
+                                    {it.value.objOrder.TotalAmount}€
+                                </a>
+                            </td>
+                            <td>
+                                <a onclick={hideAndShow}  data-record-id={it.index} style="display:block;text-decoration:none;color:black;">                 
+                                    <lightning-formatted-date-time value={it.value.objOrder.ActivatedDate}
+                                year="numeric" month="numeric" day="numeric" hour="numeric"
+                                minute="2-digit" hour12="false">
+                            </lightning-formatted-date-time>
+                                </a>
+                            </td>
+                         
+                        </tr>
+
+                        <template if:false={it.value.hideBool} key={it.value.objOrder.Id} style="padding: 5px;">
+                            <tr key={it.value.objOrder.Id}>
+                                <td colspan="5">
+                                    <div style="display: flex;flex-direction: column;">
+                                        <div style="display: flex;flex-direction: row;">
+                                            <template if:true={detailedOrder}>
+                                                <div class="slds-col slds-float_left" style="border-right: 1px solid #b5b5b5;">
+                                                    <h1 style="font-size: large;">Order Number : {detailedOrder.OrderNumber}</h1>
+                                                    <br />
+                                
+                                                    <template if:true={address}>
+                                                        <h1 style="font-size: large;">Address</h1>
+                                                        <h1 style="font-size: large;">Country : {address.country}</h1>
+                                                        <h1 style="font-size: large;">City : {address.city}</h1>
+                                                        <h1 style="font-size: large;">Street : {address.street}</h1>
+                                                        <h1 style="font-size: large;">Postal Code : {address.zip}</h1>
+                                                        <h1 style="font-size: large;">State : {address.state}</h1>
+                                                    </template>
+                                
+                                                    <br/>
+                                                    <h1 style="font-size: large;">Total Amount : {detailedOrder.TotalAmount} €</h1>
+                                                    <br/>
+                                                    <h3 style="font-size: large;">Order date : <lightning-formatted-date-time
+                                                            value={detailedOrder.ActivatedDate} year="numeric" month="numeric" day="numeric"
+                                                            hour="numeric" minute="2-digit" hour12="false">
+                                                        </lightning-formatted-date-time>
+                                                    </h3>
+                                                </div>
+                                            </template>
+                                            <template if:true={orderItems}>
+                                                <div class="slds-col slds-float_left">
+                                                    <template for:each={orderItems} for:item="item" for:index="index">
+                                                        <div key={item.Id} style="height: 1rem;margin: 1rem;" class="orderRow">
+                                                            <div class="divider" style="background-color: rgba(0, 0, 0, 0.349); height: 1px;width: 60%;margin-left: 20%;"></div>
+
+
+                                                            <div class="slds-grid slds-gutters slds-align_absolute-center" style="height: 100%;margin-top: 8px;">
+                                                                <div class="slds-col slds-size_1-of-6">
+                                                                    <h3>{item.designer}</h3>
+                                                                </div>
+                                                                <div class="slds-col slds-size_1-of-6">
+                                                                    <h3>{item.name}</h3>
+                                                                </div>
+                                                                <div class="slds-col slds-size_1-of-6">
+                                                                    <h3>{item.capacity}ml</h3>
+                                                                </div>
+                                                                <div class="slds-col slds-size_1-of-6">
+                                                                    <h3>{item.price}€</h3>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+                                
+                                        <div style="margin-top: 1rem;">
+                                            <lightning-button label="Open case" style="float: right;"></lightning-button>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>                   
+                    </template>
+                </tbody>
+            </table>
+        </div>   
+
+        <!-- <template for:each={orders} for:item="order" for:index="index">
             <div key={order.Id} style="height: 3rem;background: lemonchiffon;margin: 1rem;border-radius: 1rem;" >
                 <div class="slds-grid slds-gutters slds-align_absolute-center" style="height: 100%;" >
                     <div class="slds-col slds-size_1-of-6">
@@ -21,7 +128,7 @@
                     </div>
                 </div>
             </div>
-        </template>
+        </template> -->
     </div>
     
 </template>

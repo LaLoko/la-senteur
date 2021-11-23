@@ -24,20 +24,28 @@ public without sharing class ProfileController {
     }
     
     @AuraEnabled
-    public static List<Order> getAllOrders(){
+    public static List<OrderWrapper> getAllOrders(){
         String userId = System.UserInfo.getUserId();
         // User user = [SELECT Id,ContactId FROM User WHERE Id =: userId].get(0);
-        List<Order> orders = [SELECT Id,Name,TotalAmount,ActivatedDate,OrderNumber FROM Order WHERE CreatedById =: userId];
+        List<OrderWrapper> out = new List<OrderWrapper>();
 
-        return orders;
+        for (Order objOrder : [SELECT Id,Name,TotalAmount,ActivatedDate,OrderNumber FROM Order WHERE CreatedById =: userId]){
+            OrderWrapper wrapper = new OrderWrapper();
+            wrapper.objOrder = objOrder;
+            wrapper.hideBool = true;
+            out.add(wrapper);
+        }
+
+        return out;
     }
     @AuraEnabled
-    public static ProfileWrapper updateProfile(ProfileWrapper profile){
-        System.debug(profile);
+    public static ProfileWrapper updateProfile(String pro){
+        System.debug(pro);
         String userId = System.UserInfo.getUserId();
         User user = [SELECT Id,Name,AboutMe,Address,ContactId,Phone,Username,SenderEmail FROM User WHERE Id =: userId LIMIT 1];
         Contact contact = [SELECT Id,Name,Email,Phone,MailingStreet,MailingCity,MailingState,MailingPostalCode,MailingCountry FROM Contact WHERE Id =: user.ContactId LIMIT 1];
 
+        ProfileWrapper profile = ProfileWrapper.parse(pro);
         user.Phone = profile.phone;
         update user;
 
@@ -108,34 +116,6 @@ public without sharing class ProfileController {
         return info;
     }
 
-
-     public class ProfileWrapper{
-        @AuraEnabled
-        public String id;
-        @AuraEnabled
-        public String name;
-        @AuraEnabled
-        public String username;
-        @AuraEnabled
-        public String email;
-        @AuraEnabled
-        public String phone;
-        @AuraEnabled
-        public String aboutMe;
-        @AuraEnabled
-        public String city;
-        @AuraEnabled
-        public String street;
-        @AuraEnabled
-        public String state;
-        @AuraEnabled
-        public String zip;
-        @AuraEnabled
-        public String country;
-        
-        public ProfileWrapper(){}
-    }
-
     public class OrderWrapper{
         @AuraEnabled
         public Decimal price;
@@ -145,6 +125,10 @@ public without sharing class ProfileController {
         public String designer;
         @AuraEnabled
         public String name;
+        @AuraEnabled
+        public Boolean hideBool;
+        @AuraEnabled
+        public Order objOrder;
 
         OrderWrapper(){}
     }
