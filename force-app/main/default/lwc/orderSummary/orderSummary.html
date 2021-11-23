@@ -41,10 +41,14 @@
                     <h1>{shippingInfo.country}</h1>
                 </template>
                 <div style="margin-top: 166px;">
-                <lightning-button label="Order" onclick={order} style="width: 10rem;font-size: 1rem;"></lightning-button>
+                <lightning-button label="Order" onclick={confirmDialog} style="width: 10rem;font-size: 1rem;"></lightning-button>
             </div>
 
             </div>
         </div>
     </div>
+    <c-confirmation-dialog title='Order confirmation' message='Are you sure you want to place an order?' confirm-label='Confirm'
+    cancel-label='Cancel' visible={isDialogVisible} original-message={originalMessage} name="confirmModal"
+    onclick={openDialog}>
+</c-confirmation-dialog>
 </template>

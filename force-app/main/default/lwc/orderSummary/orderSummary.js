@@ -15,6 +15,7 @@ export default class OrderSummary extends NavigationMixin(
     @track total;
     @track shippingInfo;
     cartExist = false;
+    @track isDialogVisible = false;
 
     connectedCallback(){
         this.loadShippingInfo();
@@ -72,6 +73,9 @@ export default class OrderSummary extends NavigationMixin(
                 this.error = error;
             });
     }
+    confirmDialog(){
+        this.isDialogVisible = true;
+    }
 
     order(){
         createOrder()
@@ -98,5 +102,24 @@ export default class OrderSummary extends NavigationMixin(
             this.dispatchEvent(evt);
             this.error = error;
         });
+    }
+    openDialog(event){
+        if(event.target.name === 'openConfirmation'){
+            this.originalMessage = 'test message';
+            this.isDialogVisible = true;
+        }else if(event.target.name === 'confirmModal'){
+
+            if(event.detail !== 1){
+                this.displayMessage = 'Status: ' + event.detail.status + '. Event detail: ' + JSON.stringify(event.detail.originalMessage) + '.';
+
+                if(event.detail.status === 'confirm') {
+                    this.order();
+                    event.detail = 1;
+                }else if(event.detail.status === 'cancel'){
+                    event.detail = 1;
+                }
+            }
+            this.isDialogVisible = false;
+        }
     }
 }

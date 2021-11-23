@@ -10,9 +10,11 @@
                 <div class="slds-scrollable_y" style="height: 500px;margin:1rem">
                     <template for:each={cart} for:item="cartItem" for:index="index">
                         <div key={cartItem.Id} style="height: 8rem;" >
+                            <div class="divider" style="background-color: black; height: 1px;"></div>
+
                             <div class="slds-grid slds-gutters slds-align_absolute-center" style="height: 100%;">
                                 <div class="slds-col slds-size_1-of-6" style="height: 100%;">
-                                    <img src={cartItem.perfumePhoto} onclick={goToPerfume} data-index={index} style="height: 6rem;" />
+                                    <img src={cartItem.perfumePhoto} onclick={goToPerfume} data-index={index} style="height: 6rem;margin-top:10px" />
                                 </div>
                                 <div class="slds-col slds-size_1-of-6">
                                     <h3>{cartItem.designer} </h3>
