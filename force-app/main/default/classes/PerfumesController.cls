@@ -490,7 +490,8 @@ public without sharing class PerfumesController {
           ShipToContactId = contact.Id,
 	      EffectiveDate = System.today(),
 	      Status = 'Draft',
-	      PriceBook2Id = priceBook.Id
+	      PriceBook2Id = priceBook.Id,
+          ContractId = '80009000000Z0GVAA0'
       );
       insert order;
       System.debug(order.Id);

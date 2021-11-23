@@ -40,7 +40,6 @@ public without sharing class ProfileController {
     }
     @AuraEnabled
     public static ProfileWrapper updateProfile(String pro){
-        System.debug(pro);
         String userId = System.UserInfo.getUserId();
         User user = [SELECT Id,Name,AboutMe,Address,ContactId,Phone,Username,SenderEmail FROM User WHERE Id =: userId LIMIT 1];
         Contact contact = [SELECT Id,Name,Email,Phone,MailingStreet,MailingCity,MailingState,MailingPostalCode,MailingCountry FROM Contact WHERE Id =: user.ContactId LIMIT 1];
@@ -56,8 +55,6 @@ public without sharing class ProfileController {
         contact.MailingCountry = profile.country;
 
         update contact;
-
-        System.debug(profile);
 
         return profile;
     }
@@ -84,8 +81,6 @@ public without sharing class ProfileController {
 
         List<OrderWrapper> out = new List<OrderWrapper>();
 
-
-        System.debug(designers);
         for(OrderItem item : orderItems){
             OrderWrapper wrapper = new OrderWrapper();
             wrapper.price = item.UnitPrice;
@@ -115,21 +110,36 @@ public without sharing class ProfileController {
         ShippmentInfo info = new ShippmentInfo(contact.MailingState,contact.MailingCity,contact.MailingCountry,contact.MailingPostalCode,contact.MailingStreet);
         return info;
     }
+    @AuraEnabled
+    public static Boolean createNewCase(String items,String subject, String description){
+        String userId = System.UserInfo.getUserId();
+        User user = [SELECT Id,ContactId FROM User WHERE Id =: userId LIMIT 1];
+        Contact contact = [SELECT Id,AccountId FROM Contact WHERE Id =: user.ContactId LIMIT 1];
 
-    public class OrderWrapper{
-        @AuraEnabled
-        public Decimal price;
-        @AuraEnabled
-        public Decimal capacity;
-        @AuraEnabled
-        public String designer;
-        @AuraEnabled
-        public String name;
-        @AuraEnabled
-        public Boolean hideBool;
-        @AuraEnabled
-        public Order objOrder;
+        System.debug(items);
+        System.debug(subject);
 
-        OrderWrapper(){}
+
+        List<OrderWrapper> orderItems = OrderWrapper.parse(items);
+        Case caseObj = new Case(
+            ContactId = contact.Id,
+            AccountId = contact.AccountId,
+            Status = 'New',
+            Origin = 'Web',
+            Subject = subject,
+            Description = description);
+
+            insert caseObj;
+
+            for(OrderWrapper item : orderItems){
+                Case_Perfume__c cp = new Case_Perfume__c();
+                cp.Case__c = caseObj.Id;
+                cp.Product__c = [SELECT Id,Name FROM Product2 WHERE Name LIKE :item.name LIMIT 1].Id;
+                cp.Designer__c = [SELECT Id,Name FROM Designer__c WHERE Name LIKE : item.designer LIMIT 1].Id;
+                cp.Variant__c = [SELECT Id FROM Variant__c WHERE Product__c =: cp.Product__c AND Capacity__c =: item.capacity LIMIT 1].Id;
+
+                insert cp;
+            }
+            return true;
     }
 }

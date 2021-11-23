@@ -9,6 +9,7 @@ export default class UserOrders extends LightningElement {
     @track detailedOrder;
     orderItems;
     @track address;
+    @track isDialogVisible = false;
 
     connectedCallback(){
         this.getOrders();
@@ -18,7 +19,6 @@ export default class UserOrders extends LightningElement {
         getAllOrders()
         .then(result => {
             this.orders = result;
-            console.log(JSON.stringify(result));
         })
         .catch(error => {
             this.error = error;
@@ -31,7 +31,6 @@ export default class UserOrders extends LightningElement {
     hideAndShow( event ) {
 
         let indx = event.target.dataset.recordId;
-        console.log( 'Index is ' + indx );
 
         if ( this.orders ) {
 
@@ -42,21 +41,17 @@ export default class UserOrders extends LightningElement {
                 this.getOrderItems(this.orders[indx].objOrder);
                 this.getShippmentAddress(this.orders[indx].objOrder);
             }
-            console.log( 'Current Val ' + currVal );
             recs[ indx ].hideBool = !currVal;
             this.orders = recs;
-            console.log( 'After Change ' + this.orders[ indx ].hideBool );
 
         }
 
     }
 
     getDetails(order){
-        console.log(JSON.stringify(order));
         getOrderDetails({orderId:order.Id})
         .then(result => {
             this.detailedOrder = result;
-            console.log(JSON.stringify(result));
 
         })
         .catch(error => {
@@ -68,7 +63,6 @@ export default class UserOrders extends LightningElement {
         getOrderedPerfumes({orderId:order.Id})
         .then(result => {
             this.orderItems = result;
-            console.log(JSON.stringify(result));
         })
         .catch(error => {
             this.error = error;
@@ -78,10 +72,37 @@ export default class UserOrders extends LightningElement {
         getShippmentInfo({orderId:order.Id})
         .then(result => {
             this.address = result;
-            console.log(JSON.stringify(result));
         })
         .catch(error => {
             this.error = error;
         });  
+    }
+    openDialog(event){
+        if(event.target.name === 'openConfirmation'){
+            this.originalMessage = 'test message';
+            this.isDialogVisible = true;
+        }else if(event.target.name === 'confirmModal'){
+
+            if(event.detail !== 1){
+                this.displayMessage = 'Status: ' + event.detail.status + '. Event detail: ' + JSON.stringify(event.detail.originalMessage) + '.';
+
+                if(event.detail.status === 'confirm') {
+                    this.order();
+                    event.detail = 1;
+                    this.isDialogVisible = true;
+
+                }else if(event.detail.status === 'cancel'){
+                    console.log('x');
+                    event.detail = 1;
+                    this.isDialogVisible = false;
+                }
+            }else{
+                // this.isDialogVisible = false;
+            }
+        }
+    }
+    openCase(){
+        this.isDialogVisible = true;
+
     }
 }

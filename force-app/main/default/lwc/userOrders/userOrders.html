@@ -96,7 +96,7 @@
                                         </div>
                                 
                                         <div style="margin-top: 1rem;">
-                                            <lightning-button label="Open case" style="float: right;"></lightning-button>
+                                            <lightning-button label="Open case" style="float: right;" onclick={openCase}></lightning-button>
                                         </div>
                                     </div>
                                 </td>
@@ -106,29 +106,10 @@
                 </tbody>
             </table>
         </div>   
-
-        <!-- <template for:each={orders} for:item="order" for:index="index">
-            <div key={order.Id} style="height: 3rem;background: lemonchiffon;margin: 1rem;border-radius: 1rem;" >
-                <div class="slds-grid slds-gutters slds-align_absolute-center" style="height: 100%;" >
-                    <div class="slds-col slds-size_1-of-6">
-                        <h3>{order.OrderNumber}</h3>
-                    </div>
-                    <div class="slds-col slds-size_1-of-6">
-                        <h3>Order total : {order.TotalAmount}€</h3>
-                    </div>
-                    <div class="slds-col slds-size_1-of-5">
-                        <h3>Created date : <lightning-formatted-date-time value={order.ActivatedDate}
-                            year="numeric" month="numeric" day="numeric" hour="numeric"
-                            minute="2-digit" hour12="false">
-                        </lightning-formatted-date-time></h3>
-                    </div>
-                    <div class="slds-col slds-size_1-of-6">
-                    
-                        <lightning-button label="Go to order Details" onclick={goToOrder} data-index={index}></lightning-button>
-                    </div>
-                </div>
-            </div>
-        </template> -->
     </div>
-    
+
+    <c-new-complaint title='Order complaint' message='' confirm-label='Confirm' order={detailedOrder} items={orderItems}
+    cancel-label='Cancel' visible={isDialogVisible} original-message={originalMessage} name="confirmModal"
+    onclick={openDialog}>
+</c-new-complaint>
 </template>
