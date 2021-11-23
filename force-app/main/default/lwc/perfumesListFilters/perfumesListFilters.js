@@ -67,6 +67,7 @@ getDesigners(){
       .then(result => {
         this.notes = result;
         this.isLoading = false;
+        this.dispatchEvent(new CustomEvent('load'));
         })
       .catch(error => {
            this.error = error;

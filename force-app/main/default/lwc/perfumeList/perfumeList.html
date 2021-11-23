@@ -2,7 +2,7 @@
     <div class="slds-grid slds-wrap">
         <template if:false={searchSucces}>
             <div class="slds-col slds-size_2-of-12 filterSection" style="background: floralwhite;">
-                <c-perfumes-list-filters onfilter={handleFilters} onclear={clearFilters}></c-perfumes-list-filters>
+                <c-perfumes-list-filters onfilter={handleFilters} onclear={clearFilters} onload={handleLoad}></c-perfumes-list-filters>
             </div>
         </template>
         <template if:false={searchSucces}>
@@ -11,6 +11,7 @@
                 <c-perfume-list-pagination onsort={handleSortSelected} records={perfumesList}
                     searchsucces={searchSucces} onupdate={paginationHandler}></c-perfume-list-pagination>
             </div>
+            <template if:true={everythingLoaded}>
 
             <div style="margin-top:4rem;">
                 <template if:true={recordsFound}>
@@ -26,8 +27,11 @@
                     <h1 class="perfumesNotFound">Cannot found any perfumes</h1>
                 </template>
             </div>
+        </template>
+
         </div>
         </template>
+
 
 
         <template if:true={searchSucces}>

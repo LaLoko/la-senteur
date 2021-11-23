@@ -4,6 +4,7 @@ import getPerfumesByKey from '@salesforce/apex/PerfumesController.getPerfumesByK
 export default class PerfumeList extends LightningElement {
     @track perfumesList = [];
     @track dataLoaded = false;
+    @track loaded = false;
 
     @track perfumesToShow = [];
     @api searchKey;
@@ -71,5 +72,12 @@ export default class PerfumeList extends LightningElement {
         let link = String(window.location.href).split('/');
         let type = link[link.length-1]
         this.getRecords(type);
+    }
+    handleLoad(event){
+        console.log('wchodzi')
+        this.loaded = true;
+    }
+    get everythingLoaded(){
+        return this.loaded && this.dataLoaded;
     }
 }

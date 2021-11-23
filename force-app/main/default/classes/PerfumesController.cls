@@ -1,4 +1,4 @@
-public with sharing class PerfumesController {
+public without sharing class PerfumesController {
 
     @AuraEnabled(cacheable=true)
     public static List<PerfumeWrapper> getAllPerfumes(String type,String sortType,String designersFilter,
@@ -450,6 +450,16 @@ public with sharing class PerfumesController {
 		}     
 		return pickListValuesList;
     }
+    @AuraEnabled
+    public static ShippmentInfo getAddress(){
+        String userId = System.UserInfo.getUserId();
+
+        User user = [SELECT Id,ContactId FROM User WHERE Id =: userId LIMIT 1];
+    
+            Contact contact = [SELECT Id,MailingStreet,MailingCity,MailingState,MailingPostalCode,MailingCountry FROM Contact WHERE Id =: user.ContactId LIMIT 1];
+            ShippmentInfo info = new ShippmentInfo(contact.MailingState,contact.MailingCity,contact.MailingCountry,contact.MailingPostalCode,contact.MailingStreet);
+            return info;
+    }
 
     @AuraEnabled
     public static Boolean createOrder(){
@@ -459,13 +469,21 @@ public with sharing class PerfumesController {
         ShippmentInfo shippmentInfo = (ShippmentInfo)sessionPart.get('shippmentInfo');
         String userId = System.UserInfo.getUserId();
 
-        User user = [SELECT Id,ContactId FROM User WHERE Id =: userId].get(0);
+        User user = [SELECT Id,ContactId FROM User WHERE Id =: userId LIMIT 1];
 
-       Contact contact = [SELECT Id,AccountId FROM Contact WHERE Id =: user.ContactId].get(0);
+       Contact contact = [SELECT Id,AccountId FROM Contact WHERE Id =: user.ContactId LIMIT 1];
 
-       Account accounts = [SELECT Id FROM Account WHERE Id = : contact.AccountId].get(0);
+       Account accounts = [SELECT Id FROM Account WHERE Id = : contact.AccountId LIMIT 1];
       Pricebook2 priceBook = [SELECT Id FROM Pricebook2 WHERE isStandard=true LIMIT 1];
   
+     
+      contact.MailingStreet = shippmentInfo.street;
+      contact.MailingCity = shippmentInfo.city;
+      contact.MailingState = shippmentInfo.state;
+      contact.MailingPostalCode = shippmentInfo.zip;
+      contact.MailingCountry = shippmentInfo.country;
+      
+      update contact;
 
         Order order = new Order(
 	      AccountId = contact.AccountId,
@@ -525,27 +543,6 @@ public with sharing class PerfumesController {
             this.designer = designer;
             this.perfumeName = perfumeName;
             this.perfumePhoto = perfumePhoto;
-        }
-    }
-    class ShippmentInfo{
-        @AuraEnabled
-        public String state;
-        @AuraEnabled
-        public String city;
-        @AuraEnabled
-        public String country;
-        @AuraEnabled
-        public String zip;
-        @AuraEnabled
-        public String street;
-
-        ShippmentInfo(){}
-        ShippmentInfo(String state,String city,String country, String zip, String street){
-            this.state = state;
-            this.city = city;
-            this.country = country;
-            this.zip = zip;
-            this.street = street;
         }
     }
 

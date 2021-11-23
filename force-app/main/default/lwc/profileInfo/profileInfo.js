@@ -3,7 +3,7 @@ import getProfileInfo from '@salesforce/apex/ProfileController.getProfileInfo';
 import updateProfile from '@salesforce/apex/ProfileController.updateProfile';
 export default class ProfileInfo extends LightningElement {
     @track user;
-    editUser;
+    @track editUser;
     editMode = false;
 
     connectedCallback(){
@@ -28,6 +28,7 @@ export default class ProfileInfo extends LightningElement {
         this.editMode = false;
     }
     saveEdit(){
+        console.log(JSON.stringify(this.editUser))
         updateProfile({profile:this.editUser})
         .then(result => {
             this.user = result;
@@ -36,5 +37,23 @@ export default class ProfileInfo extends LightningElement {
         .catch(error => {
             this.error = error;
         });   
+    }
+    phoneChange(event){
+        this.editUser.phone= event.target.value;
+    }
+    cityChange(event){
+        this.editUser.city= event.target.value;
+    }
+    stateChange(event){
+        this.editUser.state= event.target.value;
+    }
+    zipChange(event){
+        this.editUser.zip= event.target.value;
+    }
+    countryChange(event){
+        this.editUser.country= event.target.value;
+    }
+    streetChange(event){
+        this.editUser.street= event.target.value;
     }
 }

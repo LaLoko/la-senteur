@@ -18,4 +18,8 @@ export default class UserOrders extends LightningElement {
             this.error = error;
         });   
     }
+    goToOrder(event){
+        let index = event.target.dataset.index;
+        this.dispatchEvent(new CustomEvent('select',{detail:this.orders[index]}));
+    }
 }

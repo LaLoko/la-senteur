@@ -1,10 +1,17 @@
 <template>
+    <template if:false={showDetails}>
+
     <lightning-tabset>
         <lightning-tab label="Profile" class="slds-theme_shade">
             <c-profile-info></c-profile-info>
         </lightning-tab>
         <lightning-tab label="Orders history">
-            <c-user-orders></c-user-orders>
+            <c-user-orders onselect={handleOrderSelect}></c-user-orders>
         </lightning-tab>
     </lightning-tabset>
+</template>
+
+    <template if:true={showDetails}>
+        <c-order-details order={order} onclose={handleDetailsClose}></c-order-details>
+    </template>
 </template>

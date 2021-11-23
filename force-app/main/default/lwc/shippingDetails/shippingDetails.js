@@ -1,7 +1,7 @@
-import { LightningElement } from 'lwc';
+import { LightningElement, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import addShippmentInfo from '@salesforce/apex/PerfumesController.addShippmentInfo';
-
+import getAddress from '@salesforce/apex/PerfumesController.getAddress';
 
 export default class ShippingDetails extends LightningElement {
     street;
@@ -9,27 +9,43 @@ export default class ShippingDetails extends LightningElement {
     zip;
     country;
     state;
+    @track address;
+
+    connectedCallback(){
+        this.getSavedAddress();
+    }
+    getSavedAddress(){
+        getAddress()
+        .then(result => {
+            this.address = result;
+            console.log(JSON.stringify(result))
+        })
+        .catch(error => {
+            this.error = error;
+        }); 
+    }
 
     streetChange(event) {
-        this.street= event.target.value;
+        this.address.street= event.target.value;
     }
     cityChange(event) {
-        this.city= event.target.value;
+        this.address.city= event.target.value;
     }
     zipChange(event) {
-        this.zip= event.target.value;
+        this.address.zip= event.target.value;
     }
     countryChange(event) {
-        this.country= event.target.value;
+        this.address.country= event.target.value;
     }
     stateChange(event) {
-        this.state= event.target.value;
+        this.address.state= event.target.value;
     }
     goToSummary(){
-        if((this.street === undefined || this.street == '')||
-        (this.city === undefined || this.city == '')||(this.zip === undefined || this.zip == '')||
-        (this.country === undefined || this.country == '')||
-        (this.state === undefined || this.state == '')){
+        if((this.address.street === undefined || this.address.street == '')||
+        (this.address.city === undefined || this.address.city == '')||
+        (this.address.zip === undefined || this.address.zip == '')||
+        (this.address.country === undefined || this.address.country == '')||
+        (this.address.state === undefined || this.address.state == '')){
             const evt = new ShowToastEvent({
                 title: 'Error',
                 message: 'One or more fields are empty',
@@ -38,7 +54,7 @@ export default class ShippingDetails extends LightningElement {
             });
             this.dispatchEvent(evt);
         }else{
-            addShippmentInfo({street:this.street,country:this.country,zip:this.zip,state:this.state,city:this.city})
+            addShippmentInfo({street:this.address.street,country:this.address.country,zip:this.address.zip,state:this.address.state,city:this.address.city})
             .then(result => {
                 this.dispatchEvent(new CustomEvent('next',{step:'3'}));
             })

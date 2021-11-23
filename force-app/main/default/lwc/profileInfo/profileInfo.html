@@ -1,51 +1,101 @@
 <template>
-    <div class="slds-col slds-size_10-of-12 slds-align_absolute-center" >
-        <div style="margin-top: 10rem;margin-right: 50rem; flex-direction: column;">
+    <div class="slds-col slds-size_10-of-12 slds-align_absolute-center">
+        <div style="margin-top: 5rem;margin-right: 40rem; flex-direction: column;">
             <template if:false={editMode}>
-            <template if:true={user}>
-            <div>
-            <h2>Name</h2>
-            <h1>{user.name}</h1>
-            </div>
-            <div style="margin-top: 1rem;">
-                <h2>Username</h2>
-                <h1>{user.username}</h1>
-            </div>
-            <div style="margin-top: 1rem;">
-                <h2>Email</h2>
-                <h1>{user.email}</h1>
-            </div>
-            <div style="margin-top: 1rem;">
-            <h2>Phone</h2>
-            <h1>{user.phone}</h1>
-            </div>
-        </template>
-            <!-- <div style="margin-top: 2rem;">
-                <lightning-button label="Edit" onclick={editProfile}></lightning-button>
-            </div> -->
-        </template>
+                <template if:true={user}>
+                    <div>
+                        <div class="slds-col" style="float: left;">
+                            <div>
+                                <h2>Name</h2>
+                                <h1>{user.name}</h1>
+                            </div>
+                            <div style="margin-top: 1rem;">
+                                <h2>Username</h2>
+                                <h1>{user.username}</h1>
+                            </div>
+                            <div style="margin-top: 1rem;">
+                                <h2>Email</h2>
+                                <h1>{user.email}</h1>
+                            </div>
+                            <div style="margin-top: 1rem;">
+                                <h2>Phone</h2>
+                                <h1>{user.phone}</h1>
+                            </div>
+                        </div>
 
-        <template if:true={editMode}>
+                        <div class="slds-col" style="float: left;margin-left: 8rem;">
+                            <div>
+                                <h2>City</h2>
+                                <h1>{user.city}</h1>
+                            </div>
+                            <div style="margin-top: 1rem;">
+                                <h2>Street</h2>
+                                <h1>{user.street}</h1>
+                            </div>
+                            <div style="margin-top: 1rem;">
+                                <h2>Postal Code</h2>
+                                <h1>{user.zip}</h1>
+                            </div>
+                            <div style="margin-top: 1rem;">
+                                <h2>State</h2>
+                                <h1>{user.state}</h1>
+                            </div>
+                            <div style="margin-top: 1rem;">
+                                <h2>Country</h2>
+                                <h1>{user.country}</h1>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+                <div style="margin-top: 2rem;">
+                    <lightning-button label="Edit" onclick={editProfile}></lightning-button>
+                </div>
+            </template>
+
+            <template if:true={editMode}>
                 <div>
-                <h2>Name</h2>
-                <h1>{editUser.name}</h1>
-                </div>
-                <div style="margin-top: 1rem;">
-                    <h2>Username</h2>
-                    <h1>{editUser.username}</h1>
-                </div>
-                <div style="margin-top: 1rem;">
-                    <lightning-input label="Email" value={editUser.email}></lightning-input>
-                </div>
-                <div style="margin-top: 1rem;">
-                    <lightning-input label="Phone" value={editUser.phone}></lightning-input>
+                    <div class="slds-col" style="float: left;">
+                        <div>
+                            <h2>Name</h2>
+                            <h1>{editUser.name}</h1>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <h2>Username</h2>
+                            <h1>{editUser.username}</h1>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <h2>Email</h2>
+                            <h1>{editUser.email}</h1>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <lightning-input label="Phone" value={editUser.phone} onchange={phoneChange}></lightning-input>
+                        </div>
+                    </div>
 
+                    <div class="slds-col" style="float: left;margin-left: 8rem;">
+                        <div>
+                            <lightning-input label="City" value={editUser.city} onchange={cityChange}></lightning-input>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <lightning-input label="Street" value={editUser.street} onchange={streetChange}></lightning-input>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <lightning-input label="Postal Code" value={editUser.zip} onchange={zipChange}></lightning-input>
+
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <lightning-input label="State" value={editUser.state} onchange={stateChange}></lightning-input>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            <lightning-input label="Country" value={editUser.country} onchange={countryChange}></lightning-input>
+                        </div>
+                    </div>
                 </div>
                 <div style="margin-top: 2rem;">
                     <lightning-button label="Cancel" onclick={exitEdit} style="margin-right: 4rem;"></lightning-button>
                     <lightning-button label="Save" onclick={saveEdit}></lightning-button>
                 </div>
-        </template>
+            </template>
         </div>
     </div>
 </template>
