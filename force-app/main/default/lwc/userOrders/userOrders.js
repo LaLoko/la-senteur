@@ -78,30 +78,39 @@ export default class UserOrders extends LightningElement {
         });  
     }
     openDialog(event){
-        if(event.target.name === 'openConfirmation'){
-            this.originalMessage = 'test message';
-            this.isDialogVisible = true;
-        }else if(event.target.name === 'confirmModal'){
+        console.log(event);
+  
+        // this.isDialogVisible = false;
 
-            if(event.detail !== 1){
-                this.displayMessage = 'Status: ' + event.detail.status + '. Event detail: ' + JSON.stringify(event.detail.originalMessage) + '.';
+        // if(event.target.name === 'openConfirmation'){
+        //     this.originalMessage = 'test message';
+        //     this.isDialogVisible = true;
+        // }else if(event.target.name === 'confirmModal'){
 
-                if(event.detail.status === 'confirm') {
-                    this.order();
-                    event.detail = 1;
-                    this.isDialogVisible = true;
+        //     if(event.detail !== 1 && event.detail !== 2){
+        //         this.displayMessage = 'Status: ' + event.detail.status + '. Event detail: ' + JSON.stringify(event.detail.originalMessage) + '.';
 
-                }else if(event.detail.status === 'cancel'){
-                    console.log('x');
-                    event.detail = 1;
-                    this.isDialogVisible = false;
-                }
-            }else{
-                // this.isDialogVisible = false;
-            }
-        }
+        //         if(event.detail.status === 'confirm') {
+        //             this.order();
+        //             event.detail = 1;
+        //             this.isDialogVisible = true;
+
+        //         }else if(event.detail.status === 'cancel'){
+        //             console.log('x');
+        //             event.detail = 1;
+        //             this.isDialogVisible = false;
+        //         }
+        //     }else{
+        //             event.detail = 1;
+        //         this.isDialogVisible = false;
+                
+        //     }
+        // }
     }
     openCase(){
+        console.log('otwieramy modala')
+        this.template.querySelector('c-new-complaint').makeVisible();
+        
         this.isDialogVisible = true;
 
     }

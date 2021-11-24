@@ -110,36 +110,4 @@ public without sharing class ProfileController {
         ShippmentInfo info = new ShippmentInfo(contact.MailingState,contact.MailingCity,contact.MailingCountry,contact.MailingPostalCode,contact.MailingStreet);
         return info;
     }
-    @AuraEnabled
-    public static Boolean createNewCase(String items,String subject, String description){
-        String userId = System.UserInfo.getUserId();
-        User user = [SELECT Id,ContactId FROM User WHERE Id =: userId LIMIT 1];
-        Contact contact = [SELECT Id,AccountId FROM Contact WHERE Id =: user.ContactId LIMIT 1];
-
-        System.debug(items);
-        System.debug(subject);
-
-
-        List<OrderWrapper> orderItems = OrderWrapper.parse(items);
-        Case caseObj = new Case(
-            ContactId = contact.Id,
-            AccountId = contact.AccountId,
-            Status = 'New',
-            Origin = 'Web',
-            Subject = subject,
-            Description = description);
-
-            insert caseObj;
-
-            for(OrderWrapper item : orderItems){
-                Case_Perfume__c cp = new Case_Perfume__c();
-                cp.Case__c = caseObj.Id;
-                cp.Product__c = [SELECT Id,Name FROM Product2 WHERE Name LIKE :item.name LIMIT 1].Id;
-                cp.Designer__c = [SELECT Id,Name FROM Designer__c WHERE Name LIKE : item.designer LIMIT 1].Id;
-                cp.Variant__c = [SELECT Id FROM Variant__c WHERE Product__c =: cp.Product__c AND Capacity__c =: item.capacity LIMIT 1].Id;
-
-                insert cp;
-            }
-            return true;
-    }
 }

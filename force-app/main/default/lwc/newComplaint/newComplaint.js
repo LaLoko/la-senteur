@@ -1,5 +1,5 @@
 import { LightningElement,api } from 'lwc';
-import createNewCase from '@salesforce/apex/ProfileController.createNewCase';
+import createNewCase from '@salesforce/apex/CaseController.createNewCase';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 export default class NewComplaint extends LightningElement {
@@ -15,16 +15,34 @@ export default class NewComplaint extends LightningElement {
     subject;
     description;
 
-    handleClick(event){
-        let finalEvent = {
-            originalMessage: this.originalMessage,
-            status: event.target.name
-        };
-        if(event.target.name == 'confirm'){
-            this.createCase();
-        }
+    // handleClick(event){
+    //     let finalEvent = {
+    //         originalMessage: this.originalMessage,
+    //         status: event.target.name
+    //     };
+    //     if(event.target.name == 'confirm'){
+    //         this.createCase();
+    //         this.dispatchEvent(new CustomEvent('click', {detail: finalEvent}));
+    //     }
+    //     if(event.target.name == 'cancel'){
+    //         this.dispatchEvent(new CustomEvent('click', {detail: 2}));
+    //     }
 
-        this.dispatchEvent(new CustomEvent('click', {detail: finalEvent}));
+    // }
+    @api
+    makeVisible(){
+        this.visible = true;
+    }
+    close(){
+        this.visible = false;
+        console.log('close')
+        // dispatchEvent(new CustomEvent('click', {detail: 2}));
+    }
+    saveCase(){
+        console.log('save')
+        this.createCase();
+        this.visible = false;
+        // dispatchEvent(new CustomEvent('click', {detail: 2}));
     }
     changeSelectedItem(event){
         let indx = event.target.dataset.recordId;
@@ -47,11 +65,13 @@ export default class NewComplaint extends LightningElement {
     createCase(){
         let caseItems = [];
         this.items.forEach(element => {
-            if(element.hideBool === undefined || element.hideBool == true){
+            if(element.hideBool == true){
                 caseItems.push(element);
             }
         });
-        createNewCase({items:JSON.stringify(caseItems),subject:this.subject,description:this.description})
+        console.log('create case')
+
+        createNewCase({items:JSON.stringify(caseItems),subject:this.subject,description:this.description,orderId:this.order.Id})
         .then(result => {
             if(result == true){
                 const evt = new ShowToastEvent({
