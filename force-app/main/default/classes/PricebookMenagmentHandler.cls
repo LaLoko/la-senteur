@@ -5,6 +5,8 @@ public with sharing class PricebookMenagmentHandler {
         this.variants = variants;
     }
     public  void afterInsert(List<Variant__c> variantsList){
+        Pricebook2 standard = [SELECT Id,Name FROM Pricebook2 WHERE isStandart = true LIMIT 1];
+
         Pricebook2 priceBook50 = [SELECT Id,Name FROM Pricebook2 WHERE Name LIKE '%50%'].get(0);
         Pricebook2 priceBook75 = [SELECT Id,Name FROM Pricebook2 WHERE Name LIKE '%75%'].get(0);
         Pricebook2 priceBook100 = [SELECT Id,Name FROM Pricebook2 WHERE Name LIKE '%100%'].get(0);
@@ -26,6 +28,9 @@ public with sharing class PricebookMenagmentHandler {
             }else{
                 priceBookId = priceBook200.Id;
             }
+            Product2 prod = [SELECT Id, minPrice__c FROM Product2 WHERE Id =: variant.Product__c LIMIT 1];
+            
+            
             PricebookEntry standardPBE = new PricebookEntry(Pricebook2Id = priceBookId, Product2Id = variant.Product__c, UnitPrice = variant.Price__c, IsActive = true);
             insert standardPBE;
         }

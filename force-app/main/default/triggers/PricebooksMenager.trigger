@@ -1,16 +1,16 @@
 trigger PricebooksMenager on Variant__c (after insert,after update, after delete) {
 
-    PricebookMenagmentHandler handler = new PricebookMenagmentHandler(Trigger.oldMap);
-    if(Trigger.isInsert){
-        handler.afterInsert(Trigger.new);
-    }
-    if(Trigger.isUpdate){
-        handler.afterUpdate(Trigger.old);
+    // PricebookMenagmentHandler handler = new PricebookMenagmentHandler(Trigger.oldMap);
+    // if(Trigger.isInsert){
+    //     handler.afterInsert(Trigger.new);
+    // }
+    // if(Trigger.isUpdate){
+    //     handler.afterUpdate(Trigger.old);
 
-    }
-    if(Trigger.isDelete){
-        handler.afterDelete(Trigger.old);
-    }
+    // }
+    // if(Trigger.isDelete){
+    //     handler.afterDelete(Trigger.old);
+    // }
 
 
     // List<Pricebook2> priceBooks = [SELECT Id,Name FROM Pricebook2];
