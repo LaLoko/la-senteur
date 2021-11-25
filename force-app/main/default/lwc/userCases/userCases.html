@@ -62,7 +62,12 @@
                                                     <h1 style="font-size: large;">Description</h1>
                                                     <h1 style="font-size: medium;">{it.value.objCase.Description}</h1>
                                                 </div>
-
+                                                <div class="slds-grid slds-gutters slds-align_absolute-center">
+                                                    <div style="float: left;">Designer</div>
+                                                    <div style="float: left;">Product</div>
+                                                    <div style="float: left;">Capacity</div>
+                                                    <div style="float: left;">Price</div>
+                                                </div>
                                                     <template for:each={it.value.orderItems} for:item="item" for:index="index">
                                                         <div key={item.Id} style="height: 1rem;margin: 1rem;" class="orderRow">
                                                             <div class="divider" style="background-color: rgba(0, 0, 0, 0.349); height: 1px;width: 100%;"></div>
@@ -98,5 +103,11 @@
                 </tbody>
             </table>
         </div>   
+    </div>
+    <div class="spinner">
+        <template if:true={isLoading}>
+             <lightning-spinner alternative-text="Loading" variant="brand" size="large">
+             </lightning-spinner>
+        </template>
     </div>
 </template>

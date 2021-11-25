@@ -6,7 +6,7 @@
 
     <template if:true={cartExist}>
         <div class="slds-grid slds-gutters">
-            <div class="slds-col slds-size_2-of-4" style="margin-left: 24rem;">
+            <div class="slds-col slds-size_2-of-4" style="margin-left: 20rem;">
                 <div class="slds-scrollable_y" style="height: 500px;margin:1rem">
                     <template for:each={cart} for:item="cartItem" for:index="index">
                         <div key={cartItem.Id} style="height: 8rem;" >
@@ -22,7 +22,7 @@
                                 <div class="slds-col slds-size_1-of-6">
                                     <h3>{cartItem.perfumeName} </h3>
                                 </div>
-                                <div class="slds-col slds-size_1-of-5">
+                                <div class="slds-col slds-size_1-of-4">
                                     <h3>{cartItem.variant} </h3>
                                 </div>
                                 <div class="slds-col slds-size_1-of-6">

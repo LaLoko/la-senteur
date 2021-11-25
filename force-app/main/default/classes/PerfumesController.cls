@@ -460,6 +460,10 @@ public without sharing class PerfumesController {
             ShippmentInfo info = new ShippmentInfo(contact.MailingState,contact.MailingCity,contact.MailingCountry,contact.MailingPostalCode,contact.MailingStreet);
             return info;
     }
+    @AuraEnabled
+    public static string getLastOrderId(){
+        return [SELECT Id FROM Order ORDER BY Id DESC LIMIT 1].Id;
+    }
 
     @AuraEnabled
     public static Boolean createOrder(){

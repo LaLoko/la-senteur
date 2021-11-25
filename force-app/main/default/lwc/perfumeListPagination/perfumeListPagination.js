@@ -21,7 +21,7 @@ export default class PerfumeListPagination extends LightningElement {
 
     @track startingRecord = 1;
     @track endingRecord = 0; 
-    @track pageSize = 8; 
+    @track pageSize = 12; 
     @track totalRecountCount = 0;
     @track totalPage;
 

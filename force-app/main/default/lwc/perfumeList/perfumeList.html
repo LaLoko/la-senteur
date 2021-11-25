@@ -1,12 +1,12 @@
 <template>
     <div class="slds-grid slds-wrap">
         <template if:false={searchSucces}>
-            <div class="slds-col slds-size_2-of-12 filterSection" style="background: floralwhite;">
+            <div style="background: floralwhite;width: 18%;">
                 <c-perfumes-list-filters onfilter={handleFilters} onclear={clearFilters} onload={handleLoad}></c-perfumes-list-filters>
             </div>
         </template>
         <template if:false={searchSucces}>
-        <div class="slds-col slds-size_10-of-12">
+        <div style="width: 82%;">
             <div>
                 <c-perfume-list-pagination onsort={handleSortSelected} records={perfumesList}
                     searchsucces={searchSucces} onupdate={paginationHandler}></c-perfume-list-pagination>

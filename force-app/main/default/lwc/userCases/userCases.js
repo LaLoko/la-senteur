@@ -9,6 +9,7 @@ export default class UserCases extends LightningElement {
     orderItems;
     @track address;
     @track isDialogVisible = false;
+    @track isLoading = true;
 
     connectedCallback(){
         this.getAllCases();
@@ -18,6 +19,7 @@ export default class UserCases extends LightningElement {
         getAllUserCases()
         .then(result => {
             this.cases = result;
+            this.isLoading = false;
         })
         .catch(error => {
             this.error = error;

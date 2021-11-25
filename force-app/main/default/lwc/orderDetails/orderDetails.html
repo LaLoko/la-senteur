@@ -4,22 +4,22 @@
         <div style="display: flex;flex-direction: row;">
             <template if:true={detailedOrder}>
                 <div class="slds-col slds-float_left">
-                    <h1 style="font-size: large;">Order Number : {detailedOrder.OrderNumber}</h1>
+                    <h1>Order Number : {detailedOrder.OrderNumber}</h1>
                     <br />
 
                     <template if:true={address}>
-                        <h1 style="font-size: large;">Address</h1>
-                        <h1 style="font-size: large;">Country : {address.country}</h1>
-                        <h1 style="font-size: large;">City : {address.city}</h1>
-                        <h1 style="font-size: large;">Street : {address.street}</h1>
-                        <h1 style="font-size: large;">Postal Code : {address.zip}</h1>
-                        <h1 style="font-size: large;">State : {address.state}</h1>
+                        <h3>Address</h3>
+                        <h3>Country : {address.country}</h3>
+                        <h3 >City : {address.city}</h3>
+                        <h3>Street : {address.street}</h3>
+                        <h3 >Postal Code : {address.zip}</h3>
+                        <h3 >State : {address.state}</h3>
                     </template>
 
                     <br/>
-                    <h1 style="font-size: large;">Total Amount : {detailedOrder.TotalAmount} €</h1>
+                    <h3>Total Amount : {detailedOrder.TotalAmount} €</h3>
                     <br/>
-                    <h3 style="font-size: large;">Order date : <lightning-formatted-date-time
+                    <h3 >Order date : <lightning-formatted-date-time
                             value={detailedOrder.ActivatedDate} year="numeric" month="numeric" day="numeric"
                             hour="numeric" minute="2-digit" hour12="false">
                         </lightning-formatted-date-time>

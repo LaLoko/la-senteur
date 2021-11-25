@@ -1,10 +1,12 @@
 import { LightningElement, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
+import getLastOrderId from '@salesforce/apex/PerfumesController.getLastOrderId';
 export default class Cart extends NavigationMixin(
     LightningElement
 ) {
     @track cartExist;
     @track step;
+    orderId;
 
     oneCompleted;
     twoCompleted;
@@ -56,6 +58,10 @@ export default class Cart extends NavigationMixin(
     }
     handleFinalization(){
         this.finalized = true;
+        getLastOrderId()
+        .then(result => {
+            this.orderId = result;
+        });
     }
 
     get currentStep(){

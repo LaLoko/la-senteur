@@ -3,7 +3,7 @@
         <div class="slds-col slds-size_3-of-4" style="margin-left: 15rem;">
             <div class="slds-col slds-size_2-of-4" style="float: left;margin-top: 3rem;">
                 <h1 style="font-size: x-large;margin-bottom:1rem;">Items :</h1>
-                <div class="slds-scrollable_y" style="height: 26rem;margin:1rem">
+                <div class="slds-scrollable_y" style="height: 14rem;margin:1rem">
                     <template for:each={cart} for:item="cartItem" for:index="index">
                         <div key={cartItem.Id} style="height: 2rem;" >
                             <div class="slds-grid slds-gutters slds-align_absolute-center" style="height: 100%;">
@@ -20,7 +20,7 @@
                         </div>
                     </template>
                 </div>
-                <h2 style="margin-left: 20rem;font-size: x-large;">Total : {total}</h2>
+                <h2 style="margin-left: 16rem;font-size: x-large;">Total : {total}</h2>
             </div>
             <div class="slds-col slds-size_2-of-4" style="float: left;margin-top: 3rem;">
                 <h1 style="font-size: x-large;margin-bottom:1rem;">Shipping Info :</h1>
@@ -40,11 +40,11 @@
                     <p style="font-weight: bold;">Shipping Country</p>
                     <h1>{shippingInfo.country}</h1>
                 </template>
-                <div style="margin-top: 166px;">
-                <lightning-button label="Order" onclick={confirmDialog} style="width: 10rem;font-size: 1rem;"></lightning-button>
             </div>
-
-            </div>
+         
+        </div>
+        <div style="margin-top: 28rem;margin-left: -38rem;">
+            <lightning-button label="Order" onclick={confirmDialog} style="width: 10rem;font-size: 1rem;"></lightning-button>
         </div>
     </div>
     <c-confirmation-dialog title='Order confirmation' message='Are you sure you want to place an order?' confirm-label='Confirm'
