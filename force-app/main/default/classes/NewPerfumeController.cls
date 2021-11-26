@@ -37,7 +37,7 @@ public class NewPerfumeController {
                 for(ID id : docIds){
                     // cvIds.add(cv.Id);
 
-                    String url = 'https://britenet-bb-dev-ed--c.documentforce.com/servlet/servlet.FileDownload?file='+id;
+                    String url = 'https://britenet-bb-dev-ed--c.documentforce.com/servlet/servlet.ImageServer?id='+id+'&oid=00D09000007z4Sw&lastMod=1637830151000';
 
                     Product_Image__c pi = new Product_Image__c(
                         Product__c = recordId,
@@ -114,7 +114,7 @@ public class NewPerfumeController {
             System.debug(variant);
         }
 
-        return 'git';
+        return prod.Id;
     }
 
     public static String stringToPicklist(String input){

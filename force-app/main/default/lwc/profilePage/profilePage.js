@@ -14,5 +14,6 @@ export default class ProfilePage extends LightningElement {
     }
     goToOrder(event){
         this.orderId = event.detail;
+        this.template.querySelector('lightning-tabset').activeTabValue = 'Orders history';
     }
 }

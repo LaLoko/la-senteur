@@ -1,12 +1,12 @@
 <template>
     <template if:false={showDetails}>
 
-    <lightning-tabset>
+    <lightning-tabset active-tab-value ="">
         <lightning-tab label="Profile" class="slds-theme_shade">
             <c-profile-info></c-profile-info>
         </lightning-tab>
-        <lightning-tab label="Orders history">
-            <c-user-orders onselect={handleOrderSelect}></c-user-orders>
+        <lightning-tab label="Orders history" value="Orders history">
+            <c-user-orders onselect={handleOrderSelect} orderid={orderId}></c-user-orders>
         </lightning-tab>
         <lightning-tab label="Complaint history">
             <c-user-cases onorder={goToOrder}></c-user-cases>

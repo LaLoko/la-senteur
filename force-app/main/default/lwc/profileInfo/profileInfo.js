@@ -4,6 +4,7 @@ import updateProfile from '@salesforce/apex/ProfileController.updateProfile';
 export default class ProfileInfo extends LightningElement {
     @track user;
     @track editUser;
+    @track isLoading = true;
     editMode = false;
 
     connectedCallback(){
@@ -14,6 +15,7 @@ export default class ProfileInfo extends LightningElement {
         getProfileInfo()
         .then(result => {
             this.user = result;
+            this.isLoading = false;
             console.log(JSON.stringify(result));
         })
         .catch(error => {

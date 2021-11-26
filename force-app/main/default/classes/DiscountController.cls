@@ -33,7 +33,7 @@ public class DiscountController {
     }
 
     @AuraEnabled
-    public static Boolean createNewPricebook(String products,String name,String description,Date startDate,Date endDate){
+    public static String createNewPricebook(String products,String name,String description,Date startDate,Date endDate){
         List<PricebookItemWrapper> productsList = PricebookItemWrapper.parse(products);
         System.debug(productsList);
 
@@ -64,7 +64,7 @@ public class DiscountController {
             }
         }
         insert variants;
-        return true;
+        return pricebook.Id;
 
         // List<PricebookEntry> entries = new List<PricebookEntry>();
 

@@ -89,13 +89,28 @@ public without sharing class PerfumesController {
             wrapper.gender = perfume.Gender__c;
             wrapper.mainAccords = perfume.Main_Accords__c;
             wrapper.photo = perfume.Photo__c;
-            wrapper.price = perfume.minPrice__c;
+            wrapper.price = getPerfumePrice(perfume.Id,perfume.minPrice__c);
             out.add(wrapper);
         }
 
         System.debug(out);
         return out;
     }
+    public static String getPerfumePrice(Id perfumeId,Decimal minPrice){
+        List<Variant__c> variants = getVariantsWithPricebook([SELECT Price__c FROM Variant__c WHERE Product__c =: perfumeId]);
+        Decimal newPrice = 0;
+        for(Variant__c variant : variants){
+            if(variant.Price__c < minPrice){
+                newPrice = variant.Price__c;
+            }
+        }
+        if(newPrice == 0){
+            return String.valueOf(minPrice);
+        }else{
+            return 'SALE '+String.valueOf(newPrice);
+        }
+    }
+
     public static String conditionFromList(List<String> toConvert){
         String condition = '';
         for(string val : toConvert) {
@@ -136,7 +151,7 @@ public without sharing class PerfumesController {
             wrapper.gender = perfume.Gender__c;
             wrapper.mainAccords = perfume.Main_Accords__c;
             wrapper.photo = perfume.Photo__c;
-            wrapper.price = perfume.minPrice__c;
+            wrapper.price = getPerfumePrice(perfume.Id,perfume.minPrice__c);
             out.add(wrapper);
         }
 
@@ -188,10 +203,18 @@ public without sharing class PerfumesController {
         ];
         Product2 perfume = perfumesList.get(0);
 
-        List<Variant__c> variants = [SELECT Price__c,Capacity__c FROM Variant__c WHERE Product__c =: perfume.Id ORDER BY Capacity__c];
+        List<Variant__c> variants = [SELECT Price__c,Capacity__c,InPromo__c FROM Variant__c WHERE Product__c =: perfume.Id ORDER BY Capacity__c];
+
+        variants = getVariantsWithPricebook(variants);
+
         List<String> variantsMap = new List<String>();
         for(Variant__c variant : variants){
-            variantsMap.add(variant.Capacity__c+' ml - '+variant.Price__c+' €');
+            if(variant.InPromo__c){
+                variantsMap.add(variant.Capacity__c+' ml - '+variant.Price__c+' € SALE');
+
+            }else{
+                variantsMap.add(variant.Capacity__c+' ml - '+variant.Price__c+' €');
+            }
         }
         System.debug(perfume);
 
@@ -212,6 +235,42 @@ public without sharing class PerfumesController {
 
         return wrapper;
     }
+    public static List<Variant__c> getVariantsWithPricebook(List<Variant__c> preVariants){
+        List<Pricebook2> pricebooks = [SELECT Id FROM Pricebook2 WHERE IsStandard = false AND IsActive = true];
+        List<Id> pricebooksIds = new List<Id>();
+        for(Pricebook2 var : pricebooks){
+            pricebooksIds.add(var.Id);
+        }
+
+        List<Id> variantIds = new List<Id>();
+        for(Variant__c var : preVariants){
+            variantIds.add(var.Id);
+        }
+        List<Pricebook_entry_variant__c> variants = [SELECT Id,Price_Book__c,New_Price__c,Variant__c 
+        FROM Pricebook_entry_variant__c WHERE Price_Book__c IN : pricebooksIds AND Variant__c IN : variantIds];
+
+        if(variants.size() > 0){
+            List<Variant__c> out = new List<Variant__c>();
+            for(Variant__c variant : preVariants){
+                Integer size = 0;
+                Decimal sum = 0;
+                for(Pricebook_entry_variant__c priceVariant : variants){
+                    if(priceVariant.Variant__c == variant.Id){
+                        size +=1;
+                        sum += priceVariant.New_Price__c;
+                    }
+                }
+                if(size != 0){
+                    variant.Price__c = sum/size;
+                    variant.InPromo__c = true;
+                }
+            }
+            return preVariants;
+        }else{
+            return preVariants;
+        }
+    }
+
     @AuraEnabled
     public static PerfumeWrapper addReview(String text,Integer score,Id perfume){
         try {
@@ -254,6 +313,7 @@ public without sharing class PerfumesController {
         String userId = System.UserInfo.getUserId();
         return [SELECT Id FROM Perfume_Review__c WHERE CreatedById =: userId AND Product__c =: id].size() > 0;
     }
+
     @AuraEnabled
     public static PerfumeWrapper removeComment(Id perfumeId){
         try {
@@ -385,14 +445,22 @@ public without sharing class PerfumesController {
     }
 
     public static Decimal getPriceFromVariant(String variant){
-        String str1 = variant.split('-')[1];
-        String str2 = str1.substring(1,str1.length()-1);
-        return decimal.valueOf(str2.deleteWhitespace());
+        if(variant.contains('SALE')){
+            return decimal.valueOf(variant.split(' ')[3].deleteWhitespace());
+        }else{
+            String str1 = variant.split('-')[1];
+            String str2 = str1.substring(1,str1.length()-1);
+            return decimal.valueOf(str2.deleteWhitespace());
+        }
     }
     public static Integer getCapacityFromVariant(String variant){
-        String str1 = variant.split('-')[0];
-        String str2 = str1.split(' ')[0];
-        return Integer.valueOf(str2.deleteWhitespace());
+        if(variant.contains('SALE')){
+            return Integer.valueOf(variant.split(' ')[0].deleteWhitespace());
+        }else{
+            String str1 = variant.split('-')[0];
+            String str2 = str1.split(' ')[0];
+            return Integer.valueOf(str2.deleteWhitespace());
+        }
     }
 
     @AuraEnabled
@@ -577,7 +645,7 @@ public without sharing class PerfumesController {
         @AuraEnabled
         public List<String> variants{get;set;}
         @AuraEnabled
-        public Decimal price {get;set;}
+        public String price {get;set;}
         @AuraEnabled
         public List<Product_Image__c> images {get;set;}
 

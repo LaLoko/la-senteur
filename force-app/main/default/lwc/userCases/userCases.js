@@ -58,10 +58,10 @@ export default class UserCases extends NavigationMixin(
     }
 
     goToOrder(event){
-        let index = event.target.dataset.index;
-        let orderId = this.orderItems[index].objOrder.Id; 
-        console.log(orderId);
-        this.dispatchEvent(new CustomEvent('order',{detail:orderId}));
+        var index = event.target.dataset.recordId;
+        // var orderId = this.orderItems[index].objOrder.Id; 
+        // console.log(orderId);
+        this.dispatchEvent(new CustomEvent('order',{detail:this.cases[index].objCase.Order__c}));
 
     }
 

@@ -3,8 +3,10 @@ import getPricebookItems from '@salesforce/apex/DiscountController.getPricebookI
 import createNewPricebook from '@salesforce/apex/DiscountController.createNewPricebook';
 
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-
-export default class DiscountManager extends LightningElement {
+import { NavigationMixin } from 'lightning/navigation';
+export default class DiscountManager extends NavigationMixin(
+    LightningElement
+  ) {
     pricebookName = '';
     description = '';
     startDate;
@@ -12,7 +14,7 @@ export default class DiscountManager extends LightningElement {
     @track isLoading = true;
     products = [];
     rowOffset = 0;
-    draftValues = []
+    draftValues = [];
 
     connectedCallback(){
         this.getAllProducts();
@@ -52,9 +54,9 @@ export default class DiscountManager extends LightningElement {
         });   
     }
     handlePriceChange(event){
-        this.draftValues = event.target.draftValues;
+       this.draftValues = event.target.draftValues;
         // let indx = event.target.dataset.recordId;
-        console.log(JSON.stringify(event.target.draftValues))
+        console.log(JSON.stringify(event.detail.draftValues))
   
 
         // if ( this.products ) {
@@ -84,6 +86,9 @@ export default class DiscountManager extends LightningElement {
         // }
     }
     savePricebook(){
+        let rows = this.template.querySelector("lightning-datatable").getSelectedRows()
+        console.log(JSON.stringify(rows));
+
         var priceBelowZero = false;
         var somethingSelected = false;
 
@@ -95,7 +100,7 @@ export default class DiscountManager extends LightningElement {
                 }
             });
         });
-        console.log(this.products)
+        console.log(JSON.stringify(this.draftValues))
 
         this.products.forEach(element => {
             if(element.selected){
@@ -110,8 +115,14 @@ export default class DiscountManager extends LightningElement {
             if(!priceBelowZero){
                 createNewPricebook({products:JSON.stringify(this.products),name:this.pricebookName,description:this.description,startDate:this.startDate,endDate:this.endDate})
                 .then(result => {
-                    // this.products = result;
-                    // this.isLoading = false;
+                    this[NavigationMixin.Navigate]({
+                        type: 'standard__recordPage',
+                        attributes: {
+                            recordId: result,
+                            objectApiName: 'Product2',
+                            actionName: 'view'
+                        }
+                    });
                 })
                 .catch(error => {
                     this.error = error;

@@ -1,4 +1,4 @@
-import { LightningElement, track } from 'lwc';
+import { LightningElement, track, api } from 'lwc';
 import getAllOrders from '@salesforce/apex/ProfileController.getAllOrders';
 import getOrderDetails from '@salesforce/apex/ProfileController.getOrderDetails';
 import getOrderedPerfumes from '@salesforce/apex/ProfileController.getOrderedPerfumes';
@@ -12,6 +12,7 @@ export default class UserOrders extends NavigationMixin(
     orderItems;
     @track address;
     @track isDialogVisible = false;
+    @api orderid;
 
     connectedCallback(){
         this.getOrders();
@@ -21,6 +22,18 @@ export default class UserOrders extends NavigationMixin(
         getAllOrders()
         .then(result => {
             this.orders = result;
+            console.log(this.orderId);
+            if(this.orderid){
+                console.log('wbija')
+                let index = 0;
+                for(let i=0;i<this.orders.length;i++){
+                    if(this.orders[i].objOrder.Id == this.orderId){
+                        index = i;
+                    }
+                }
+                console.log(index)
+               this.hs(index);
+            }
         })
         .catch(error => {
             this.error = error;
@@ -31,9 +44,10 @@ export default class UserOrders extends NavigationMixin(
         this.dispatchEvent(new CustomEvent('select',{detail:this.orders[index]}));
     }
     hideAndShow( event ) {
-
         let indx = event.target.dataset.recordId;
-
+        this.hs(indx);
+    }
+    hs(indx){
         if ( this.orders ) {
 
             let recs =  JSON.parse( JSON.stringify( this.orders ) );
@@ -45,9 +59,7 @@ export default class UserOrders extends NavigationMixin(
             }
             recs[ indx ].hideBool = !currVal;
             this.orders = recs;
-
         }
-
     }
 
     getDetails(order){

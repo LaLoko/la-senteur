@@ -15,4 +15,7 @@ export default class PerfumeItem extends NavigationMixin(
                 }
             });
     }
+    get priceStyle(){
+        return this.item.price.includes('SALE') ? 'sale' : 'normal'; 
+    }
 }

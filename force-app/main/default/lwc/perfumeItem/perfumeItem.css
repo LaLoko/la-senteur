@@ -10,3 +10,9 @@
     height: 86%;
     object-fit: contain;
 }
+.sale{
+    color: red;
+}
+.normal{
+    color: black;
+}

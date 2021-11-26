@@ -5,8 +5,11 @@ import getAllAccords from '@salesforce/apex/PerfumesController.getAllAccords';
 
 import createNewPerfume from '@salesforce/apex/NewPerfumeController.createNewPerfume';
 
+import { NavigationMixin } from 'lightning/navigation';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-export default class PerfumeAddPage extends LightningElement {
+export default class PerfumeAddPage extends NavigationMixin(
+  LightningElement
+) {
 
  @track name = '';
     selGender = '';
@@ -195,7 +198,15 @@ export default class PerfumeAddPage extends LightningElement {
           })
           .then(result => {              
               this.template.querySelector('c-file-upload-multi').uploadFiles();
-              this.clear();
+              // this.clear();
+              this[NavigationMixin.Navigate]({
+                type: 'standard__recordPage',
+                attributes: {
+                    recordId: result,
+                    objectApiName: 'Pricebook2',
+                    actionName: 'view'
+                }
+            });
           })
           .catch(error => {
               this.error = error;
