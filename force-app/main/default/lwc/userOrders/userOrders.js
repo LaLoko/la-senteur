@@ -3,8 +3,10 @@ import getAllOrders from '@salesforce/apex/ProfileController.getAllOrders';
 import getOrderDetails from '@salesforce/apex/ProfileController.getOrderDetails';
 import getOrderedPerfumes from '@salesforce/apex/ProfileController.getOrderedPerfumes';
 import getShippmentInfo from '@salesforce/apex/ProfileController.getShippmentInfo';
-
-export default class UserOrders extends LightningElement {
+import { NavigationMixin } from 'lightning/navigation';
+export default class UserOrders extends NavigationMixin(
+    LightningElement
+) {
     @track orders;
     @track detailedOrder;
     orderItems;
@@ -113,5 +115,18 @@ export default class UserOrders extends LightningElement {
         
         this.isDialogVisible = true;
 
+    }
+    goToPerfume(event){
+        let index = event.target.dataset.index;
+        console.log(index);
+                this[NavigationMixin.Navigate]({
+                    type: 'comm__namedPage',
+                    attributes: {
+                        pageName: 'perfume-detail'
+                    },
+                    state: {
+                        'id': this.orderItems[index].perfumeId
+                    }
+                });
     }
 }

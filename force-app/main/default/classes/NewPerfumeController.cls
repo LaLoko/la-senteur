@@ -30,7 +30,8 @@ public class NewPerfumeController {
                 // Insert cvList;
 
                 Product2 product = [SELECT Id,Photo__c FROM Product2 WHERE Id =: recordId LIMIT 1];
-                product.Photo__c = 'https://britenet-bb-dev-ed--c.documentforce.com/servlet/servlet.FileDownload?file='+docIds.get(0);
+                // product.Photo__c = 'https://britenet-bb-dev-ed--c.documentforce.com/servlet/servlet.FileDownload?file='+docIds.get(0);
+                product.Photo__c = 'https://britenet-bb-dev-ed--c.documentforce.com/servlet/servlet.ImageServer?id='+docIds.get(0)+'&oid=00D09000007z4Sw&lastMod=1637830151000';
                 update product;
 
                 for(ID id : docIds){

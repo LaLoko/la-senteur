@@ -78,7 +78,7 @@
                                                                     <h3>{item.designer}</h3>
                                                                 </div>
                                                                 <div class="slds-col slds-size_1-of-6">
-                                                                    <h3>{item.name}</h3>
+                                                                    <h3 onclick={goToPerfume} data-record-id={it.index} data-index={index} style="text-decoration: underline;color: blue;">{item.name}</h3>
                                                                 </div>
                                                                 <div class="slds-col slds-size_1-of-6">
                                                                     <h3>{item.capacity}ml</h3>
@@ -91,7 +91,7 @@
                                                     </template>
 
                                                     <div class="slds-align_absolute-center">
-                                                        <lightning-button label="Go to order"></lightning-button>
+                                                        <lightning-button label="Go to order" onclick={goToOrder} data-index={index}></lightning-button>
                                                     </div>
                                                 </div>
                                         </div>

@@ -100,6 +100,7 @@ public without sharing class CaseController {
             for(Product2 product : products){
                 if(cs.Product__c == product.Id){
                     wrapper.name = product.Name;
+                    wrapper.perfumeId = product.Id;
                     for(Designer__c designer : designers){
                         if(designer.Id == product.Designer__c){
                             wrapper.designer = designer.Name;

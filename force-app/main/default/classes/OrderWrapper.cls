@@ -8,6 +8,8 @@ public class OrderWrapper{
     @AuraEnabled
     public String name;
     @AuraEnabled
+    public Id perfumeId;
+    @AuraEnabled
     public Boolean hideBool;
     @AuraEnabled
     public Order objOrder;

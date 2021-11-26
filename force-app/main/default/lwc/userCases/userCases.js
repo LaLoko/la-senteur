@@ -1,12 +1,13 @@
 import { LightningElement,track } from 'lwc';
 import getAllUserCases from '@salesforce/apex/CaseController.getAllUserCases';
-
-
-export default class UserCases extends LightningElement {
+import { NavigationMixin } from 'lightning/navigation';
+export default class UserCases extends NavigationMixin(
+    LightningElement
+) {
 
     @track cases;
-    @track detailedOrder;
-    orderItems;
+    // @track detailedOrder;
+    // orderItems;
     @track address;
     @track isDialogVisible = false;
     @track isLoading = true;
@@ -25,10 +26,10 @@ export default class UserCases extends LightningElement {
             this.error = error;
         });   
     }
-    goToOrder(event){
-        let index = event.target.dataset.index;
-        this.dispatchEvent(new CustomEvent('select',{detail:this.orders[index]}));
-    }
+    // goToOrder(event){
+    //     let index = event.target.dataset.index;
+    //     this.dispatchEvent(new CustomEvent('select',{detail:this.orders[index]}));
+    // }
     hideAndShow( event ) {
 
         let indx = event.target.dataset.recordId;
@@ -40,6 +41,28 @@ export default class UserCases extends LightningElement {
             recs[ indx ].hideBool = !currVal;
             this.cases = recs;
         }
+    }
+    goToPerfume(event){
+        let index = event.target.dataset.index;
+        let indx = event.target.dataset.recordId;
+
+                this[NavigationMixin.Navigate]({
+                    type: 'comm__namedPage',
+                    attributes: {
+                        pageName: 'perfume-detail'
+                    },
+                    state: {
+                        'id': this.cases[indx].orderItems[index].perfumeId
+                    }
+                });
+    }
+
+    goToOrder(event){
+        let index = event.target.dataset.index;
+        let orderId = this.orderItems[index].objOrder.Id; 
+        console.log(orderId);
+        this.dispatchEvent(new CustomEvent('order',{detail:orderId}));
+
     }
 
     // getDetails(order){

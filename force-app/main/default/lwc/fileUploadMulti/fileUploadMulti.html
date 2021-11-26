@@ -9,8 +9,10 @@
         flex-direction: column;">
             <template if:true={filesData}>
                 <template for:each={filesData} for:item="imgName" for:index="index">
+                    
                     <h1 key={imgName.fileName} style="font-size: 20px">{imgName.fileName}&nbsp;
                         <lightning-icon style="height: 1rem;" icon-name="utility:close" data-id={index} onclick={removeReceiptImage} ></lightning-icon></h1>
+                        <img key={imgName.fileName} src={imgName.fileContents}/>
                     <!-- {imgName.fileName} -->
                     <!-- <span key={imgName.fileName} data-id={index} onclick={removeReceiptImage}
                         class="removeImage">x</span> &nbsp; -->

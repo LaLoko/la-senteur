@@ -2,7 +2,7 @@
     <lightning-card title="New Pricebook">
         <div class="container">
             <div class="slds-align_absolute-center" style="flex-direction: column;width: 60%;">
-                <lightning-input label="Name" value={pricebookName} onchange={handleNameChange}></lightning-input>
+                <lightning-input label="Name" value={pricebookName} onchange={handleNameChange} required="true"></lightning-input>
                 <lightning-textarea label="Description" value={description} onchange={handleDescriptionChange} style="width: 50rem;"></lightning-textarea>
             </div>
             <div style="display: flex;">

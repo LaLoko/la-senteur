@@ -9,7 +9,7 @@
             <c-user-orders onselect={handleOrderSelect}></c-user-orders>
         </lightning-tab>
         <lightning-tab label="Complaint history">
-            <c-user-cases></c-user-cases>
+            <c-user-cases onorder={goToOrder}></c-user-cases>
         </lightning-tab>
     </lightning-tabset>
 </template>

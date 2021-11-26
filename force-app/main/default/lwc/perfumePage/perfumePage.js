@@ -52,6 +52,9 @@ export default class PerfumePage extends LightningElement {
                 if(this.currPhoto === undefined){
                     this.currPhoto = this.perfume.images[this.photoIndex].URL__c;
                 }
+                if(result.images.length < 2){
+                    this.disableNextPhoto = true;
+                }
             })
             .catch(error => {
                 this.error = error;

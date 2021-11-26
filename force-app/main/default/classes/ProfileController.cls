@@ -88,6 +88,7 @@ public without sharing class ProfileController {
 
             for(Product2 product : perfumes){
                 if (product.Id == item.Product2Id) {
+                    wrapper.perfumeId = product.Id;
                     wrapper.name = product.Name;
                     for(Designer__c designer : designers){
                         if(designer.Id == product.Designer__c){
