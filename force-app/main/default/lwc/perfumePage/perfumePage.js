@@ -209,6 +209,7 @@ export default class PerfumePage extends LightningElement {
     }
     
     editReview(event){
+        console.log(this.commentToEdit.Review__c);
         updateReview({text:this.commentToEdit.Review__c,score:this.editScore,perfumeId:this.id})
         .then(result => {
             this.getAllReviews();

@@ -64,7 +64,29 @@ public without sharing class PerfumesController {
         }
      
         perfumesList = database.query(query);
-        System.debug(perfumesList);
+        if(sortType!= null && sortType.contains('popular')){
+        List<AggregateResult> orderItems = [SELECT Product2Id , COUNT(Id) FROM OrderItem GROUP BY Product2Id ORDER BY COUNT(Id) DESC];
+        List<Product2> out = new List<Product2>();
+        for(AggregateResult item : orderItems){
+            for(Product2 product : perfumesList){
+                if(item.get('Product2Id') == product.Id){
+                    out.add(product);
+                }
+            }
+        }
+        for(Product2 product : perfumesList){
+            Boolean notInList = true;
+            for(Product2 inOut : out){
+            if(inOut.Id == product.Id){
+                notInList = false;
+            }
+        }
+        if(notInList){
+            out.add(product);
+        }
+    }
+        perfumesList = out;
+    }
 
         List<Id> ids = new List<Id>();
         for (Product2 perfume : perfumesList) {
@@ -161,13 +183,25 @@ public without sharing class PerfumesController {
 
     @AuraEnabled
     public static List<BestsellerWrapper> getBestsellers(){
-        List<Product2> perfumesList = [
+        List<AggregateResult> orderItems = [SELECT Product2Id , COUNT(Id) FROM OrderItem GROUP BY Product2Id ORDER BY COUNT(Id) DESC];
+        System.debug(orderItems);
+        List<Product2> allPerfumes = [
                 SELECT Id, Name,Photo__c,Designer__c, minPrice__c
                 FROM Product2
                 WHERE Family = 'Perfumes'
-                ORDER BY Score__c
-                LIMIT 5
         ];
+        Integer currNumber = 1;
+        List<Product2> perfumesList = new List<Product2>();
+        for(AggregateResult item : orderItems){
+            for(Product2 product : allPerfumes){
+                if(item.get('Product2Id') == product.Id){
+                    perfumesList.add(product);
+                    currNumber ++;
+                }
+                if(currNumber == 5) break;
+            }
+        }
+
 
         List<Id> ids = new List<Id>();
         for (Product2 perfume : perfumesList) {
@@ -187,7 +221,7 @@ public without sharing class PerfumesController {
             wrapper.designer = designersKeys.get(perfume.Designer__c);
             wrapper.photo = perfume.Photo__c;
             wrapper.bestsellerName = wrapper.designer +' '+wrapper.name;
-            wrapper.price = perfume.minPrice__c + ' €';
+            wrapper.price = getPerfumePrice(perfume.Id,perfume.minPrice__c)+' €';
             wrapper.URL = 'https://lasenteur-developer-edition.eu40.force.com/s/perfume-detail?id='+perfume.Id;
             out.add(wrapper);
         }
@@ -292,8 +326,9 @@ public without sharing class PerfumesController {
 
     @AuraEnabled
     public static List<ReviewWrapper> getReviews(Id id){
-        List<Perfume_Review__c> reviews = [SELECT Review__c,Score__c,Username__c,Created_date__c FROM Perfume_Review__c WHERE Product__c =: id];
+        List<Perfume_Review__c> reviews = [SELECT Review__c,Score__c,Username__c,Created_date__c,CreatedById FROM Perfume_Review__c WHERE Product__c =: id];
         List<ReviewWrapper> out = new List<ReviewWrapper>();
+        String userId = System.UserInfo.getUserId();
 
         for(Perfume_Review__c review : reviews){
             ReviewWrapper wrapper = new ReviewWrapper();
@@ -301,6 +336,7 @@ public without sharing class PerfumesController {
             wrapper.score = review.Score__c;
             wrapper.scoreName = wrapper.scoreNames.get(review.Score__c);
             wrapper.text = review.Review__c;
+            wrapper.currUserReview = review.CreatedById == userId ? true : false;
             wrapper.username = review.Username__c;
             wrapper.createdTime = review.Created_date__c;
             out.add(wrapper);
@@ -697,6 +733,8 @@ public without sharing class PerfumesController {
         public Decimal score {get;set;}
         @AuraEnabled
         public String text {get;set;}
+        @AuraEnabled
+        public Boolean currUserReview {get;set;}
         @AuraEnabled
         public Datetime createdTime {get;set;}
 

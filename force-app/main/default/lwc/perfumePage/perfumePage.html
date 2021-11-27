@@ -39,8 +39,11 @@
                         </div>
                         <div style="width: 32%;margin-left: 2rem;">
                             <div style="float: right;">
-                                <h1 style="margin-right: 20px;">{perfumeScore}&nbsp;&nbsp;
-                                    <lightning-icon class="gold-background" icon-name="utility:favorite"
+                                <p></p>
+
+                                <h1 style="margin-right: 20px;">
+                                    <lightning-formatted-number value={perfumeScore} format-style="decimal" minimum-fraction-digits="2">
+                                        </lightning-formatted-number>&nbsp;&nbsp;<lightning-icon class="gold-background" icon-name="utility:favorite"
                                         icon-color="gold"></lightning-icon>
                                 </h1>
                             </div>
@@ -81,6 +84,7 @@
                                                     </p>
                                                     <h3 style="font-size: 14px;"><b>Opinion :</b>{review.scoreName}</h3>
                                                 </div>
+                                                <template if:true={review.currUserReview}>
                                                 <div style="float: right; margin-right: 41px; margin-top: -28px;">
                                                     <lightning-button-icon data-id={review.Id} icon-name="utility:edit"
                                                         title="edit" onclick={editComment}>
@@ -89,7 +93,9 @@
                                                         icon-name="utility:delete" title="delete" onclick={openDialog}>
                                                     </lightning-button-icon>
                                                 </div>
+                                            </template>
                                             </div>
+                                            
                                             <div style="margin-top: 30px;margin-left:30px;margin-right:20px">
                                                 <lightning-formatted-rich-text value={review.text}>
                                                 </lightning-formatted-rich-text>
@@ -104,7 +110,7 @@
                             <div style="height: 40px; margin-bottom:24px">
                                 <h2 style="margin-left: 40px;float:left;margin-top: 20px;">Share your opinion</h2>
                                 <div style="margin-left: 90rem;">
-                                    <lightning-combobox style="float: left;width:155px;margin-left:-3rem"
+                                    <lightning-combobox style="float: left;width:155px;margin-left:-15rem"
                                         options={scoreOptions} label="Score" value={score} onchange={scoreChange}>
                                     </lightning-combobox>
                                 </div>
@@ -125,7 +131,7 @@
                     <template if:true={editingComment}>
                         <div style="height: 40px; margin-bottom:24px">
                             <div style="margin-left: 90rem;">
-                                <lightning-combobox style="float: left;width:155px;margin-left:-3rem"
+                                <lightning-combobox style="float: left;width:155px;margin-left:-15rem"
                                     options={scoreOptions} label="Score" value={editScore} onchange={editScoreChange}>
                                 </lightning-combobox>
                             </div>
