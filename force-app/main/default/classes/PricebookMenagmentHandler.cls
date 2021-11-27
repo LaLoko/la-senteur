@@ -1,71 +1,81 @@
 public with sharing class PricebookMenagmentHandler {
-    final Map<Id,SObject> variants;
 
-    public PricebookMenagmentHandler(Map<Id,SObject> variants) {
-        this.variants = variants;
+    public PricebookMenagmentHandler() {
     }
-    public  void afterInsert(List<Variant__c> variantsList){
-        Pricebook2 standard = [SELECT Id,Name FROM Pricebook2 WHERE isStandart = true LIMIT 1];
 
-        Pricebook2 priceBook50 = [SELECT Id,Name FROM Pricebook2 WHERE Name LIKE '%50%'].get(0);
-        Pricebook2 priceBook75 = [SELECT Id,Name FROM Pricebook2 WHERE Name LIKE '%75%'].get(0);
-        Pricebook2 priceBook100 = [SELECT Id,Name FROM Pricebook2 WHERE Name LIKE '%100%'].get(0);
-        Pricebook2 priceBook125 = [SELECT Id,Name FROM Pricebook2 WHERE Name LIKE '%125%'].get(0);
-        Pricebook2 priceBook200 = [SELECT Id,Name FROM Pricebook2 WHERE Name LIKE '%200%'].get(0);
+    public  void afterInsert(List<Pricebook2> pricebooks){
+        minPriceUpdate(pricebooks);
+    }
+    public  void afterUpdate(List<Pricebook2> pricebooks){
+        minPriceUpdate(pricebooks);
+    }
 
-        // List<Product2> perfumes = [SELECT Name,Id,Variant__c FROM Product2 WHERE Variant__c IN :variants.keySet()];
+    public void afterDelete(List<Pricebook2> pricebooks){
+        List<Id> delIds = new List<Id>();
+        for(Pricebook2 pricebook : pricebooks){
+            delIds.add(pricebook.Id);
+        }
+        List<Pricebook_entry_variant__c> pVatiants = [SELECT Id FROM Pricebook_entry_variant__c WHERE Price_Book__c IN : delIds];
+        delete pVatiants;
+        minPriceUpdate(pricebooks);
+    }
 
-        for(Variant__c variant : variantsList){
-            Id priceBookId;
-            if(variant.Capacity__c == 50){
-                priceBookId = priceBook50.Id;
-            }else if(variant.Capacity__c == 75){
-                priceBookId = priceBook75.Id;
-            }else if(variant.Capacity__c == 100){
-                priceBookId = priceBook100.Id;
-            }else if(variant.Capacity__c == 125){
-                priceBookId = priceBook125.Id;
+    public static void minPriceUpdate(List<Pricebook2> pricebooks){
+        List<Id> activeIds = new List<Id>();
+        for(Pricebook2 pricebook : pricebooks){
+            if(pricebook.ValidFrom >= date.today() && pricebook.ValidTo <= date.today()){
+                pricebook.IsActive = true;
+                activeIds.add(pricebook.Id);                
             }else{
-                priceBookId = priceBook200.Id;
+                pricebook.IsActive = false;
             }
-            Product2 prod = [SELECT Id, minPrice__c FROM Product2 WHERE Id =: variant.Product__c LIMIT 1];
-            
-            
-            PricebookEntry standardPBE = new PricebookEntry(Pricebook2Id = priceBookId, Product2Id = variant.Product__c, UnitPrice = variant.Price__c, IsActive = true);
-            insert standardPBE;
         }
+        if(activeIds.size() > 0 ){
+        List<Pricebook_entry_variant__c> pricebookVariants = [SELECT New_price__c,Variant__c FROM Pricebook_entry_variant__c WHERE Price_Book__c IN : activeIds];
 
-    }
-    public  void afterUpdate(List<Variant__c> variantsList){
+        List<Id> variantIds = new List<Id>();
+
+        for(Pricebook_entry_variant__c variant : pricebookVariants){
+            variantIds.add(variant.Variant__c);
+        }
+        List<Variant__c> variants = [SELECT Id,Product__c FROM Variant__c WHERE Id IN : variantIds];
         List<Id> productIds = new List<Id>();
-        for(Variant__c variant : variantsList){
+
+        for(Variant__c variant : variants){
             productIds.add(variant.Product__c);
         }
-        List<PricebookEntry> pricebookEntries = [SELECT Id,UnitPrice,Product2Id FROM PricebookEntry WHERE Product2Id IN :productIds];
-        for(Variant__c variant : variantsList){
-            for(PricebookEntry entry : pricebookEntries){
-                if(variant.Product__c == entry.Product2Id){
-                    entry.UnitPrice = variant.Price__c;
-                }
-            }
-        }
-        update pricebookEntries;
-    }
-    public  void afterDelete(List<Variant__c> variantsList){
-        List<Id> productIds = new List<Id>();
-        for(Variant__c variant : variantsList){
-            productIds.add(variant.Product__c);
-        }
-        List<PricebookEntry> pricebookEntries = [SELECT Id,UnitPrice FROM PricebookEntry WHERE Product2Id IN :productIds];
+        List<Product2> products = [SELECT Id,minPrice__c FROM Product2 WHERE Id IN : productIds];
 
-        List<PricebookEntry> entriesToDel = new List<PricebookEntry>();
-        for(Variant__c variant : variantsList){
-            for(PricebookEntry entry : pricebookEntries){
-                if(variant.Product__c == entry.Product2Id && variant.Price__c == entry.UnitPrice){
-                    entriesToDel.add(entry);
+        for(Product2 product : products){
+            for(Variant__c variant : variants){
+                if(variant.Product__c == product.Id){
+                    for(Pricebook_entry_variant__c pVariant : pricebookVariants){
+                        if(pVariant.Variant__c == variant.Id){
+                            if(pVariant.New_price__c < product.minPrice__c){
+                                product.minPrice__c = pVariant.New_price__c;
+                            }
+                        }
+                    }
                 }
             }
+
         }
-        delete entriesToDel;
+    }else{
+        List<Pricebook2> activePricebooks = [SELECT Id, IsStandard, IsActive FROM Pricebook2 WHERE IsStandard = false];
+        if(activePricebooks.size() == 0){
+            Pricebook2 standard = [SELECT Id, IsStandard FROM Pricebook2 WHERE IsStandard = true LIMIT 1];
+            List<PricebookEntry> entries = [SELECT UnitPrice,Pricebook2Id,Product2Id FROM PricebookEntry WHERE Pricebook2Id =: standard.Id];
+            List<Product2> products = [SELECT minPrice__c,Id FROM Product2 WHERE Family = 'Perfumes'];
+
+            for(PricebookEntry entry : entries){
+                for(Product2 product : products){
+                    if(entry.Product2Id == product.Id){
+                        product.minPrice__c = entry.UnitPrice;
+                    }
+                }
+            }
+            update products;
+        }
+    }
     }
 }

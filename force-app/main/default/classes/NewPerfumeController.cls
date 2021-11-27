@@ -34,7 +34,7 @@ public class NewPerfumeController {
                 product.Photo__c = 'https://britenet-bb-dev-ed--c.documentforce.com/servlet/servlet.ImageServer?id='+docIds.get(0)+'&oid=00D09000007z4Sw&lastMod=1637830151000';
                 update product;
 
-                for(ID id : docIds){
+                for(Id id : docIds){
                     // cvIds.add(cv.Id);
 
                     String url = 'https://britenet-bb-dev-ed--c.documentforce.com/servlet/servlet.ImageServer?id='+id+'&oid=00D09000007z4Sw&lastMod=1637830151000';

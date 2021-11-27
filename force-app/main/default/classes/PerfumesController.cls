@@ -32,19 +32,19 @@ public without sharing class PerfumesController {
             }
             query += ' AND Designer__c IN :designersIds ';
         }
-        if(accords != null){
+        if(accords != null && accords != ''){
             String condition = conditionFromList(accords.split(','));
             query += ' AND Main_accords__c INCLUDES ('+condition+') ';
         }
-        if(topNotes != null){
+        if(topNotes != null && topNotes != ''){
             String condition = conditionFromList(topNotes.split(','));
             query += ' AND Top_Notes__c INCLUDES ('+condition+') ';
         }
-        if(middleNotes != null){
+        if(middleNotes != null && middleNotes != ''){
             String condition = conditionFromList(middleNotes.split(','));
             query += ' AND Middle_Notes__c INCLUDES ('+condition+') ';
         }
-        if(baseNotes != null){
+        if(baseNotes != null && baseNotes != ''){
             String condition = conditionFromList(baseNotes.split(','));
             query += ' AND Base_Notes__c INCLUDES ('+condition+') ';
         }

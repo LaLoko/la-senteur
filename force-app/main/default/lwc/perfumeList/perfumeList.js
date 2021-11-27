@@ -14,6 +14,8 @@ export default class PerfumeList extends LightningElement {
     @track allDesigners = []
     @track allAccords = [];
     @track allNotes = [];
+
+    @track isLoading = true;
     
     connectedCallback(){
         let link = String(window.location.href).split('/');
@@ -51,6 +53,7 @@ export default class PerfumeList extends LightningElement {
                     this.error = error;
                 });      
             }
+            this.isLoading = false;
     }
     handleSortSelected(event){
         let link = String(window.location.href).split('/');

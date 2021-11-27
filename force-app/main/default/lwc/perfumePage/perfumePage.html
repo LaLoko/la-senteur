@@ -7,6 +7,8 @@
                     <div class="slds-grid slds-gutters">
                         <div>
                             <img class="product-img" src={currPhoto}></img>
+
+                            <template if:false={disablePhotoPagination}>
                             <div style="margin-left: 8rem;margin-bottom:1rem">
                                 <lightning-button variant="brand-outline" label="Prev" onclick={prevPhoto}
                                     class="slds-m-left_x-small" style="margin-right: 84px;"
@@ -16,6 +18,7 @@
                                     icon-name="utility:chevronright" icon-position="right" disabled={disableNextPhoto}>
                                 </lightning-button>
                             </div>
+                        </template>
                         </div>
                         <div>
                             <div class="details">
@@ -154,6 +157,12 @@
             </div>
         </div>
     </template>
+    <div class="spinner">
+        <template if:true={isLoading}>
+             <lightning-spinner alternative-text="Loading" variant="brand" size="large">
+             </lightning-spinner>
+        </template>
+    </div>
 
     <c-confirmation-dialog title='Delete confirmation' message='Do you want to delete review?' confirm-label='Delete'
         cancel-label='Cancel' visible={isDialogVisible} original-message={originalMessage} name="confirmModal"

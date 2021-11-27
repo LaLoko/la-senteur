@@ -31,10 +31,11 @@ export default class PerfumePage extends LightningElement {
     photoIndex = 0;
     disableNextPhoto = false;
     disablePrevPhoto = true;
+    disablePhotoPagination = false;
 
     @track isDialogVisible = false;
     @track originalMessage;
-    @track displayMessage = 'Click on the \'Open Confirmation\' button to test the dialog.';
+    @track isLoading = true;
 
     connectedCallback(){
         let incomeURL = window.location.href;
@@ -54,7 +55,9 @@ export default class PerfumePage extends LightningElement {
                 }
                 if(result.images.length < 2){
                     this.disableNextPhoto = true;
+                    this.disablePhotoPagination = true;
                 }
+                this.isLoading = false;
             })
             .catch(error => {
                 this.error = error;
