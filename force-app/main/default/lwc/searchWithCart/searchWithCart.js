@@ -1,6 +1,5 @@
 import { LightningElement } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
-
 export default class SearchWithCart extends NavigationMixin(
     LightningElement
 ) {
@@ -15,9 +14,11 @@ export default class SearchWithCart extends NavigationMixin(
             }
         });
 }
+
 keyChanged(event) {
     this.searchKey= event.target.value;
 }
+
 toCart(){
     this[NavigationMixin.Navigate]({
         type: 'comm__namedPage',

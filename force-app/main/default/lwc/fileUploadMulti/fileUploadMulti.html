@@ -13,9 +13,6 @@
                     <h1 key={imgName.fileName} style="font-size: 20px">{imgName.fileName}&nbsp;
                         <lightning-icon style="height: 1rem;" icon-name="utility:close" data-id={index} onclick={removeReceiptImage} ></lightning-icon></h1>
                         <img key={imgName.fileName}/>
-                    <!-- {imgName.fileName} -->
-                    <!-- <span key={imgName.fileName} data-id={index} onclick={removeReceiptImage}
-                        class="removeImage">x</span> &nbsp; -->
                 </template>
             </template>
         </div>
@@ -23,6 +20,10 @@
         </lightning-input>
 
         <br />
-        <!-- <lightning-button variant="brand" label="Upload Files" onclick={uploadFiles} class="slds-m-top_medium"> </lightning-button> -->
     </div>
+    
+    <c-confirmation-dialog title='Delete confirmation' message='Do you want to delete this photo?' confirm-label='Delete'
+    cancel-label='Cancel' visible={isDialogVisible} original-message={originalMessage} name="confirmModal"
+    onclick={openDialog}>
+</c-confirmation-dialog>
 </template>

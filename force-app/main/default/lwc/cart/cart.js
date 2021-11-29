@@ -15,7 +15,7 @@ export default class Cart extends NavigationMixin(
     stepOne = true;
     stepTwo;
     stepThree;
-
+    
     finalized = false;
 
     connectedCallback(){

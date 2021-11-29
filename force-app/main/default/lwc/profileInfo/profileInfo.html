@@ -68,7 +68,8 @@
                             <h1>{editUser.email}</h1>
                         </div>
                         <div style="margin-top: 1rem;">
-                            <lightning-input label="Phone" value={editUser.phone} onchange={phoneChange}></lightning-input>
+                            <lightning-input label="Phone" value={editUser.phone} onchange={phoneChange}>
+                            </lightning-input>
                         </div>
                     </div>
 
@@ -77,17 +78,21 @@
                             <lightning-input label="City" value={editUser.city} onchange={cityChange}></lightning-input>
                         </div>
                         <div style="margin-top: 1rem;">
-                            <lightning-input label="Street" value={editUser.street} onchange={streetChange}></lightning-input>
+                            <lightning-input label="Street" value={editUser.street} onchange={streetChange}>
+                            </lightning-input>
                         </div>
                         <div style="margin-top: 1rem;">
-                            <lightning-input label="Postal Code" value={editUser.zip} onchange={zipChange}></lightning-input>
+                            <lightning-input label="Postal Code" value={editUser.zip} onchange={zipChange}>
+                            </lightning-input>
 
                         </div>
                         <div style="margin-top: 1rem;">
-                            <lightning-input label="State" value={editUser.state} onchange={stateChange}></lightning-input>
+                            <lightning-input label="State" value={editUser.state} onchange={stateChange}>
+                            </lightning-input>
                         </div>
                         <div style="margin-top: 1rem;">
-                            <lightning-input label="Country" value={editUser.country} onchange={countryChange}></lightning-input>
+                            <lightning-input label="Country" value={editUser.country} onchange={countryChange}>
+                            </lightning-input>
                         </div>
                     </div>
                 </div>
@@ -100,8 +105,8 @@
     </div>
     <div class="spinner">
         <template if:true={isLoading}>
-             <lightning-spinner alternative-text="Loading" variant="brand" size="large">
-             </lightning-spinner>
+            <lightning-spinner alternative-text="Loading" variant="brand" size="large">
+            </lightning-spinner>
         </template>
     </div>
 </template>

@@ -1,16 +1,18 @@
 <template>
     <div class="slds-grid_align-spread slds-wrap base">
-    <div class="slds-col slds-size_3-of-12 slds-align_absolute-center search">
-        <div class="slds-float_left">
-            <lightning-input type="search" onchange={keyChanged} class="slds-m-bottom_small" style="width: 22rem;"
-            value={searchKey}></lightning-input>
+        <div class="slds-col slds-size_3-of-12 slds-align_absolute-center search">
+            <div class="slds-float_left">
+                <lightning-input type="search" onchange={keyChanged} class="slds-m-bottom_small" style="width: 22rem;"
+                    value={searchKey}></lightning-input>
+            </div>
+            <div class="slds-float_left" style="margin-top: 7px;">
+                <lightning-button variant="brand-outline" label="Search" onclick={search} class="slds-m-left_x-small">
+                </lightning-button>
+            </div>
         </div>
-        <div class="slds-float_left" style="margin-top: 7px;">
-            <lightning-button variant="brand-outline" label="Search" onclick={search} class="slds-m-left_x-small"></lightning-button>
+        <div class="slds-col slds-size_2-of-12 slds-float_right" style="margin-right: -12rem;margin-top: -40px;">
+            <lightning-icon icon-name="utility:cart" onclick={toCart} class="slds-m-left_xx-small" title="Cart">
+            </lightning-icon>
         </div>
-    </div>
-    <div class="slds-col slds-size_2-of-12 slds-float_right" style="margin-right: -12rem;margin-top: -40px;">
-        <lightning-icon icon-name="utility:cart" onclick={toCart} class="slds-m-left_xx-small" title="Cart"></lightning-icon>
-    </div>
     </div>
 </template>

@@ -16,9 +16,6 @@ export default class MultiPickList extends LightningElement {
   constructor() {
     super();
     this._filterValue = "";
-    //this.showfilterinput = true;
-    //this.showrefreshbutton = true;
-    //this.showclearbutton = true;
   }
   renderedCallback() {
     let self = this;
@@ -26,16 +23,13 @@ export default class MultiPickList extends LightningElement {
       this.template
         .querySelector(".ms-input")
         .addEventListener("click", function (event) {
-          console.log("multipicklist clicked");
           self.onDropDownClick(event.target);
           event.stopPropagation();
         });
       this.template.addEventListener("click", function (event) {
-        console.log("multipicklist-1 clicked");
         event.stopPropagation();
       });
       document.addEventListener("click", function (event) {
-        console.log("document clicked");
         self.closeAllDropDown();
       });
       this._initializationCompleted = true;

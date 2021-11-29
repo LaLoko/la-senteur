@@ -1,7 +1,7 @@
 public class PricebooksDateValidation implements Database.Batchable<sObject>{
      
         public Database.QueryLocator start(Database.BatchableContext BC){
-            String query = 'SELECT Id, IsStandard, IsActive FROM Pricebook2 WHERE IsStandard = false';
+            String query = 'SELECT Id, IsStandard, IsActive,ValidFrom,ValidTo FROM Pricebook2 WHERE IsStandard = false';
            return Database.getQueryLocator(query);
         }
      
@@ -14,7 +14,6 @@ public class PricebooksDateValidation implements Database.Batchable<sObject>{
             }
         }
     }
-     
         public void finish(Database.BatchableContext BC){
         }
 }

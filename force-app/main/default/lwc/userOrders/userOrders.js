@@ -22,16 +22,13 @@ export default class UserOrders extends NavigationMixin(
         getAllOrders()
         .then(result => {
             this.orders = result;
-            console.log(this.orderId);
             if(this.orderid){
-                console.log('wbija')
                 let index = 0;
                 for(let i=0;i<this.orders.length;i++){
                     if(this.orders[i].objOrder.Id == this.orderId){
                         index = i;
                     }
                 }
-                console.log(index)
                this.hs(index);
             }
         })
@@ -39,14 +36,17 @@ export default class UserOrders extends NavigationMixin(
             this.error = error;
         });   
     }
+
     goToOrder(event){
         let index = event.target.dataset.index;
         this.dispatchEvent(new CustomEvent('select',{detail:this.orders[index]}));
     }
+
     hideAndShow( event ) {
         let indx = event.target.dataset.recordId;
         this.hs(indx);
     }
+
     hs(indx){
         if ( this.orders ) {
 
@@ -82,6 +82,7 @@ export default class UserOrders extends NavigationMixin(
             this.error = error;
         });  
     }
+
     getShippmentAddress(order){
         getShippmentInfo({orderId:order.Id})
         .then(result => {
@@ -91,46 +92,14 @@ export default class UserOrders extends NavigationMixin(
             this.error = error;
         });  
     }
-    openDialog(event){
-        console.log(event);
-  
-        // this.isDialogVisible = false;
 
-        // if(event.target.name === 'openConfirmation'){
-        //     this.originalMessage = 'test message';
-        //     this.isDialogVisible = true;
-        // }else if(event.target.name === 'confirmModal'){
-
-        //     if(event.detail !== 1 && event.detail !== 2){
-        //         this.displayMessage = 'Status: ' + event.detail.status + '. Event detail: ' + JSON.stringify(event.detail.originalMessage) + '.';
-
-        //         if(event.detail.status === 'confirm') {
-        //             this.order();
-        //             event.detail = 1;
-        //             this.isDialogVisible = true;
-
-        //         }else if(event.detail.status === 'cancel'){
-        //             console.log('x');
-        //             event.detail = 1;
-        //             this.isDialogVisible = false;
-        //         }
-        //     }else{
-        //             event.detail = 1;
-        //         this.isDialogVisible = false;
-                
-        //     }
-        // }
-    }
     openCase(){
-        console.log('otwieramy modala')
         this.template.querySelector('c-new-complaint').makeVisible();
-        
         this.isDialogVisible = true;
-
     }
+
     goToPerfume(event){
         let index = event.target.dataset.index;
-        console.log(index);
                 this[NavigationMixin.Navigate]({
                     type: 'comm__namedPage',
                     attributes: {

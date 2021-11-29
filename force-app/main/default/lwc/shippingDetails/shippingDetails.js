@@ -1,8 +1,7 @@
 import { LightningElement, track } from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import addShippmentInfo from '@salesforce/apex/PerfumesController.addShippmentInfo';
-import getAddress from '@salesforce/apex/PerfumesController.getAddress';
-
+import getAddress from '@salesforce/apex/PerfumesController.getAddress';s
 export default class ShippingDetails extends LightningElement {
     street;
     city;
@@ -14,11 +13,11 @@ export default class ShippingDetails extends LightningElement {
     connectedCallback(){
         this.getSavedAddress();
     }
+
     getSavedAddress(){
         getAddress()
         .then(result => {
             this.address = result;
-            console.log(JSON.stringify(result))
         })
         .catch(error => {
             this.error = error;
@@ -28,18 +27,23 @@ export default class ShippingDetails extends LightningElement {
     streetChange(event) {
         this.address.street= event.target.value;
     }
+
     cityChange(event) {
         this.address.city= event.target.value;
     }
+
     zipChange(event) {
         this.address.zip= event.target.value;
     }
+
     countryChange(event) {
         this.address.country= event.target.value;
     }
+    
     stateChange(event) {
         this.address.state= event.target.value;
     }
+
     goToSummary(){
         if((this.address.street === undefined || this.address.street == '')||
         (this.address.city === undefined || this.address.city == '')||

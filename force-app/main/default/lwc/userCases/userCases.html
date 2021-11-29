@@ -6,44 +6,46 @@
                     <tr>
                         <th class="" scope="col">
                             <div class="slds-truncate" title="Order Number">Case Number</div>
-                          </th>
-                          <th class="" scope="col">
+                        </th>
+                        <th class="" scope="col">
                             <div class="slds-truncate" title="Amount">Created Date</div>
-                          </th>
-                          <th class="" scope="col">
+                        </th>
+                        <th class="" scope="col">
                             <div class="slds-truncate" title="Amount">Closed Date</div>
-                          </th>
-                          <th class="" scope="col">
-                              <div class="slds-truncate" title="Created Date">Status</div>
-                            </th>
+                        </th>
+                        <th class="" scope="col">
+                            <div class="slds-truncate" title="Created Date">Status</div>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
                     <template iterator:it={cases}>
-                        <tr class="slds-hint-parent" key={it.value.objCase.Id} style="cursor: pointer;">                        
+                        <tr class="slds-hint-parent" key={it.value.objCase.Id} style="cursor: pointer;">
                             <td>
-                                <a onclick={hideAndShow}  data-record-id={it.index} style="display:block;text-decoration:none;color:black;">                 
+                                <a onclick={hideAndShow} data-record-id={it.index}
+                                    style="display:block;text-decoration:none;color:black;">
                                     {it.value.objCase.CaseNumber}
                                 </a>
                             </td>
                             <td>
-                                <a onclick={hideAndShow}  data-record-id={it.index} style="display:block;text-decoration:none;color:black;">                 
-                                    <lightning-formatted-date-time value={it.value.objCase.CreatedDate}
-                                    year="numeric" month="numeric" day="numeric" hour="numeric"
-                                    minute="2-digit" hour12="false">
-                                </lightning-formatted-date-time>
+                                <a onclick={hideAndShow} data-record-id={it.index}
+                                    style="display:block;text-decoration:none;color:black;">
+                                    <lightning-formatted-date-time value={it.value.objCase.CreatedDate} year="numeric"
+                                        month="numeric" day="numeric" hour="numeric" minute="2-digit" hour12="false">
+                                    </lightning-formatted-date-time>
                                 </a>
                             </td>
                             <td>
-                                <a onclick={hideAndShow}  data-record-id={it.index} style="display:block;text-decoration:none;color:black;">                 
-                                    <lightning-formatted-date-time value={it.value.objCase.ClosedDate}
-                                year="numeric" month="numeric" day="numeric" hour="numeric"
-                                minute="2-digit" hour12="false">
-                            </lightning-formatted-date-time>
+                                <a onclick={hideAndShow} data-record-id={it.index}
+                                    style="display:block;text-decoration:none;color:black;">
+                                    <lightning-formatted-date-time value={it.value.objCase.ClosedDate} year="numeric"
+                                        month="numeric" day="numeric" hour="numeric" minute="2-digit" hour12="false">
+                                    </lightning-formatted-date-time>
                                 </a>
                             </td>
                             <td>
-                                <a onclick={hideAndShow}  data-record-id={it.index} style="display:block;text-decoration:none;color:black;">                 
+                                <a onclick={hideAndShow} data-record-id={it.index}
+                                    style="display:block;text-decoration:none;color:black;">
                                     {it.value.objCase.Status}
                                 </a>
                             </td>
@@ -54,11 +56,12 @@
                                 <td colspan="5">
                                     <div style="display: flex;flex-direction: column;">
                                         <div style="display: flex;flex-direction: row;">
-                              
-                                                <div class="slds-col slds-float_left">
-                                                    <div>
-                                                    <h1 style="font-size: x-large;text-align: center;">Subject : {it.value.objCase.Subject}</h1>
-                                                    <br/>
+
+                                            <div class="slds-col slds-float_left">
+                                                <div>
+                                                    <h1 style="font-size: x-large;text-align: center;">Subject :
+                                                        {it.value.objCase.Subject}</h1>
+                                                    <br />
                                                     <h1 style="font-size: large;">Description</h1>
                                                     <h1 style="font-size: medium;">{it.value.objCase.Description}</h1>
                                                 </div>
@@ -68,46 +71,55 @@
                                                     <div style="float: left;">Capacity</div>
                                                     <div style="float: left;">Price</div>
                                                 </div>
-                                                    <template for:each={it.value.orderItems} for:item="item" for:index="index">
-                                                        <div key={item.Id} style="height: 1rem;margin: 1rem;" class="orderRow">
-                                                            <div class="divider" style="background-color: rgba(0, 0, 0, 0.349); height: 1px;width: 100%;"></div>
+                                                <template for:each={it.value.orderItems} for:item="item"
+                                                    for:index="index">
+                                                    <div key={item.Id} style="height: 1rem;margin: 1rem;"
+                                                        class="orderRow">
+                                                        <div class="divider"
+                                                            style="background-color: rgba(0, 0, 0, 0.349); height: 1px;width: 100%;">
+                                                        </div>
 
 
-                                                            <div class="slds-grid slds-gutters slds-align_absolute-center" style="height: 100%;margin-top: 8px;">
-                                                                <div class="slds-col slds-size_1-of-6">
-                                                                    <h3>{item.designer}</h3>
-                                                                </div>
-                                                                <div class="slds-col slds-size_1-of-6">
-                                                                    <h3 onclick={goToPerfume} data-record-id={it.index} data-index={index} style="text-decoration: underline;color: blue;">{item.name}</h3>
-                                                                </div>
-                                                                <div class="slds-col slds-size_1-of-6">
-                                                                    <h3>{item.capacity}ml</h3>
-                                                                </div>
-                                                                <div class="slds-col slds-size_1-of-6">
-                                                                    <h3>{item.price}€</h3>
-                                                                </div>
+                                                        <div class="slds-grid slds-gutters slds-align_absolute-center"
+                                                            style="height: 100%;margin-top: 8px;">
+                                                            <div class="slds-col slds-size_1-of-6">
+                                                                <h3>{item.designer}</h3>
+                                                            </div>
+                                                            <div class="slds-col slds-size_1-of-6">
+                                                                <h3 onclick={goToPerfume} data-record-id={it.index}
+                                                                    data-index={index}
+                                                                    style="text-decoration: underline;color: blue;">
+                                                                    {item.name}</h3>
+                                                            </div>
+                                                            <div class="slds-col slds-size_1-of-6">
+                                                                <h3>{item.capacity}ml</h3>
+                                                            </div>
+                                                            <div class="slds-col slds-size_1-of-6">
+                                                                <h3>{item.price}€</h3>
                                                             </div>
                                                         </div>
-                                                    </template>
-
-                                                    <div class="slds-align_absolute-center">
-                                                        <lightning-button label="Go to order" onclick={goToOrder} data-record-id={it.index}></lightning-button>
                                                     </div>
+                                                </template>
+
+                                                <div class="slds-align_absolute-center">
+                                                    <lightning-button label="Go to order" onclick={goToOrder}
+                                                        data-record-id={it.index}></lightning-button>
                                                 </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </td>
                             </tr>
-                        </template>                   
+                        </template>
                     </template>
                 </tbody>
             </table>
-        </div>   
+        </div>
     </div>
     <div class="spinner">
         <template if:true={isLoading}>
-             <lightning-spinner alternative-text="Loading" variant="brand" size="large">
-             </lightning-spinner>
+            <lightning-spinner alternative-text="Loading" variant="brand" size="large">
+            </lightning-spinner>
         </template>
     </div>
 </template>

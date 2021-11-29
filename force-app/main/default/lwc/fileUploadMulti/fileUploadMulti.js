@@ -2,14 +2,15 @@ import {LightningElement,api,track} from 'lwc';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import uploadFiles from '@salesforce/apex/NewPerfumeController.uploadFiles'
 const MAX_FILE_SIZE = 2097152;
- 
 export default class FileUploadMultiLWC extends LightningElement {
  
     @api recordId;
     @api title;
     @track filesData = [];
     showSpinner = false;
- 
+    @track isDialogVisible = false;
+    @track currIndex;
+
     handleFileUploaded(event) {
         if (event.target.files.length > 0) {
             for(var i=0; i< event.target.files.length; i++){
@@ -39,10 +40,8 @@ export default class FileUploadMultiLWC extends LightningElement {
             filedata : JSON.stringify(this.filesData)
         })
         .then(result => {
-            console.log(result);
             if(result && result == 'success') {
                 this.filesData = [];
-                // this.template.querySelector('c-perfume-add-page').clear();
                 this.showToast('Success', 'success', 'Perfume added successfully.');
             } else {
                 this.showToast('Error', 'error', result);

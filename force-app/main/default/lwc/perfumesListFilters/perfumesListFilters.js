@@ -73,6 +73,7 @@ getDesigners(){
            this.error = error;
       });    
   }
+  
   get notesOptions(){
     var returnOptions = [];
     var index = 1;
@@ -148,10 +149,12 @@ getDesigners(){
 
     this.dispatchEvent(new CustomEvent('filter',{detail:filters}));
   }
+
   clear(){
     this.clearComboboxes();
     this.dispatchEvent(new CustomEvent('clear'));
   }
+
   clearComboboxes(){
     this.template
       .querySelector(".picklist1")

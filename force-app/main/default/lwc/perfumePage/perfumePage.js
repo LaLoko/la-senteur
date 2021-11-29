@@ -63,6 +63,7 @@ export default class PerfumePage extends LightningElement {
                 this.error = error;
             });      
 }
+
     setNotes(perfume){
         this.topNotes = perfume.topNotes.split(';')
         this.middleNotes = perfume.middleNotes.split(';')
@@ -119,6 +120,7 @@ export default class PerfumePage extends LightningElement {
     get perfumeScore(){
         return this.perfume.score;
     }
+    
     get reviewsExist(){
         return this.reviesExists;
     }
@@ -196,7 +198,6 @@ export default class PerfumePage extends LightningElement {
     editComment(){
         getReviewToEdit({perfumeId:this.id})
         .then(result => {
-            console.log(JSON.stringify(result))
             this.commentToEdit = result;
             this.editingComment = true;
             this.editScore = result.score.toString();
@@ -212,7 +213,6 @@ export default class PerfumePage extends LightningElement {
     }
     
     editReview(event){
-        console.log(this.commentToEdit.Review__c);
         updateReview({text:this.commentToEdit.Review__c,score:this.editScore,perfumeId:this.id})
         .then(result => {
             this.getAllReviews();
@@ -243,6 +243,7 @@ export default class PerfumePage extends LightningElement {
             this.isDialogVisible = false;
         }
     }
+
     nextPhoto(){
         if(this.photoIndex + 1 <= this.perfume.images.length){
             this.photoIndex += 1;
@@ -291,7 +292,5 @@ export default class PerfumePage extends LightningElement {
         .catch(error => {
             this.error = error;
         }); 
-
- 
     }
 }

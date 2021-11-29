@@ -1,77 +1,83 @@
 <template>
     <lightning-card>
-    <div class="container">
-        <div style="margin-bottom: 2rem;">
-            <h1 style="font-size: xx-large;">Add new perfume</h1>
-        </div>
-        <div>
+        <div class="container">
+            <div style="margin-bottom: 2rem;">
+                <h1 style="font-size: xx-large;">Add new perfume</h1>
+            </div>
             <div>
-                <lightning-input label="Name" type="text" value={name} onchange={handleNameChange} class="slds-align_absolute-center">
-                </lightning-input>
-            </div>
-            <div class="slds-col" style="float: left;margin-right: 1rem;">
-                <lightning-combobox label="Designer" options={designers} value={selDesigner}
-                    onchange={handleDesignerChange}></lightning-combobox>
-            </div>
-            <div class="slds-col" style="float: left;">
-                <lightning-combobox label="Gender" options={genders} value={selGender} onchange={handleGenderChange}>
-                </lightning-combobox>
-            </div>
-
-        </div>
-
-        <div class="slds-grid" style="margin-top: 2rem;">
-            <template if:true={accords}>
-                <div class="slds-col" style="float: left;margin-right: 1rem;">
-                    <c-multi-pick-list label="Main accords" class="picklist2" options={accordsOptions}
-                        showclearbutton='true' showfilterinput='true' showrefreshbutton='true'
-                        onitemselected={handleAccordSelect}></c-multi-pick-list>
-                </div>
-            </template>
-            <template if:true={notes}>
-                <div class="slds-col" style="float: left;margin-right: 1rem;">
-                    <c-multi-pick-list label="Top notes" class="picklist3" options={notesOptions} showclearbutton='true'
-                        showfilterinput='true' showrefreshbutton='true' onitemselected={handleTopNoteSelect}>
-                    </c-multi-pick-list>
+                <div>
+                    <lightning-input label="Name" type="text" value={name} onchange={handleNameChange}
+                        class="slds-align_absolute-center">
+                    </lightning-input>
                 </div>
                 <div class="slds-col" style="float: left;margin-right: 1rem;">
-                    <c-multi-pick-list label="Middle notes" class="picklist4" options={notesOptions}
-                        showclearbutton='true' showfilterinput='true' showrefreshbutton='true'
-                        onitemselected={handleMiddleNoteSelect}></c-multi-pick-list>
+                    <lightning-combobox label="Designer" options={designers} value={selDesigner}
+                        onchange={handleDesignerChange}></lightning-combobox>
                 </div>
                 <div class="slds-col" style="float: left;">
-                    <c-multi-pick-list label="Base Notes" class="picklist5" options={notesOptions}
-                        showclearbutton='true' showfilterinput='true' showrefreshbutton='true'
-                        onitemselected={handleBaseNoteSelect}></c-multi-pick-list>
+                    <lightning-combobox label="Gender" options={genders} value={selGender}
+                        onchange={handleGenderChange}>
+                    </lightning-combobox>
                 </div>
-            </template>
-        </div>
-        <div>
-            <div style="margin-top: 2rem;">
-                <c-file-upload-multi title="Perfume photos"></c-file-upload-multi>
             </div>
-        </div>
-        <div>
+
+            <div class="slds-grid" style="margin-top: 2rem;">
+                <template if:true={accords}>
+                    <div class="slds-col" style="float: left;margin-right: 1rem;">
+                        <c-multi-pick-list label="Main accords" class="picklist2" options={accordsOptions}
+                            showclearbutton='true' showfilterinput='true' showrefreshbutton='true'
+                            onitemselected={handleAccordSelect}></c-multi-pick-list>
+                    </div>
+                </template>
+                <template if:true={notes}>
+                    <div class="slds-col" style="float: left;margin-right: 1rem;">
+                        <c-multi-pick-list label="Top notes" class="picklist3" options={notesOptions}
+                            showclearbutton='true' showfilterinput='true' showrefreshbutton='true'
+                            onitemselected={handleTopNoteSelect}>
+                        </c-multi-pick-list>
+                    </div>
+                    <div class="slds-col" style="float: left;margin-right: 1rem;">
+                        <c-multi-pick-list label="Middle notes" class="picklist4" options={notesOptions}
+                            showclearbutton='true' showfilterinput='true' showrefreshbutton='true'
+                            onitemselected={handleMiddleNoteSelect}></c-multi-pick-list>
+                    </div>
+                    <div class="slds-col" style="float: left;">
+                        <c-multi-pick-list label="Base Notes" class="picklist5" options={notesOptions}
+                            showclearbutton='true' showfilterinput='true' showrefreshbutton='true'
+                            onitemselected={handleBaseNoteSelect}></c-multi-pick-list>
+                    </div>
+                </template>
+            </div>
             <div>
-            <h1>Variants</h1>
+                <div style="margin-top: 2rem;">
+                    <c-file-upload-multi title="Perfume photos"></c-file-upload-multi>
+                </div>
+            </div>
+            <div>
+                <div>
+                    <h1>Variants</h1>
 
-            <lightning-pill-container items={variants} onitemremove={handleItemRemove}></lightning-pill-container>
+                    <lightning-pill-container items={variants} onitemremove={handleItemRemove}>
+                    </lightning-pill-container>
 
-            <div style="margin-top: 1rem;">
-                <lightning-input type="text" label="Capacity" value={variantCap} onchange={handleCapChange} style="float: left;margin-right: 1rem;"></lightning-input>
-                <lightning-input type="text" label="Price" value={variantPrice} onchange={handlePriceChange} style="float: left;margin-right: 1rem;"></lightning-input>
-                <lightning-button label="Add variant" style="float: left; margin-top:24px" onclick={addVariant}></lightning-button>
+                    <div style="margin-top: 1rem;">
+                        <lightning-input type="text" label="Capacity" value={variantCap} onchange={handleCapChange}
+                            style="float: left;margin-right: 1rem;"></lightning-input>
+                        <lightning-input type="text" label="Price" value={variantPrice} onchange={handlePriceChange}
+                            style="float: left;margin-right: 1rem;"></lightning-input>
+                        <lightning-button label="Add variant" style="float: left; margin-top:24px" onclick={addVariant}>
+                        </lightning-button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 8rem;margin-left: 11rem;">
+                    <lightning-button variant="brand" label="Add perfume" style="width:6rem" onclick={addPerfume}>
+                    </lightning-button>
+                </div>
             </div>
         </div>
+    </lightning-card>
 
-        <div style="margin-top: 8rem;margin-left: 11rem;">
-            <lightning-button variant="brand" label="Add perfume" style="width:6rem" onclick={addPerfume}></lightning-button>
-        </div>
-
-
-        </div>
-    </div>
-</lightning-card>
     <div class="spinner">
         <template if:true={isLoading}>
             <lightning-spinner alternative-text="Loading" variant="brand" size="large">

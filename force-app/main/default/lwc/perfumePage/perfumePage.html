@@ -9,16 +9,17 @@
                             <img class="product-img" src={currPhoto}></img>
 
                             <template if:false={disablePhotoPagination}>
-                            <div style="margin-left: 8rem;margin-bottom:1rem">
-                                <lightning-button variant="brand-outline" label="Prev" onclick={prevPhoto}
-                                    class="slds-m-left_x-small" style="margin-right: 84px;"
-                                    icon-name="utility:chevronleft" disabled={disablePrevPhoto}></lightning-button>
-                                <lightning-button variant="brand-outline" label="Next" onclick={nextPhoto}
-                                    class="slds-m-left_x-small" style="margin-right: 5px;"
-                                    icon-name="utility:chevronright" icon-position="right" disabled={disableNextPhoto}>
-                                </lightning-button>
-                            </div>
-                        </template>
+                                <div style="margin-left: 8rem;margin-bottom:1rem">
+                                    <lightning-button variant="brand-outline" label="Prev" onclick={prevPhoto}
+                                        class="slds-m-left_x-small" style="margin-right: 84px;"
+                                        icon-name="utility:chevronleft" disabled={disablePrevPhoto}></lightning-button>
+                                    <lightning-button variant="brand-outline" label="Next" onclick={nextPhoto}
+                                        class="slds-m-left_x-small" style="margin-right: 5px;"
+                                        icon-name="utility:chevronright" icon-position="right"
+                                        disabled={disableNextPhoto}>
+                                    </lightning-button>
+                                </div>
+                            </template>
                         </div>
                         <div>
                             <div class="details">
@@ -45,9 +46,10 @@
                                 <p></p>
 
                                 <h1 style="margin-right: 20px;">
-                                    <lightning-formatted-number value={perfumeScore} format-style="decimal" minimum-fraction-digits="2">
-                                        </lightning-formatted-number>&nbsp;&nbsp;<lightning-icon class="gold-background" icon-name="utility:favorite"
-                                        icon-color="gold"></lightning-icon>
+                                    <lightning-formatted-number value={perfumeScore} format-style="decimal"
+                                        minimum-fraction-digits="2">
+                                    </lightning-formatted-number>&nbsp;&nbsp;<lightning-icon class="gold-background"
+                                        icon-name="utility:favorite" icon-color="gold"></lightning-icon>
                                 </h1>
                             </div>
                             <div style="margin-top: 100px;">
@@ -88,17 +90,18 @@
                                                     <h3 style="font-size: 14px;"><b>Opinion :</b>{review.scoreName}</h3>
                                                 </div>
                                                 <template if:true={review.currUserReview}>
-                                                <div style="float: right; margin-right: 41px; margin-top: -28px;">
-                                                    <lightning-button-icon data-id={review.Id} icon-name="utility:edit"
-                                                        title="edit" onclick={editComment}>
-                                                    </lightning-button-icon>
-                                                    <lightning-button-icon data-id={review.Id} name="openConfirmation"
-                                                        icon-name="utility:delete" title="delete" onclick={openDialog}>
-                                                    </lightning-button-icon>
-                                                </div>
-                                            </template>
+                                                    <div style="float: right; margin-right: 41px; margin-top: -28px;">
+                                                        <lightning-button-icon data-id={review.Id}
+                                                            icon-name="utility:edit" title="edit" onclick={editComment}>
+                                                        </lightning-button-icon>
+                                                        <lightning-button-icon data-id={review.Id}
+                                                            name="openConfirmation" icon-name="utility:delete"
+                                                            title="delete" onclick={openDialog}>
+                                                        </lightning-button-icon>
+                                                    </div>
+                                                </template>
                                             </div>
-                                            
+
                                             <div style="margin-top: 30px;margin-left:30px;margin-right:20px">
                                                 <lightning-formatted-rich-text value={review.text}>
                                                 </lightning-formatted-rich-text>
@@ -140,7 +143,7 @@
                             </div>
                         </div>
                         <div style="margin-top: 10px;">
-                            <lightning-input-rich-text style="margin: 10px;" value={commentToEdit.text}
+                            <lightning-input-rich-text style="margin: 10px;" value={commentToEdit.text} class="editText"
                                 onchange={editReviewChange}>
                             </lightning-input-rich-text>
                         </div>
@@ -159,8 +162,8 @@
     </template>
     <div class="spinner">
         <template if:true={isLoading}>
-             <lightning-spinner alternative-text="Loading" variant="brand" size="large">
-             </lightning-spinner>
+            <lightning-spinner alternative-text="Loading" variant="brand" size="large">
+            </lightning-spinner>
         </template>
     </div>
 

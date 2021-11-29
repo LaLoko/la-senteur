@@ -5,13 +5,14 @@
                 <h1 style="font-size: x-large;margin-bottom:1rem;">Items :</h1>
                 <div class="slds-scrollable_y" style="height: 14rem;margin:1rem">
                     <template for:each={cart} for:item="cartItem" for:index="index">
-                        <div key={cartItem.Id} style="height: 2rem;" >
+                        <div key={cartItem.Id} style="height: 2rem;">
                             <div class="slds-grid slds-gutters slds-align_absolute-center" style="height: 100%;">
                                 <div class="slds-col slds-size_1-of-3">
                                     <h3>{cartItem.designer} </h3>
                                 </div>
                                 <div class="slds-col slds-size_1-of-3">
-                                    <h3 onclick={goToPerfume} data-index={index} style="text-decoration: underline;color: blue;">{cartItem.perfumeName} </h3>
+                                    <h3 onclick={goToPerfume} data-index={index}
+                                        style="text-decoration: underline;color: blue;">{cartItem.perfumeName} </h3>
                                 </div>
                                 <div class="slds-col slds-size_1-of-3">
                                     <h3>{cartItem.variant} </h3>
@@ -41,14 +42,15 @@
                     <h1>{shippingInfo.country}</h1>
                 </template>
             </div>
-         
+
         </div>
         <div style="margin-top: 28rem;margin-left: -38rem;">
-            <lightning-button label="Order" onclick={confirmDialog} style="width: 10rem;font-size: 1rem;"></lightning-button>
+            <lightning-button label="Order" onclick={confirmDialog} style="width: 10rem;font-size: 1rem;">
+            </lightning-button>
         </div>
     </div>
-    <c-confirmation-dialog title='Order confirmation' message='Are you sure you want to place an order?' confirm-label='Confirm'
-    cancel-label='Cancel' visible={isDialogVisible} original-message={originalMessage} name="confirmModal"
-    onclick={openDialog}>
-</c-confirmation-dialog>
+    <c-confirmation-dialog title='Order confirmation' message='Are you sure you want to place an order?'
+        confirm-label='Confirm' cancel-label='Cancel' visible={isDialogVisible} original-message={originalMessage}
+        name="confirmModal" onclick={openDialog}>
+    </c-confirmation-dialog>
 </template>

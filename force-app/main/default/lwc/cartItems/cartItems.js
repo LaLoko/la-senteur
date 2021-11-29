@@ -44,7 +44,6 @@ export default class CartItems extends NavigationMixin(
     }
     deleteItemFormCart(event){
         let index = event.target.dataset.index;
-        console.log(index);
 
         deleteFromCart({id:index})
         .then(result => {

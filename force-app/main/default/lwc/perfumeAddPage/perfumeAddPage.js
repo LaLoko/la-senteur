@@ -27,9 +27,7 @@ export default class PerfumeAddPage extends NavigationMixin(
 
 @track accords;
 @track notes;
-
     @track isLoading = true;
-
 
     connectedCallback(){
         this.getDesigners();
@@ -66,6 +64,7 @@ export default class PerfumeAddPage extends NavigationMixin(
         }); 
         return returnOptions;
       }
+      
       getNotes(){
         getAllNotes()
           .then(result => {

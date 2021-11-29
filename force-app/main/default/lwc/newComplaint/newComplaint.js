@@ -15,40 +15,21 @@ export default class NewComplaint extends LightningElement {
     subject;
     description;
 
-    // handleClick(event){
-    //     let finalEvent = {
-    //         originalMessage: this.originalMessage,
-    //         status: event.target.name
-    //     };
-    //     if(event.target.name == 'confirm'){
-    //         this.createCase();
-    //         this.dispatchEvent(new CustomEvent('click', {detail: finalEvent}));
-    //     }
-    //     if(event.target.name == 'cancel'){
-    //         this.dispatchEvent(new CustomEvent('click', {detail: 2}));
-    //     }
-
-    // }
     @api
     makeVisible(){
         this.visible = true;
     }
     close(){
         this.visible = false;
-        console.log('close')
-        // dispatchEvent(new CustomEvent('click', {detail: 2}));
     }
     saveCase(){
-        console.log('save')
         this.createCase();
         this.visible = false;
-        // dispatchEvent(new CustomEvent('click', {detail: 2}));
     }
     changeSelectedItem(event){
         let indx = event.target.dataset.recordId;
 
         if ( this.items ) {
-
             let recs =  JSON.parse( JSON.stringify( this.items ) );
             let currVal = recs[ indx ].hideBool;
             recs[ indx ].hideBool = !currVal;
@@ -69,7 +50,6 @@ export default class NewComplaint extends LightningElement {
                 caseItems.push(element);
             }
         });
-        console.log('create case')
 
         createNewCase({items:JSON.stringify(caseItems),subject:this.subject,description:this.description,orderId:this.order.Id})
         .then(result => {

@@ -2,98 +2,37 @@
     <lightning-card title="New Pricebook">
         <div class="container">
             <div class="slds-align_absolute-center" style="flex-direction: column;width: 60%;">
-                <lightning-input label="Name" value={pricebookName} onchange={handleNameChange} required="true"></lightning-input>
-                <lightning-textarea label="Description" value={description} onchange={handleDescriptionChange} style="width: 50rem;"></lightning-textarea>
+                <lightning-input label="Name" value={pricebookName} onchange={handleNameChange} required="true">
+                </lightning-input>
+
+                <lightning-textarea label="Description" value={description} onchange={handleDescriptionChange}
+                    style="width: 50rem;"></lightning-textarea>
             </div>
             <div style="display: flex;">
-                <lightning-input type="date" value={startDate} label="Valid from" onchange={handleStartDateChange} style="margin-right: 1rem;"></lightning-input>
-                <lightning-input type="date" value={endDate} label="Valid to" onchange={handleEndDateChange}></lightning-input>
+                <lightning-input type="date" value={startDate} label="Valid from" onchange={handleStartDateChange}
+                    style="margin-right: 1rem;"></lightning-input>
+                <lightning-input type="date" value={endDate} label="Valid to" onchange={handleEndDateChange}>
+                </lightning-input>
             </div>
 
             <template if:true={products}>
-            <div class="slds-scrollable_y" style="height: 50vh;margin-top: 1rem;width: 96%;">
-                <div class="slds-box slds-theme_default">
-                    <lightning-datatable
-                    key-field="variantId"
-                    data={products}
-                    onchange={handlePriceChange}
-                    show-row-number-column
-                    row-number-offset={rowOffset}
-                    suppress-bottom-bar
-                    onrowselection={handlePerfumeSelection}
-                    columns={columns}>
-            </lightning-datatable>
-
-
-                    <!-- <table class="slds-table slds-table_cell-buffer slds-table_bordered">
-                        <thead>
-                            <tr>
-                                <th class="" scope="col">
-                                    <div class="slds-truncate" title="Order Number"></div>
-                                  </th>
-                                <th class="" scope="col">
-                                    <div class="slds-truncate" title="Order Number">Designer</div>
-                                  </th>
-                                  <th class="" scope="col">
-                                    <div class="slds-truncate" title="Amount">Perfume Name</div>
-                                  </th>
-                                  <th class="" scope="col">
-                                    <div class="slds-truncate" title="Amount">Gender</div>
-                                  </th>
-                                  <th class="" scope="col">
-                                      <div class="slds-truncate" title="Capacity">Capacity</div>
-                                      
-                                    </th>
-                                    <th class="" scope="col">
-                                        <div class="slds-truncate" title="Price">Price</div>
-                                      </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <template iterator:it={products}>
-                                <tr class="slds-hint-parent" key={it.variantId} style="cursor: pointer;">  
-                                    <td>
-                                            <lightning-input type="checkbox" checked={it.value.selected} onchange={handlePerfumeSelection} data-record-id={it.index}></lightning-input>
-                                    </td>                      
-                                    <td>
-                                        <a onclick={goToDesigner}  data-record-id={it.index} style="display:block;text-decoration:none;color:black;">                 
-                                            {it.value.designer}
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <a onclick={goToProduct}  data-record-id={it.index} style="display:block;text-decoration:none;color:black;">                 
-                                            {it.value.name}
-                                        </a>
-                                    </td>
-                                    <td>
-                                        {it.value.gender}
-                                    </td>
-                                    <td>
-                                        {it.value.capacity}
-                                    </td>
-                                    <td>
-                                        <template if:true={it.value.selected}>
-                                            <lightning-input name="price" value={it.value.price} onchange={handlePriceChange}></lightning-input>
-                                        </template>
-                                        <template if:false={it.value.selected}>
-                                            {it.value.price}
-                                        </template>
-                                    </td>
-                                </tr>            
-                            </template>
-                        </tbody>
-                    </table> -->
-                </div>   
-            </div>
-        </template>
-        <div class="slds-align_absolute-center" style="margin-top: 2rem;">
-            <lightning-button label="Save" onclick={savePricebook}></lightning-button>
-        </div>
+                <div class="slds-scrollable_y" style="height: 50vh;margin-top: 1rem;width: 96%;">
+                    <div class="slds-box slds-theme_default">
+                        <lightning-datatable key-field="variantId" data={products} onsave={savePricebook}
+                            draft-values={draftValues} show-row-number-column onrowselection={handlePerfumeSelection}
+                            columns={columns}>
+                        </lightning-datatable>
+                    </div>
+                </div>
+            </template>
+            <!-- <div class="slds-align_absolute-center" style="margin-top: 2rem;">
+                <lightning-button label="Save" onclick={savePricebook}></lightning-button>
+            </div> -->
 
             <div class="spinner">
                 <template if:true={isLoading}>
-                     <lightning-spinner alternative-text="Loading" variant="brand" size="large">
-                     </lightning-spinner>
+                    <lightning-spinner alternative-text="Loading" variant="brand" size="large">
+                    </lightning-spinner>
                 </template>
             </div>
         </div>

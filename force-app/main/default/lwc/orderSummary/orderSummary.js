@@ -7,7 +7,6 @@ import getCartTotalPrice from '@salesforce/apex/PerfumesController.getCartTotalP
 import getShippingInfo from '@salesforce/apex/PerfumesController.getShippingInfo';
 import getCartItemId from '@salesforce/apex/PerfumesController.getCartItemId';
 import createOrder from '@salesforce/apex/PerfumesController.createOrder';
-
 export default class OrderSummary extends NavigationMixin(
     LightningElement
 ) {
@@ -48,12 +47,12 @@ export default class OrderSummary extends NavigationMixin(
         getShippingInfo()
         .then(result => {
             this.shippingInfo = result;
-            console.log(JSON.stringify(this.shippingInfo))
         })
         .catch(error => {
             this.error = error;
         }); 
     }
+
     goToPerfume(event){
         let index = event.target.dataset.index;
         console.log(index);
@@ -73,6 +72,7 @@ export default class OrderSummary extends NavigationMixin(
                 this.error = error;
             });
     }
+
     confirmDialog(){
         this.isDialogVisible = true;
     }
@@ -103,6 +103,7 @@ export default class OrderSummary extends NavigationMixin(
             this.error = error;
         });
     }
+
     openDialog(event){
         if(event.target.name === 'openConfirmation'){
             this.originalMessage = 'test message';

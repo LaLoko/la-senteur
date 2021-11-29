@@ -2,66 +2,63 @@
     <div class="slds-grid slds-wrap">
         <template if:false={searchSucces}>
             <div style="background: floralwhite;width: 18%;">
-                <c-perfumes-list-filters onfilter={handleFilters} onclear={clearFilters} onload={handleLoad}></c-perfumes-list-filters>
+                <c-perfumes-list-filters onfilter={handleFilters} onclear={clearFilters} onload={handleLoad}>
+                </c-perfumes-list-filters>
             </div>
         </template>
         <template if:false={searchSucces}>
-        <div style="width: 82%;">
-            <div>
-                <c-perfume-list-pagination onsort={handleSortSelected} records={perfumesList}
-                    searchsucces={searchSucces} onupdate={paginationHandler}></c-perfume-list-pagination>
-            </div>
-            <template if:true={everythingLoaded}>
+            <div style="width: 82%;">
+                <div>
+                    <c-perfume-list-pagination onsort={handleSortSelected} records={perfumesList}
+                        searchsucces={searchSucces} onupdate={paginationHandler}></c-perfume-list-pagination>
+                </div>
+                <template if:true={everythingLoaded}>
 
-            <div style="margin-top:4rem;">
-                <template if:true={recordsFound}>
-                    <template if:true={searchSucces}>
-                        <div style="margin-bottom: 2rem;">
-                            <h1 style="font-size: 32px;">Search result :</h1>
-                        </div>
-                    </template>
+                    <div style="margin-top:4rem;">
+                        <template if:true={recordsFound}>
+                            <template if:true={searchSucces}>
+                                <div style="margin-bottom: 2rem;">
+                                    <h1 style="font-size: 32px;">Search result :</h1>
+                                </div>
+                            </template>
 
-                    <c-perfumes-to-show perfumes-list={perfumesToShow}></c-perfumes-to-show>
-                </template>
-                <template if:false={recordsFound}>
-                    <h1 class="perfumesNotFound">Cannot found any perfumes</h1>
+                            <c-perfumes-to-show perfumes-list={perfumesToShow}></c-perfumes-to-show>
+                        </template>
+                        <template if:false={recordsFound}>
+                            <h1 class="perfumesNotFound">Cannot found any perfumes</h1>
+                        </template>
+                    </div>
                 </template>
             </div>
         </template>
-
-        </div>
-        </template>
-
-
-
         <template if:true={searchSucces}>
-       <div class="slds-col slds-size_10-of-12" style="margin-left: 16rem;">
-            <div>
-                <c-perfume-list-pagination onsort={handleSortSelected} records={perfumesList}
-                    searchsucces={searchSucces} onupdate={paginationHandler}></c-perfume-list-pagination>
-            </div>
+            <div class="slds-col slds-size_10-of-12" style="margin-left: 16rem;">
+                <div>
+                    <c-perfume-list-pagination onsort={handleSortSelected} records={perfumesList}
+                        searchsucces={searchSucces} onupdate={paginationHandler}></c-perfume-list-pagination>
+                </div>
 
-            <div style="margin-top:4rem;">
-                <template if:true={recordsFound}>
-                    <template if:true={searchSucces}>
-                        <div style="margin-bottom: 2rem;">
-                            <h1 style="font-size: 32px;">Search result :</h1>
-                        </div>
+                <div style="margin-top:4rem;">
+                    <template if:true={recordsFound}>
+                        <template if:true={searchSucces}>
+                            <div style="margin-bottom: 2rem;">
+                                <h1 style="font-size: 32px;">Search result :</h1>
+                            </div>
+                        </template>
+
+                        <c-perfumes-to-show perfumes-list={perfumesToShow}></c-perfumes-to-show>
                     </template>
-
-                    <c-perfumes-to-show perfumes-list={perfumesToShow}></c-perfumes-to-show>
-                </template>
-                <template if:false={recordsFound}>
-                    <h1 class="perfumesNotFound">Cannot found any perfumes</h1>
-                </template>
+                    <template if:false={recordsFound}>
+                        <h1 class="perfumesNotFound">Cannot found any perfumes</h1>
+                    </template>
+                </div>
             </div>
-        </div>
         </template>
     </div>
     <div class="spinner">
         <template if:true={isLoading}>
-             <lightning-spinner alternative-text="Loading" variant="brand" size="large">
-             </lightning-spinner>
+            <lightning-spinner alternative-text="Loading" variant="brand" size="large">
+            </lightning-spinner>
         </template>
     </div>
 </template>

@@ -53,67 +53,57 @@ export default class DiscountManager extends NavigationMixin(
             this.error = error;
         });   
     }
-    handlePriceChange(event){
-       this.draftValues = event.target.draftValues;
-        // let indx = event.target.dataset.recordId;
-        console.log(JSON.stringify(event.detail.draftValues))
-  
-
-        // if ( this.products ) {
-        //     let price =  event.target.value;
-
-        //     let recs =  JSON.parse( JSON.stringify( this.products ) );
-        //     recs[ indx ].price = price;
-        //     this.products = recs;
-        // }
-    }
 
     handlePerfumeSelection(event){
         const selectedRows = event.detail.selectedRows;
         for (let i = 0; i < selectedRows.length; i++) {
            selectedRows[i].selected = true;
-           console.log(selectedRows[i].name);
         }
-
-        // let indx = event.target.dataset.recordId;
-
-        // if ( this.products ) {
-
-        //     let recs =  JSON.parse( JSON.stringify( this.products ) );
-        //     let currVal = recs[ indx ].selected;
-        //     recs[ indx ].selected = !currVal;
-        //     this.products = recs;
-        // }
     }
-    savePricebook(){
+    savePricebook(event){
         let rows = this.template.querySelector("lightning-datatable").getSelectedRows()
-        console.log(JSON.stringify(rows));
-
-        var priceBelowZero = false;
-        var somethingSelected = false;
-
-        this.products.forEach(element => {
-            this.draftValues.forEach(el => {
-                if(element.variantId == el.variantId){
-                    element.price = el.price;
-                    console.log(el.price);
+        let products = event.detail.draftValues;
+        let priceBelowZero = false;
+    
+        if(rows.length > 0){
+        products.forEach(prod => {
+            rows.forEach(row => {
+                if(row.variantId == prod.variantId){
+                    row.price = prod.price;
                 }
-            });
+            });  
         });
-        console.log(JSON.stringify(this.draftValues))
+    }else{
+            const evt = new ShowToastEvent({
+                title: 'Error',
+                message: 'No rows selected',
+                variant: 'error',
+                mode: 'dismissable'
+            });
+            this.dispatchEvent(evt);
+            return;
+        
+    }
+        products = rows;
 
-        this.products.forEach(element => {
-            if(element.selected){
-                somethingSelected = true;
+        products.forEach(element => {
                 if(element.price <= 0){
                     priceBelowZero = true;
                 }            
-            }
         });
-        console.log(priceBelowZero)
-        if(somethingSelected){
+        console.log(priceBelowZero);
+        if(this.pricebookName === undefined || this.pricebookName == ''){
+            const evt = new ShowToastEvent({
+                title: 'Error',
+                message: 'Name cannot be empty',
+                variant: 'error',
+                mode: 'dismissable'
+            });
+            this.dispatchEvent(evt);
+            return;
+        }
             if(!priceBelowZero){
-                createNewPricebook({products:JSON.stringify(this.products),name:this.pricebookName,description:this.description,startDate:this.startDate,endDate:this.endDate})
+                createNewPricebook({products:JSON.stringify(products),name:this.pricebookName,description:this.description,startDate:this.startDate,endDate:this.endDate})
                 .then(result => {
                     this[NavigationMixin.Navigate]({
                         type: 'standard__recordPage',
@@ -136,15 +126,5 @@ export default class DiscountManager extends NavigationMixin(
                 });
                 this.dispatchEvent(evt);
             }
-        }else{
-            const evt = new ShowToastEvent({
-                title: 'Error',
-                message: 'No products selected',
-                variant: 'error',
-                mode: 'dismissable'
-            });
-            this.dispatchEvent(evt);
-        }
-
     }
 }

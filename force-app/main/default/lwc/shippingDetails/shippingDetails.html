@@ -2,13 +2,19 @@
     <div class="slds-grid slds-gutters">
         <div class="slds-col slds-size_2-of-4" style="margin-left: 24rem;margin-top: 6rem;">
             <template if:true={address}>
-            <lightning-input type="text" label="Shipping Street" value={address.street} onchange={streetChange}></lightning-input>
-            <lightning-input type="text" label="Shipping City" value={address.city} onchange={cityChange}></lightning-input>
-            <lightning-input type="text" label="Shipping State/Province" value={address.state} onchange={stateChange}></lightning-input>
-            <lightning-input type="text" label="Shipping Zip/Postal Code" value={address.zip} onchange={zipChange}></lightning-input>
-            <lightning-input type="text" label="Shipping Country" value={address.country} onchange={countryChange}></lightning-input>
-        </template>
-            <lightning-button  label="Go to summary" style="float: right;margin: 2rem ;color: white;" onclick={goToSummary}></lightning-button>
+                <lightning-input type="text" label="Shipping Street" value={address.street} onchange={streetChange}>
+                </lightning-input>
+                <lightning-input type="text" label="Shipping City" value={address.city} onchange={cityChange}>
+                </lightning-input>
+                <lightning-input type="text" label="Shipping State/Province" value={address.state}
+                    onchange={stateChange}></lightning-input>
+                <lightning-input type="text" label="Shipping Zip/Postal Code" value={address.zip} onchange={zipChange}>
+                </lightning-input>
+                <lightning-input type="text" label="Shipping Country" value={address.country} onchange={countryChange}>
+                </lightning-input>
+            </template>
+            <lightning-button label="Go to summary" style="float: right;margin: 2rem ;color: white;"
+                onclick={goToSummary}></lightning-button>
         </div>
     </div>
 </template>

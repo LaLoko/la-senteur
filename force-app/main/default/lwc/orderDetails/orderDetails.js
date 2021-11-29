@@ -2,7 +2,6 @@ import { LightningElement,api,track } from 'lwc';
 import getOrderDetails from '@salesforce/apex/ProfileController.getOrderDetails';
 import getOrderedPerfumes from '@salesforce/apex/ProfileController.getOrderedPerfumes';
 import getShippmentInfo from '@salesforce/apex/ProfileController.getShippmentInfo';
-
 export default class OrderDetails extends LightningElement {
     @api order;
     @track detailedOrder;
@@ -17,12 +16,9 @@ export default class OrderDetails extends LightningElement {
     }
 
     getDetails(){
-        console.log(JSON.stringify(this.order));
         getOrderDetails({orderId:this.order.Id})
         .then(result => {
             this.detailedOrder = result;
-            console.log(JSON.stringify(result));
-
         })
         .catch(error => {
             this.error = error;
@@ -33,7 +29,6 @@ export default class OrderDetails extends LightningElement {
         getOrderedPerfumes({orderId:this.order.Id})
         .then(result => {
             this.orderItems = result;
-            console.log(JSON.stringify(result));
         })
         .catch(error => {
             this.error = error;
@@ -43,7 +38,6 @@ export default class OrderDetails extends LightningElement {
         getShippmentInfo({orderId:this.order.Id})
         .then(result => {
             this.address = result;
-            console.log(JSON.stringify(result));
             this.isLoading = false;
         })
         .catch(error => {
