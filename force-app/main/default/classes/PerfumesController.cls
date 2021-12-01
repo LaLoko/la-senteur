@@ -57,15 +57,23 @@ public without sharing class PerfumesController {
             query += ' ORDER BY minPrice__c ASC';
         } else if (sortType != null && sortType.contains('Price DESC')) {
             query += ' ORDER BY minPrice__c DESC';
-        } else if (sortType != null && sortType.contains('Score')) {
+        } else if (sortType != null && sortType.contains('Score ASC')) {
             query += ' ORDER BY Score__c ASC';
+        } else if (sortType != null && sortType.contains('Score DESC')) {
+            query += ' ORDER BY Score__c DESC';
         } else {
             query += ' ORDER BY Name ASC';
         }
 
         perfumesList = database.query(query);
         if (sortType != null && sortType.contains('popular')) {
-            List<AggregateResult> orderItems = [SELECT Product2Id, COUNT(Id) FROM OrderItem GROUP BY Product2Id ORDER BY COUNT(Id) DESC];
+            List<AggregateResult> orderItems;
+
+            if(sortType.contains('DESC')){
+                 orderItems = [SELECT Product2Id, COUNT(Id) FROM OrderItem GROUP BY Product2Id ORDER BY COUNT(Id) DESC];
+            }else{
+                 orderItems = [SELECT Product2Id, COUNT(Id) FROM OrderItem GROUP BY Product2Id ORDER BY COUNT(Id) ASC];
+            }
             List<Product2> out = new List<Product2>();
             for (AggregateResult item : orderItems) {
                 for (Product2 product : perfumesList) {
@@ -115,19 +123,24 @@ public without sharing class PerfumesController {
             wrapper.price = getPerfumePrice(perfume.Id);
             out.add(wrapper);
         }
-
         return out;
     }
+    
     public static String getPerfumePrice(Id perfumeId) {
-        List<Variant__c> variants = getVariantsWithPricebook([SELECT Price__c FROM Variant__c WHERE Product__c = :perfumeId]);
+        List<Variant__c> variants = getVariantsWithPricebook([SELECT Price__c,InPromo__c FROM Variant__c WHERE Product__c = :perfumeId]);
         Decimal newPrice = variants.get(0).Price__c;
+        Boolean promo =false;
         for (Variant__c variant : variants) {
             if (variant.Price__c < newPrice) {
                 newPrice = variant.Price__c;
             }
+            if(variant.InPromo__c){
+                promo = true;
+            }
         }
+        System.debug(variants);
         Decimal minPrice = [SELECT UnitPrice FROM PricebookEntry WHERE Product2Id = :perfumeId LIMIT 1].UnitPrice;
-        if (minPrice == newPrice) {
+        if (!promo) {
             return String.valueOf(minPrice);
         } else {
             return 'SALE ' + String.valueOf(newPrice);
@@ -144,6 +157,10 @@ public without sharing class PerfumesController {
 
     @AuraEnabled
     public static List<PerfumeWrapper> getPerfumesByKey(String key) {
+        System.debug('|'+key+'|');
+        if(key == null || key.deleteWhitespace() == ''){
+            return null;
+        }
         key = '%' + key + '%';
         List<Product2> perfumesList = [
                 SELECT Id, Name,Photo__c,Score__c,Top_Notes__c,Main_accords__c,Middle_Notes__c,Gender__c,Designer__c,Base_Notes__c, minPrice__c
@@ -196,7 +213,7 @@ public without sharing class PerfumesController {
                     perfumesList.add(product);
                     currNumber++;
                 }
-                if (currNumber == 5) break;
+                if (currNumber == 6) break;
             }
         }
 
@@ -222,6 +239,7 @@ public without sharing class PerfumesController {
             wrapper.URL = 'https://lasenteur-developer-edition.eu40.force.com/s/perfume-detail?id=' + perfume.Id;
             out.add(wrapper);
         }
+        System.debug(out);
         return out;
     }
 
@@ -284,18 +302,20 @@ public without sharing class PerfumesController {
         ];
 
         if (variants.size() > 0) {
-            List<Variant__c> out = new List<Variant__c>();
             for (Variant__c variant : preVariants) {
-                Integer size = 0;
-                Decimal sum = 0;
+                Decimal min;
                 for (Pricebook_entry_variant__c priceVariant : variants) {
                     if (priceVariant.Variant__c == variant.Id) {
-                        size += 1;
-                        sum += priceVariant.New_Price__c;
+                        if(min == null){
+                            min = priceVariant.New_Price__c;
+                        }
+                        if(priceVariant.New_Price__c < min){
+                            min = priceVariant.New_Price__c;
+                        }
                     }
                 }
-                if (size != 0) {
-                    variant.Price__c = sum / size;
+                if (min != null) {
+                    variant.Price__c = min;
                     variant.InPromo__c = true;
                 }
             }
@@ -503,6 +523,15 @@ public without sharing class PerfumesController {
     }
 
     @AuraEnabled
+    public static void addInvoiceData(String companyName,String state, String city, String country, String zip, String street){
+        Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
+
+        ShippmentInfo info = new ShippmentInfo(companyName,state, city, country, zip, street);
+
+        sessionPart.put('invoiceData', info);
+    }
+
+    @AuraEnabled
     public static ShippmentInfo getShippingInfo() {
         Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
 
@@ -514,6 +543,14 @@ public without sharing class PerfumesController {
         Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
         List<CartItem> cart = (List<CartItem>) sessionPart.get('cart');
         return cart.get(index).id;
+    }
+
+    public static void clearBasket(){
+        Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
+        sessionPart.put('shippmentInfo', null);
+        sessionPart.put('cart', null);
+        sessionPart.put('total', null);
+        sessionPart.put('invoiceData',null);
     }
 
     @AuraEnabled
@@ -569,6 +606,8 @@ public without sharing class PerfumesController {
             Cache.SessionPartition sessionPart = Cache.Session.getPartition('local.lasenteur');
             List<CartItem> cart = (List<CartItem>) sessionPart.get('cart');
             ShippmentInfo shippmentInfo = (ShippmentInfo) sessionPart.get('shippmentInfo');
+            ShippmentInfo invoiceData = (ShippmentInfo) sessionPart.get('invoiceData');
+
             String userId = System.UserInfo.getUserId();
 
             User user = [SELECT Id,ContactId FROM User WHERE Id = :userId LIMIT 1];
@@ -594,6 +633,18 @@ public without sharing class PerfumesController {
             );
             insert order;
 
+            if(invoiceData != null){
+            Invoice__c invoice = new Invoice__c();
+            invoice.Company_name__c = invoiceData.companyName;
+            invoice.Order__c = order.Id;
+            invoice.Shipping_City__c = invoiceData.city;
+            invoice.Shipping_Country__c = invoiceData.country;
+            invoice.Shipping_State__c = invoiceData.state;
+            invoice.Shipping_Street__c = invoiceData.street;
+            invoice.Shipping_Zip_Code__c = invoiceData.zip;
+        insert invoice;    
+        }
+
             List<PricebookEntry> pricebookEntries = [SELECT Id,Product2Id FROM PricebookEntry WHERE Pricebook2Id = :priceBook.Id];
             For (CartItem item : cart) {
                 Decimal price = getPriceFromVariant(item.variant);
@@ -613,10 +664,31 @@ public without sharing class PerfumesController {
             }
             order.Status = 'Activated';
             update order;
+            clearBasket();
             return true;
         } catch (Exception e) {
             return false;
         }
+    }
+
+    @AuraEnabled
+    public static AdvWrapper getAdv(){
+        AdvWrapper wrapper = new AdvWrapper();
+        Pricebook2 pricebook = [SELECT Name FROM Pricebook2 WHERE IsStandard = false AND isActive = true LIMIT 1];
+        wrapper.title = pricebook.Name;
+        Product_Image__c image = [SELECT URL__c FROM Product_Image__c LIMIT 1];
+        wrapper.photo = image.URL__c;
+        System.debug(wrapper);
+        return wrapper;
+    }
+
+    public class AdvWrapper{
+        @AuraEnabled
+        public  String title;
+        @AuraEnabled
+        public  String photo;
+
+        AdvWrapper(){}    
     }
 
     class CartItem {

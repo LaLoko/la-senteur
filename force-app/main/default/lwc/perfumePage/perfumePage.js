@@ -26,6 +26,8 @@ export default class PerfumePage extends LightningElement {
     editingComment = false;
     @api commentToEdit;
     @track editScore;
+    textBeforeEdit;
+    isEdited;
 
     currPhoto;
     photoIndex = 0;
@@ -193,12 +195,15 @@ export default class PerfumePage extends LightningElement {
 
     editReviewChange(event) {
         this.commentToEdit.Review__c= event.target.value;
+        this.isEdited = true;
     }
 
     editComment(){
         getReviewToEdit({perfumeId:this.id})
         .then(result => {
             this.commentToEdit = result;
+            this.textBeforeEdit = result.text;
+            this.isEdited = false;
             this.editingComment = true;
             this.editScore = result.score.toString();
             
@@ -213,6 +218,10 @@ export default class PerfumePage extends LightningElement {
     }
     
     editReview(event){
+        if(!this.isEdited){
+            this.commentToEdit.Review__c = this.textBeforeEdit;
+        }
+
         updateReview({text:this.commentToEdit.Review__c,score:this.editScore,perfumeId:this.id})
         .then(result => {
             this.getAllReviews();

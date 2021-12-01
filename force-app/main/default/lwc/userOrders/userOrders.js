@@ -4,6 +4,7 @@ import getOrderDetails from '@salesforce/apex/ProfileController.getOrderDetails'
 import getOrderedPerfumes from '@salesforce/apex/ProfileController.getOrderedPerfumes';
 import getShippmentInfo from '@salesforce/apex/ProfileController.getShippmentInfo';
 import { NavigationMixin } from 'lightning/navigation';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 export default class UserOrders extends NavigationMixin(
     LightningElement
 ) {
@@ -23,9 +24,11 @@ export default class UserOrders extends NavigationMixin(
         .then(result => {
             this.orders = result;
             if(this.orderid){
-                let index = 0;
+                let index;
+                console.log(JSON.stringify(this.orders[0].objOrder.Id))
+                console.log(this.orderid)
                 for(let i=0;i<this.orders.length;i++){
-                    if(this.orders[i].objOrder.Id == this.orderId){
+                    if(this.orders[i].objOrder.Id == this.orderid){
                         index = i;
                     }
                 }
@@ -48,6 +51,15 @@ export default class UserOrders extends NavigationMixin(
     }
 
     hs(indx){
+        if(indx === undefined){
+            const evt = new ShowToastEvent({
+                title: 'Error',
+                message: 'Order cannot be found',
+                variant: 'error',
+                mode: 'dismissable'
+            });
+            this.dispatchEvent(evt);
+        }
         if ( this.orders ) {
 
             let recs =  JSON.parse( JSON.stringify( this.orders ) );

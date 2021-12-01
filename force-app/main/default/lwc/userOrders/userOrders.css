@@ -1,3 +1,9 @@
 orderRow :hover{
     background: rgb(206, 206, 206);
 }
+.divider{
+    background-color: rgba(0, 0, 0, 0.349); 
+    height: 1px;
+    /* width: 60%;
+    margin-left: 20%; */
+}

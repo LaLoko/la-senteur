@@ -20,6 +20,7 @@ export default class FileUploadMultiLWC extends LightningElement {
                 }
                 let file = event.target.files[i];
                 let reader = new FileReader();
+
                 reader.onload = e => {
                     var fileContents = reader.result.split(',')[1]
                     this.filesData.push({'fileName':file.name, 'fileContent':fileContents});
@@ -54,8 +55,10 @@ export default class FileUploadMultiLWC extends LightningElement {
     }
  
     removeReceiptImage(event) {
-        var index = event.currentTarget.dataset.id;
-        this.filesData.splice(index, 1);
+        // var index = event.currentTarget.dataset.id;
+        this.filesData.splice(this.currIndex, 1);
+        this.currIndex = undefined;
+        this.dialogDisable();
     }
  
     showToast(title, variant, message) {
@@ -66,5 +69,13 @@ export default class FileUploadMultiLWC extends LightningElement {
                 message: message,
             })
         );
+    }
+
+    openModal(event){
+        this.isDialogVisible = true;
+        this.currIndex = event.currentTarget.dataset.id;
+    }
+    dialogDisable(){
+        this.isDialogVisible = false;
     }
 }

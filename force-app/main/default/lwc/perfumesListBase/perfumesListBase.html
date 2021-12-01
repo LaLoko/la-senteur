@@ -2,15 +2,28 @@
     <div class="slds-size_1-of-6 slds-align_absolute-center" style="height: 520px;width:300px">
         <lightning-carousel class="carusel">
             <template for:each={bestsellers} for:item="perfume" for:index="index">
-                <lightning-carousel-image 
-                key={perfume.Id}
-                class="carousel-image"
-                src={perfume.photo}
-                description = {perfume.price}
-                header={perfume.bestsellerName} 
-                href={perfume.URL}>
-            </lightning-carousel-image>           
-        </template>
+                <lightning-carousel-image key={perfume.Id} class="carousel-image" src={perfume.photo}
+                    description={perfume.price} header={perfume.bestsellerName} href={perfume.URL}>
+                </lightning-carousel-image>
+            </template>
         </lightning-carousel>
     </div>
+
+    <template if:true={showModal}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+            aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <lightning-button-icon onclick={closeModal} icon-name="utility:close" style="float: right;">
+                    </lightning-button-icon>
+                    <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">{adv.title}</h2>
+                </header>
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <img src="https://britenet-bb-dev-ed--c.documentforce.com/servlet/servlet.ImageServer?id=01509000001RWDT&oid=00D09000007z4Sw&lastMod=1638256974000"
+                        style="object-fit: contain !important;" onclick={goToSale}>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
 </template>

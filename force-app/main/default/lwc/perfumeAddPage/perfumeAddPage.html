@@ -4,21 +4,14 @@
             <div style="margin-bottom: 2rem;">
                 <h1 style="font-size: xx-large;">Add new perfume</h1>
             </div>
-            <div>
-                <div>
-                    <lightning-input label="Name" type="text" value={name} onchange={handleNameChange}
-                        class="slds-align_absolute-center">
-                    </lightning-input>
-                </div>
-                <div class="slds-col" style="float: left;margin-right: 1rem;">
-                    <lightning-combobox label="Designer" options={designers} value={selDesigner}
-                        onchange={handleDesignerChange}></lightning-combobox>
-                </div>
-                <div class="slds-col" style="float: left;">
-                    <lightning-combobox label="Gender" options={genders} value={selGender}
-                        onchange={handleGenderChange}>
-                    </lightning-combobox>
-                </div>
+            <div style="display: flex;width: 50%;justify-content: space-evenly;" class="slds-align_absolute-center">
+                <lightning-input label="Name" type="text" value={name} onchange={handleNameChange}
+                    style="width: 18rem;">
+                </lightning-input>
+                <lightning-combobox label="Designer" options={designers} value={selDesigner}
+                    onchange={handleDesignerChange}></lightning-combobox>
+                <lightning-combobox label="Gender" options={genders} value={selGender} onchange={handleGenderChange}>
+                </lightning-combobox>
             </div>
 
             <div class="slds-grid" style="margin-top: 2rem;">
@@ -50,7 +43,7 @@
             </div>
             <div>
                 <div style="margin-top: 2rem;">
-                    <c-file-upload-multi title="Perfume photos"></c-file-upload-multi>
+                    <c-file-upload-multi title="Perfume photos" ></c-file-upload-multi>
                 </div>
             </div>
             <div>
@@ -61,9 +54,9 @@
                     </lightning-pill-container>
 
                     <div style="margin-top: 1rem;">
-                        <lightning-input type="text" label="Capacity" value={variantCap} onchange={handleCapChange}
+                        <lightning-input type="text" label="Capacity (ml)" value={variantCap} onchange={handleCapChange}
                             style="float: left;margin-right: 1rem;"></lightning-input>
-                        <lightning-input type="text" label="Price" value={variantPrice} onchange={handlePriceChange}
+                        <lightning-input type="text" label="Price (EUR)" value={variantPrice} onchange={handlePriceChange}
                             style="float: left;margin-right: 1rem;"></lightning-input>
                         <lightning-button label="Add variant" style="float: left; margin-top:24px" onclick={addVariant}>
                         </lightning-button>

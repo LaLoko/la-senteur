@@ -20,6 +20,9 @@ export default class Cart extends NavigationMixin(
 
     connectedCallback(){
         this.step = '1';
+        this.stepOne = true;
+        this.stepTwo = false;
+        this.stepThree = false; 
     }
 
     goToOne(){
@@ -67,11 +70,14 @@ export default class Cart extends NavigationMixin(
     get currentStep(){
         return this.step;
     }
-    goToHome(){
+    goToOrder(){
         this[NavigationMixin.Navigate]({
             type: 'comm__namedPage',
             attributes: {
-                pageName: 'home'
+                pageName: 'profile'
+            },
+            state: {
+                'orderId': this.orderId
             }
         });
     }

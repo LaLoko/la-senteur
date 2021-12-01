@@ -1,20 +1,53 @@
 <template>
-    <div class="slds-grid slds-gutters">
-        <div class="slds-col slds-size_2-of-4" style="margin-left: 24rem;margin-top: 6rem;">
-            <template if:true={address}>
-                <lightning-input type="text" label="Shipping Street" value={address.street} onchange={streetChange}>
+    <div class="slds-grid slds-gutters" style="display: flex; flex-direction: column;margin: 2rem;align-items: center;">
+        <div>
+            <div class="slds-col slds-size_2-of-4" style="margin-top: 4rem;float: left;width: 20rem;">
+                <h1 style="font-size: medium;">Shipping address</h1>
+                <template if:true={address}>
+                    <lightning-input type="text" label="Shipping Street" value={address.street} onchange={streetChange}>
+                    </lightning-input>
+                    <lightning-input type="text" label="Shipping City" value={address.city} onchange={cityChange}>
+                    </lightning-input>
+                    <lightning-input type="text" label="Shipping State/Province" value={address.state}
+                        onchange={stateChange}></lightning-input>
+                    <lightning-input type="text" label="Shipping Zip/Postal Code" value={address.zip}
+                        onchange={zipChange}>
+                    </lightning-input>
+                    <lightning-input type="text" label="Shipping Country" value={address.country}
+                        onchange={countryChange}>
+                    </lightning-input>
+                </template>
+                <lightning-input type="checkbox" label="I want invoice" checked={wantInvoice} onchange={clickInvoice} style="float: right;margin-top: 2rem;">
                 </lightning-input>
-                <lightning-input type="text" label="Shipping City" value={address.city} onchange={cityChange}>
-                </lightning-input>
-                <lightning-input type="text" label="Shipping State/Province" value={address.state}
-                    onchange={stateChange}></lightning-input>
-                <lightning-input type="text" label="Shipping Zip/Postal Code" value={address.zip} onchange={zipChange}>
-                </lightning-input>
-                <lightning-input type="text" label="Shipping Country" value={address.country} onchange={countryChange}>
-                </lightning-input>
+            </div>
+
+            <template if:true={wantInvoice}>
+                <div class="slds-col slds-size_2-of-4" style="float: left;margin-top: 63px;width: 20rem;">
+                    <h1 style="font-size: medium;">Invoice data</h1>
+                    <h1 style="margin-top: 1rem;">Company data</h1>
+                    <lightning-input type="text" label="Company name" value={companyName} onchange={handleCompanyNameChange}>
+                    </lightning-input>
+
+                    <h1 style="margin-top: 2rem;">Companty address</h1>
+                    <lightning-input type="checkbox" label="Same as shipping address" checked={sameAdress} onchange={companyAddressChange}>
+                    </lightning-input>
+                    <lightning-input type="text" label="Shipping Street" value={street} onchange={companyStreetChange} style="margin-top: 1rem;">
+                    </lightning-input>
+                    <lightning-input type="text" label="Shipping City" value={city} onchange={companyCityChange}>
+                    </lightning-input>
+                    <lightning-input type="text" label="Shipping State/Province" value={state}
+                        onchange={companyStateChange}></lightning-input>
+                    <lightning-input type="text" label="Shipping Zip/Postal Code" value={zip}
+                        onchange={companyZipChange}>
+                    </lightning-input>
+                    <lightning-input type="text" label="Shipping Country" value={country}
+                        onchange={companyCountryChange}>
+                    </lightning-input>
+                </div>
             </template>
-            <lightning-button label="Go to summary" style="float: right;margin: 2rem ;color: white;"
-                onclick={goToSummary}></lightning-button>
         </div>
+
+        <lightning-button label="Go to summary" style="margin: 2rem ;color: white;" class="slds-align_absolute-center"
+            onclick={goToSummary}></lightning-button>
     </div>
 </template>

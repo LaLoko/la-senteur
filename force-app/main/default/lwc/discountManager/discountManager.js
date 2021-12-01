@@ -25,7 +25,7 @@ export default class DiscountManager extends NavigationMixin(
             {label: 'Designer',fieldName: 'designer',editable: false},
             {label: 'Perfume Name',fieldName: 'name',editable: false},
             {label: 'Gender',fieldName: 'gender',editable: false},
-            {label: 'Capacity',fieldName: 'capacity',type: 'decimal',editable: false},
+            {label: 'Capacity (ml)',fieldName: 'capacity',type: 'decimal',editable: false},
             {label: 'Price',fieldName: 'price',type: 'currency',editable: true},
         ];
     }

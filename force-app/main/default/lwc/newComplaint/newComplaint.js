@@ -1,8 +1,10 @@
-import { LightningElement,api } from 'lwc';
+import { LightningElement,api,track } from 'lwc';
 import createNewCase from '@salesforce/apex/CaseController.createNewCase';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-
-export default class NewComplaint extends LightningElement {
+import { NavigationMixin } from 'lightning/navigation';
+export default class NewComplaint extends NavigationMixin(
+    LightningElement
+) {
     @api visible; 
     @api title; 
     @api name; 
@@ -14,6 +16,7 @@ export default class NewComplaint extends LightningElement {
     @api items
     subject;
     description;
+    @track caseId;
 
     @api
     makeVisible(){
@@ -50,26 +53,50 @@ export default class NewComplaint extends LightningElement {
                 caseItems.push(element);
             }
         });
+        if(caseItems.length == 0){
+            const evt = new ShowToastEvent({
+                title: 'Error',
+                message: 'No case items selected',
+                variant: 'error',
+                mode: 'dismissable'
+            });
+            this.dispatchEvent(evt);
+            return;
+        }
+        if(this.subject === undefined || this.subject == ''){
+            const evt = new ShowToastEvent({
+                title: 'Error',
+                message: 'No case subject',
+                variant: 'error',
+                mode: 'dismissable'
+            });
+            this.dispatchEvent(evt);
+            return;
+        }
+        if(this.description === undefined || this.description == ''){
+            const evt = new ShowToastEvent({
+                title: 'Error',
+                message: 'No case description',
+                variant: 'error',
+                mode: 'dismissable'
+            });
+            this.dispatchEvent(evt);
+            return;
+        }
 
         createNewCase({items:JSON.stringify(caseItems),subject:this.subject,description:this.description,orderId:this.order.Id})
         .then(result => {
-            if(result == true){
-                const evt = new ShowToastEvent({
-                    title: 'Success',
-                    message: 'Case created succesfully',
-                    variant: 'succes',
-                    mode: 'dismissable'
+            console.log(JSON.stringify(result))
+                this[NavigationMixin.Navigate]({
+                    type: 'comm__namedPage',
+                    attributes: {
+                        pageName: 'profile'
+                    },
+                    state: {
+                        'caseId': result
+                    }
                 });
-                this.dispatchEvent(evt);
-            }else{
-                const evt = new ShowToastEvent({
-                    title: 'Error',
-                    message: 'Cannot create case',
-                    variant: 'error',
-                    mode: 'dismissable'
-                });
-                this.dispatchEvent(evt);
-            }
+    
         })
         .catch(error => {
             this.error = error;

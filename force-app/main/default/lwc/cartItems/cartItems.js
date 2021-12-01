@@ -12,6 +12,8 @@ export default class CartItems extends NavigationMixin(
     @track total;
     cartExist = false;
     @track isLoading = true;
+    @track isDialogVisible = false;
+    currIndex;
 
     connectedCallback(){
         this.loadCart();
@@ -42,21 +44,33 @@ export default class CartItems extends NavigationMixin(
             this.error = error;
         });   
     }
-    deleteItemFormCart(event){
-        let index = event.target.dataset.index;
 
-        deleteFromCart({id:index})
+    deleteItemFormCart(){
+
+        deleteFromCart({id:this.currIndex})
         .then(result => {
             this.loadCart();
             this.getTotalPrice();
+            this.closeDialog();
         })
         .catch(error => {
             this.error = error;
         });   
     }
+
+    openDialog(event){
+        this.currIndex = event.target.dataset.index;
+        this.isDialogVisible = true;
+    }
+
+    closeDialog(){
+        this.isDialogVisible = false;
+    }
+
     goToShippment(){
         this.dispatchEvent(new CustomEvent('next',{step:'2'}));
     }
+
     goToPerfume(event){
         let index = event.target.dataset.index;
             getCartItemId({index:index})

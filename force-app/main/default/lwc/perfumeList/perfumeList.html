@@ -32,7 +32,7 @@
             </div>
         </template>
         <template if:true={searchSucces}>
-            <div class="slds-col slds-size_10-of-12" style="margin-left: 16rem;">
+            <div class="slds-col slds-size_10-of-12" style="margin-left: 10rem;">
                 <div>
                     <c-perfume-list-pagination onsort={handleSortSelected} records={perfumesList}
                         searchsucces={searchSucces} onupdate={paginationHandler}></c-perfume-list-pagination>
@@ -41,7 +41,7 @@
                 <div style="margin-top:4rem;">
                     <template if:true={recordsFound}>
                         <template if:true={searchSucces}>
-                            <div style="margin-bottom: 2rem;">
+                            <div>
                                 <h1 style="font-size: 32px;">Search result :</h1>
                             </div>
                         </template>

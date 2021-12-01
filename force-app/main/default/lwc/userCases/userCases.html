@@ -101,6 +101,25 @@
                                                     </div>
                                                 </template>
 
+                                                <template if:true={responsesExist}>
+                                                    <h1 style="font-size: large;margin: 1rem
+                                                    ; margin-top: 3rem;">Case responses :</h1>
+                                                    <template for:each={it.value.caseFeed} for:item="feed">
+                                                        <div key={feed.publishDate} style="margin: 1rem;">
+                                                            <h2 style="font-size: medium;">{feed.name}</h2>
+                                                            <lightning-formatted-date-time value={feed.publishDate}
+                                                                year="numeric" month="numeric" day="numeric"
+                                                                hour="numeric" minute="2-digit" hour12="false">
+                                                            </lightning-formatted-date-time>
+
+                                                            <div style="margin: 10px;">
+                                                            <lightning-formatted-rich-text value={feed.text} >
+                                                            </lightning-formatted-rich-text>
+                                                        </div>
+                                                        </div>
+                                                    </template>
+                                                </template>
+
                                                 <div class="slds-align_absolute-center">
                                                     <lightning-button label="Go to order" onclick={goToOrder}
                                                         data-record-id={it.index}></lightning-button>

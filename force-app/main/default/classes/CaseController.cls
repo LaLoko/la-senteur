@@ -1,7 +1,7 @@
 public without sharing class CaseController {
 
     @AuraEnabled
-    public static Boolean createNewCase(String items, String subject, String description, Id orderId) {
+    public static Id createNewCase(String items, String subject, String description, Id orderId) {
         String userId = System.UserInfo.getUserId();
         User user = [SELECT Id,ContactId FROM User WHERE Id = :userId LIMIT 1];
         Contact contact = [SELECT Id,AccountId FROM Contact WHERE Id = :user.ContactId LIMIT 1];
@@ -25,7 +25,6 @@ public without sharing class CaseController {
         }
 
         List<Product2> products = [SELECT Id,Name FROM Product2 WHERE Name IN :names];
-        System.debug(orderItems);
 
         for (OrderWrapper item : orderItems) {
             Case_Item__c cp = new Case_Item__c();
@@ -35,8 +34,9 @@ public without sharing class CaseController {
 
             insert cp;
         }
-        return true;
+        return caseObj.Id;
     }
+
     @AuraEnabled
     public static List<CaseWrapper> getAllUserCases() {
         String userId = System.UserInfo.getUserId();
@@ -49,6 +49,7 @@ public without sharing class CaseController {
             wrapper.objCase = c;
             wrapper.hideBool = true;
             wrapper.orderItems = getOrderItems(c.Order__c, c.Id);
+            wrapper.caseFeed = getCaseFeed(c.Id);
             out.add(wrapper);
         }
         return out;
@@ -100,6 +101,46 @@ public without sharing class CaseController {
         return out;
     }
 
+    public static List<FeedItemWrapper> getCaseFeed(Id caseId){
+        List<FeedItem> feed = [SELECT ID, Body, ParentId, CreatedById,CreatedDate
+        FROM FeedItem 
+        WHERE ParentId =: caseId];
+
+        List<Id> userIds = new List<Id>();
+        for(FeedItem item : feed){
+            userIds.add(item.CreatedById);
+        }
+        List<User> users = [SELECT Id,Name FROM User WHERE Id IN : userIds];
+
+        List<FeedItemWrapper> out = new List<FeedItemWrapper>();
+
+        for(FeedItem item : feed){
+            if(item.Body == null || item.Body == ''){
+                continue;
+            }
+            FeedItemWrapper wrapper = new FeedItemWrapper();
+            for(User user: users){
+                if(user.Id == item.CreatedById){
+                    wrapper.name = user.Name;
+                }
+            }
+            wrapper.text = item.Body;
+            wrapper.publishDate = item.CreatedDate;
+            out.add(wrapper);
+        }
+        return out;
+    }
+    class FeedItemWrapper{
+        @AuraEnabled
+        public String name ;
+        @AuraEnabled
+        public String  text;
+        @AuraEnabled
+        public Datetime  publishDate;
+
+        FeedItemWrapper(){}
+    }
+
     class CaseWrapper {
         @AuraEnabled
         public Boolean hideBool;
@@ -107,6 +148,8 @@ public without sharing class CaseController {
         public Case objCase;
         @AuraEnabled
         public List<OrderWrapper> orderItems;
+        @AuraEnabled
+        public List<FeedItemWrapper> caseFeed;
 
         CaseWrapper() {
         }

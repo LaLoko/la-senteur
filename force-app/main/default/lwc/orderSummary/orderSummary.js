@@ -80,17 +80,7 @@ export default class OrderSummary extends NavigationMixin(
     order(){
         createOrder()
         .then(result => {
-            if(result == true){
                 this.dispatchEvent(new CustomEvent('next'));
-            }else{
-                const evt = new ShowToastEvent({
-                    title: 'Error',
-                    message: 'Cannot place an order',
-                    variant: 'error',
-                    mode: 'dismissable'
-                });
-                this.dispatchEvent(evt);
-            }
         })
         .catch(error => {
             const evt = new ShowToastEvent({
@@ -101,6 +91,7 @@ export default class OrderSummary extends NavigationMixin(
             });
             this.dispatchEvent(evt);
             this.error = error;
+            console.log(JSON.stringify(error.message))
         });
     }
 

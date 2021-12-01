@@ -55,19 +55,19 @@
                                                     <br />
 
                                                     <template if:true={address}>
-                                                        <h1 style="font-size: large;">Address</h1>
-                                                        <h1 style="font-size: large;">Country : {address.country}</h1>
-                                                        <h1 style="font-size: large;">City : {address.city}</h1>
-                                                        <h1 style="font-size: large;">Street : {address.street}</h1>
-                                                        <h1 style="font-size: large;">Postal Code : {address.zip}</h1>
-                                                        <h1 style="font-size: large;">State : {address.state}</h1>
+                                                        <h1 style="font-size: medium;">Address</h1>
+                                                        <h1 style="font-size: medium;">Country : {address.country}</h1>
+                                                        <h1 style="font-size: medium;">City : {address.city}</h1>
+                                                        <h1 style="font-size: medium;">Street : {address.street}</h1>
+                                                        <h1 style="font-size: medium;">Postal Code : {address.zip}</h1>
+                                                        <h1 style="font-size: medium;">State : {address.state}</h1>
                                                     </template>
 
                                                     <br />
-                                                    <h1 style="font-size: large;">Total Amount :
+                                                    <h1 style="font-size: medium;">Total Amount :
                                                         {detailedOrder.TotalAmount} €</h1>
                                                     <br />
-                                                    <h3 style="font-size: large;">Order date :
+                                                    <h3 style="font-size: medium;">Order date :
                                                         <lightning-formatted-date-time
                                                             value={detailedOrder.ActivatedDate} year="numeric"
                                                             month="numeric" day="numeric" hour="numeric"
@@ -79,7 +79,7 @@
                                             <template if:true={orderItems}>
                                                 <div class="slds-col slds-float_left">
                                                     <div class="slds-grid slds-gutters slds-align_absolute-center"
-                                                        style="border-bottom: 1px solid black;width: 95%;">
+                                                        >
                                                         <div style="float: left;">Designer</div>
                                                         <div style="float: left;">Product</div>
                                                         <div style="float: left;">Capacity</div>
@@ -88,10 +88,7 @@
                                                     <template for:each={orderItems} for:item="item" for:index="index">
                                                         <div key={item.Id} style="height: 1rem;margin: 1rem;"
                                                             class="orderRow">
-                                                            <div class="divider"
-                                                                style="background-color: rgba(0, 0, 0, 0.349); height: 1px;width: 60%;margin-left: 20%;">
-                                                            </div>
-
+                                                            <div class="divider"></div>
 
                                                             <div class="slds-grid slds-gutters slds-align_absolute-center"
                                                                 style="height: 100%;margin-top: 8px;">

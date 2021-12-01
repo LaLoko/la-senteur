@@ -4,7 +4,7 @@
             <lightning-card class="card" title="Cart" icon-name="utility:cart" style="height: 100%;">
                 <template if:false={finalized}>
                     <div style="margin: 1rem;">
-                        <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
+                        <lightning-progress-indicator current-step={currentStep}>
                             <lightning-progress-step label="Cart Info" value="1" onclick={goToOne}>
                             </lightning-progress-step>
                             <lightning-progress-step label="Shipping Details" value="2" onclick={goToSecond}>
@@ -28,7 +28,7 @@
                     <h1 style="text-align: center;font-size: xxx-large;margin-top: 15rem;">The order has been placed
                     </h1>
                     <h2 style="font-size: xx-large;text-align: center;">We will inform you about progress soon</h2>
-                    <lightning-button class="slds-align_absolute-center" label="Go to Homepage" onclick={goToHome}
+                    <lightning-button class="slds-align_absolute-center" label="Go to order" onclick={goToOrder}
                         style="margin-top: 2rem;"></lightning-button>
                 </template>
             </lightning-card>
