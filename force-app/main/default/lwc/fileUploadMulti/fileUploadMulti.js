@@ -7,6 +7,7 @@ export default class FileUploadMultiLWC extends LightningElement {
     @api recordId;
     @api title;
     @track filesData = [];
+    @track fileData;
     showSpinner = false;
     @track isDialogVisible = false;
     @track currIndex;
@@ -23,7 +24,8 @@ export default class FileUploadMultiLWC extends LightningElement {
 
                 reader.onload = e => {
                     var fileContents = reader.result.split(',')[1]
-                    this.filesData.push({'fileName':file.name, 'fileContent':fileContents});
+                    console.log(reader.result)
+                    this.filesData.push({'fileName':file.name, 'fileContent':fileContents,'src':reader.result});
                 };
                 reader.readAsDataURL(file);
             }

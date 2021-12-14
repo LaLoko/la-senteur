@@ -107,7 +107,7 @@ export default class ShippingDetails extends LightningElement {
     }
 
     handleCompanyNameChange(event){
-        this.street= event.target.value;
+        this.companyName= event.target.value;
     }
 
     companyStreetChange(event) {

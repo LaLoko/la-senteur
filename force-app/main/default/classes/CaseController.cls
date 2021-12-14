@@ -3,11 +3,20 @@ public without sharing class CaseController {
     @AuraEnabled
     public static Id createNewCase(String items, String subject, String description, Id orderId) {
         String userId = System.UserInfo.getUserId();
-        User user = [SELECT Id,ContactId FROM User WHERE Id = :userId LIMIT 1];
-        Contact contact = [SELECT Id,AccountId FROM Contact WHERE Id = :user.ContactId LIMIT 1];
+        User user = [
+                SELECT Id, ContactId
+                FROM User
+                WHERE Id = :userId
+                LIMIT 1
+        ];
+        Contact contact = [
+                SELECT Id, AccountId
+                FROM Contact
+                WHERE Id = :user.ContactId
+                LIMIT 1
+        ];
 
         List<OrderWrapper> orderItems = OrderWrapper.parse(items);
-
         Case caseObj = new Case(
                 ContactId = contact.Id,
                 AccountId = contact.AccountId,
@@ -24,55 +33,106 @@ public without sharing class CaseController {
             names.add(item.name);
         }
 
-        List<Product2> products = [SELECT Id,Name FROM Product2 WHERE Name IN :names];
+        List<Product2> products = [
+                SELECT Id, Name
+                FROM Product2
+                WHERE Name IN :names
+        ];
+        List<Variant__c> variants = [
+                SELECT Id, Capacity__c, Product__c
+                FROM Variant__c
+        ];
 
+        List<Case_Item__c> caseItems = new List<Case_Item__c>();
         for (OrderWrapper item : orderItems) {
-            Case_Item__c cp = new Case_Item__c();
-            cp.Case__c = caseObj.Id;
-            cp.Product__c = [SELECT Id,Name FROM Product2 WHERE Name LIKE :item.name LIMIT 1].Id;
-            cp.Variant__c = [SELECT Id FROM Variant__c WHERE Product__c = :cp.Product__c AND Capacity__c = :item.capacity LIMIT 1].Id;
+            Case_Item__c caseItem = new Case_Item__c();
+            caseItem.Case__c = caseObj.Id;
+            for (Product2 product : products) {
+                if (product.Name == item.name) {
+                    caseItem.Id = product.Id;
 
-            insert cp;
+                    for (Variant__c variant : variants) {
+                        if (variant.Product__c == product.Id && variant.Capacity__c == item.capacity) {
+                            caseItem.Variant__c = variant.Id;
+                        }
+                    }
+                }
+            }
+
+            caseItems.add(caseItem);
         }
+
+        insert caseItems;
         return caseObj.Id;
     }
 
     @AuraEnabled
     public static List<CaseWrapper> getAllUserCases() {
         String userId = System.UserInfo.getUserId();
-        User user = [SELECT Id,ContactId FROM User WHERE Id = :userId LIMIT 1];
-        List<Case> cases = [SELECT Id,CaseNumber, Status, ClosedDate,CreatedDate,Order__c,Subject,Description FROM Case WHERE ContactId = :user.ContactId];
+        User user = [
+                SELECT Id, ContactId
+                FROM User
+                WHERE Id = :userId
+                LIMIT 1
+        ];
+        List<Case> cases = [
+                SELECT Id, CaseNumber, Status, ClosedDate, CreatedDate, Order__c, Subject, Description
+                FROM Case
+                WHERE ContactId = :user.ContactId
+        ];
 
-        List<CaseWrapper> out = new List<CaseWrapper>();
-        for (Case c : cases) {
+        List<CaseWrapper> casesWrapper = new List<CaseWrapper>();
+        for (Case case : cases) {
             CaseWrapper wrapper = new CaseWrapper();
-            wrapper.objCase = c;
+            wrapper.objCase = case;
             wrapper.hideBool = true;
-            wrapper.orderItems = getOrderItems(c.Order__c, c.Id);
-            wrapper.caseFeed = getCaseFeed(c.Id);
-            out.add(wrapper);
+            wrapper.orderItems = getOrderItems(case.Order__c, case.Id);
+            wrapper.caseFeed = getCaseFeed(case.Id);
+            casesWrapper.add(wrapper);
         }
-        return out;
+        return casesWrapper;
     }
 
     public static List<OrderWrapper> getOrderItems(Id orderId, Id caseId) {
         List<OrderWrapper> out = new List<OrderWrapper>();
-        List<OrderItem> orderItems = [SELECT Id,OrderId, Product2Id, UnitPrice,Capacity__c FROM OrderItem WHERE OrderId = :orderId];
+        List<OrderItem> orderItems = [
+                SELECT Id, OrderId, Product2Id, UnitPrice, Capacity__c
+                FROM OrderItem
+                WHERE OrderId = :orderId
+        ];
 
         List<Id> productIds = new List<Id>();
         for (OrderItem item : orderItems) {
             productIds.add(item.Product2Id);
         }
-        List<Product2> products = [SELECT Id,Name,Designer__c FROM Product2 WHERE Id IN :productIds];
+
+        List<Product2> products = [
+                SELECT Id, Name, Designer__c
+                FROM Product2
+                WHERE Id IN :productIds
+        ];
 
         List<Id> designersIds = new List<Id>();
         for (Product2 product : products) {
             designersIds.add(product.Designer__c);
         }
-        List<Designer__c> designers = [SELECT Id,Name FROM Designer__c WHERE Id IN :designersIds];
-        List<Case_Item__c> caseItems = [SELECT Product__c, Variant__c, Case__c FROM Case_Item__c WHERE Case__c = :caseId];
 
-        List<Variant__c> variants = [SELECT Id,Capacity__c,Price__c FROM Variant__c WHERE Product__c IN :productIds];
+        List<Designer__c> designers = [
+                SELECT Id, Name
+                FROM Designer__c
+                WHERE Id IN :designersIds
+        ];
+        List<Case_Item__c> caseItems = [
+                SELECT Product__c, Variant__c, Case__c
+                FROM Case_Item__c
+                WHERE Case__c = :caseId
+        ];
+
+        List<Variant__c> variants = [
+                SELECT Id, Capacity__c, Price__c
+                FROM Variant__c
+                WHERE Product__c IN :productIds
+        ];
 
         for (Case_Item__c cs : caseItems) {
             OrderWrapper wrapper = new OrderWrapper();
@@ -101,44 +161,52 @@ public without sharing class CaseController {
         return out;
     }
 
-    public static List<FeedItemWrapper> getCaseFeed(Id caseId){
-        List<FeedItem> feed = [SELECT ID, Body, ParentId, CreatedById,CreatedDate
-        FROM FeedItem 
-        WHERE ParentId =: caseId];
+    public static List<FeedItemWrapper> getCaseFeed(Id caseId) {
+        List<FeedItem> feed = [
+                SELECT ID, Body, ParentId, CreatedById, CreatedDate
+                FROM FeedItem
+                WHERE ParentId = :caseId
+        ];
 
         List<Id> userIds = new List<Id>();
-        for(FeedItem item : feed){
+        for (FeedItem item : feed) {
             userIds.add(item.CreatedById);
         }
-        List<User> users = [SELECT Id,Name FROM User WHERE Id IN : userIds];
+        List<User> users = [
+                SELECT Id, Name
+                FROM User
+                WHERE Id IN :userIds
+        ];
 
-        List<FeedItemWrapper> out = new List<FeedItemWrapper>();
+        List<FeedItemWrapper> feedItems = new List<FeedItemWrapper>();
 
-        for(FeedItem item : feed){
-            if(item.Body == null || item.Body == ''){
+        for (FeedItem item : feed) {
+            if (item.Body == null || item.Body == '') {
                 continue;
             }
             FeedItemWrapper wrapper = new FeedItemWrapper();
-            for(User user: users){
-                if(user.Id == item.CreatedById){
+            for (User user : users) {
+                if (user.Id == item.CreatedById) {
                     wrapper.name = user.Name;
                 }
             }
             wrapper.text = item.Body;
             wrapper.publishDate = item.CreatedDate;
-            out.add(wrapper);
+            feedItems.add(wrapper);
         }
-        return out;
+        return feedItems;
     }
-    class FeedItemWrapper{
+
+    class FeedItemWrapper {
         @AuraEnabled
         public String name ;
         @AuraEnabled
-        public String  text;
+        public String text;
         @AuraEnabled
-        public Datetime  publishDate;
+        public Datetime publishDate;
 
-        FeedItemWrapper(){}
+        FeedItemWrapper() {
+        }
     }
 
     class CaseWrapper {

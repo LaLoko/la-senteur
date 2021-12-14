@@ -1,0 +1,198 @@
+<template>
+    <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+        <thead>
+            <tr>
+                <th class="" scope="col">
+                    <div class="slds-truncate">Pricebook Name</div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate">Valid From</div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate">Valid To</div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate">Active</div>
+                </th>
+                <th class="" scope="col">
+                    <div class="slds-truncate"></div>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <template iterator:it={pricebooks}>
+                <tr class="slds-hint-parent" key={it.value.Id} style="cursor: pointer;">
+                    <td>
+                        {it.value.Name}
+                    </td>
+                    <td>
+                        <lightning-formatted-date-time value={it.value.ValidFrom} year="numeric" month="numeric"
+                            day="numeric" hour="numeric" minute="2-digit" hour12="false">
+                        </lightning-formatted-date-time>
+                    </td>
+                    <td>
+                        <lightning-formatted-date-time value={it.value.ValidTo} year="numeric" month="numeric"
+                            day="numeric" hour="numeric" minute="2-digit" hour12="false">
+                        </lightning-formatted-date-time>
+                    </td>
+                    <td>
+                        <lightning-input type="checkbox" disabled="true" checked={it.value.IsActive}></lightning-input>
+                    </td>
+                    <td>
+                        <lightning-button label="Pricebook details" data-record-id={it.index} onclick={showModal}>
+                        </lightning-button>
+                    </td>
+                </tr>
+            </template>
+        </tbody>
+    </table>
+
+    <template if:true={detailsVisible}>
+        <template if:true={detailedPircebook}>
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+                aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning-button-icon onclick={closeModal} icon-name="utility:close" style="float: right;">
+                        </lightning-button-icon>
+                        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">
+                            {detailedPircebook.pricebook.Name}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <div>
+
+                            <template if:false={isDialogVisible}>
+                                <template if:true={detailedPircebook}>
+                                <template if:false={pricebookInEdit}>
+                                    <lightning-button label="Delete" variant="destructive-text" style="float: right;"
+                                        onclick={openDelPricebookModal}></lightning-button>
+                                    <lightning-button label="Edit" style="float: right;margin-right: 1rem;"
+                                        onclick={openEdit}></lightning-button>
+
+                                    <h2>Pricebook name</h2>
+                                    <h1 style="font-size: medium;">{detailedPircebook.pricebook.Name}</h1>
+                                    <br />
+                                    <h2>Pricebook description</h2>
+                                    <h1 style="font-size: medium;">{detailedPircebook.pricebook.Description}</h1>
+                                    <br />
+                                    <h1>Valid form</h1>
+                                    <lightning-formatted-date-time value={detailedPircebook.pricebook.ValidFrom}
+                                        year="numeric" month="numeric" day="numeric" hour="numeric" minute="2-digit"
+                                        hour12="false" style="font-size: medium;">
+                                    </lightning-formatted-date-time>
+                                    <br />
+                                    <h1>Valid to</h1>
+                                    <lightning-formatted-date-time value={detailedPircebook.pricebook.ValidTo}
+                                        year="numeric" month="numeric" day="numeric" hour="numeric" minute="2-digit"
+                                        hour12="false" style="font-size: medium;">
+                                    </lightning-formatted-date-time>
+
+                                    <lightning-input label="Is active" type="checkbox"
+                                        checked={detailedPircebook.pricebook.IsActive} disabled="true"
+                                        style="float: right;">
+                                    </lightning-input>
+
+                                    <div style="margin-top: 2rem;" class="slds-scrollable_y">
+                                        <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th class="" scope="col">
+                                                        <div class="slds-truncate">Designer name</div>
+                                                    </th>
+                                                    <th class="" scope="col">
+                                                        <div class="slds-truncate">Perfume name</div>
+                                                    </th>
+                                                    <th class="" scope="col">
+                                                        <div class="slds-truncate">Capacity</div>
+                                                    </th>
+                                                    <th class="" scope="col">
+                                                        <div class="slds-truncate">Price (EUR)</div>
+                                                    </th>
+                                                    <th class="" scope="col">
+                                                        <div class="slds-truncate"></div>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <template iterator:it={detailedPircebook.pricebookItems}>
+                                                    <tr class="slds-hint-parent" key={it.value.Id}
+                                                        style="cursor: pointer;">
+                                                        <td>
+                                                            {it.value.designerName}
+                                                        </td>
+                                                        <td>
+                                                            {it.value.productName}
+                                                        </td>
+                                                        <td>
+                                                            {it.value.capacity} ml
+                                                        </td>
+                                                        <td>
+                                                            <lightning-input type="text"
+                                                                value={it.value.entry.New_price__c}
+                                                                style="display: flex;" data-record-id={it.index}
+                                                                onchange={handleVariantPriceChange}>
+                                                            </lightning-input>
+                                                        </td>
+                                                        <td>
+                                                            <lightning-button label="Delete" data-record-id={it.index}
+                                                                onclick={openDelVariantModal}>
+                                                            </lightning-button>
+                                                        </td>
+                                                    </tr>
+                                                </template>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <template if:true={variantsChanged}>
+                                        <lightning-button label="Save" class="slds-align_absolute-center"
+                                            variant="brand" style="margin-top: 1rem;" onclick={saveEditedVariants}>
+                                        </lightning-button>
+                                    </template>
+                                </template>
+
+                                <template if:true={pricebookInEdit}>
+                                    <lightning-input type="text" label="Pricebook name" value={editPricebookName}
+                                        onchange={handleNameChange} required="true"></lightning-input>
+
+                                    <lightning-textarea label="Description" value={editPricebookDesc}
+                                        onchange={handleDescriptionChange}></lightning-textarea>
+
+                                    <lightning-input type="date" value={editPricebookValidFrom} label="Valid from"
+                                        onchange={handleStartDateChange} style="margin-right: 1rem;"></lightning-input>
+
+                                    <lightning-input type="date" value={editPricebookValidTo} label="Valid to"
+                                        onchange={handleEndDateChange} style="margin-right: 1rem;"></lightning-input>
+
+                                    <lightning-input label="Is active" type="checkbox" checked={editPricebookActive}
+                                        onchange={handleActiveChange} style="float: right;margin:1rem">
+                                    </lightning-input>
+
+                                    <div class="slds-align_absolute-center" style="margin-top: 2rem;margin-left: 9rem;">
+                                        <lightning-button label="Cancel" style="float: right;margin-right: 1rem;"
+                                            onclick={closeEdit}></lightning-button>
+                                        <lightning-button label="Save" style="float: right;" onclick={saveEdit}>
+                                        </lightning-button>
+                                    </div>
+                                </template>
+                            </template>
+                            </template>
+
+                            <template if:true={isDialogVisible}>
+                                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-2">
+                                    <p style="text-align: center;">Do you really want to delete this item?</p>
+                                </div>
+                                <footer class="slds-modal__footer">
+                                    <lightning-button variant="neutral" name="cancel" label="Cancel"
+                                        onclick={cancel} style="margin-right: 1rem;"></lightning-button>
+                                    <lightning-button variant="brand" name="confirm" label="Confirm"
+                                        onclick={confirm}></lightning-button>
+                                </footer>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+    </template>
+</template>

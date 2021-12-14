@@ -11,7 +11,7 @@
             <template if:true={filesData}>
                 <template for:each={filesData} for:item="imgName" for:index="index">
                     
-                    <h1 key={imgName.fileName} style="font-size: 20px">{imgName.fileName}&nbsp;
+                    <h1 key={imgName.fileName} style="font-size: 20px"><img style="max-width: 100px;max-height: 100px;" src={imgName.src}>{imgName.fileName}&nbsp;
                         <lightning-icon style="height: 1rem;" icon-name="utility:close" data-id={index} onclick={openModal} ></lightning-icon></h1>
                         
                 </template>

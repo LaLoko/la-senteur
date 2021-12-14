@@ -3,32 +3,46 @@ public class NewPerfumeController {
     public static String uploadFiles(String recordId, String filedata) {
         try {
             if (String.isNotBlank(FileData)) {
-                recordId = [SELECT Id FROM Product2 WHERE Family = 'Perfumes' ORDER BY Id DESC LIMIT 1].Id;
+                recordId = [
+                        SELECT Id
+                        FROM Product2
+                        WHERE Family = 'Perfumes'
+                        ORDER BY Id DESC
+                        LIMIT 1
+                ].Id;
                 List<FileDataWP> files = (List<FileDataWP>) JSON.deserialize(filedata, List<FileDataWP>.class);
-                List<Id> docIds = new List<Id>();
-
+                List<Document> documents = new List<Document>();
                 for (FileDataWP file : files) {
                     Document doc = new Document();
                     doc.FolderId = '00l09000002RzWJ';
                     doc.Name = file.fileName;
                     doc.body = EncodingUtil.base64Decode(file.fileContent);
                     doc.IsPublic = true;
-                    insert doc;
-                    docIds.add(doc.Id);
+                    documents.add(doc);
                 }
-                Product2 product = [SELECT Id,Photo__c FROM Product2 WHERE Id = :recordId LIMIT 1];
-                product.Photo__c = 'https://britenet-bb-dev-ed--c.documentforce.com/servlet/servlet.ImageServer?id=' + docIds.get(0) + '&oid=00D09000007z4Sw&lastMod=1637830151000';
+                insert documents;
+
+                Product2 product = [
+                        SELECT Id, Photo__c
+                        FROM Product2
+                        WHERE Id = :recordId
+                        LIMIT 1
+                ];
+                String baseUrl = URL.getSalesforceBaseUrl().toExternalForm().replace('.my.salesforce.com','--c.documentforce.com/servlet/servlet.ImageServer?id=');
+                product.Photo__c = baseUrl + documents.get(0).Id + '&oid=00D09000007z4Sw&lastMod=1637830151000';
                 update product;
 
-                for (Id id : docIds) {
-                    String url = 'https://britenet-bb-dev-ed--c.documentforce.com/servlet/servlet.ImageServer?id=' + id + '&oid=00D09000007z4Sw&lastMod=1637830151000';
+                List<Product_Image__c> productImages = new List<Product_Image__c>();
+                for (Document document : documents) {
+                    String url = baseUrl + document.Id + '&oid=00D09000007z4Sw&lastMod=1637830151000';
 
-                    Product_Image__c pi = new Product_Image__c(
+                    Product_Image__c productImage = new Product_Image__c(
                             Product__c = recordId,
                             URL__c = url
                     );
-                    insert pi;
+                    productImages.add(productImage);
                 }
+                insert productImages;
             } else {
                 return 'record Id is Blank';
             }
@@ -40,12 +54,17 @@ public class NewPerfumeController {
 
     @AuraEnabled
     public static string createNewPerfume(String name, String designer, String gender, String accords, String topNotes, String middleNotes, String baseNotes, String variants) {
-        Id designerId = [SELECT Id, Name FROM Designer__c WHERE Name LIKE :designer LIMIT 1].Id;
+        Id designerId = [
+                SELECT Id, Name
+                FROM Designer__c
+                WHERE Name LIKE :designer
+                LIMIT 1
+        ].Id;
 
-        List<String> varts = stringToVariants(variants);
+        List<String> variantsList = stringToVariants(variants);
         Decimal minPrice = 90000000;
 
-        for (String var : varts) {
+        for (String var : variantsList) {
             if (PerfumesController.getPriceFromVariant(var) < minPrice) {
                 minPrice = PerfumesController.getPriceFromVariant(var);
             }
@@ -63,14 +82,18 @@ public class NewPerfumeController {
                 Middle_Notes__c = stringToPicklist(middleNotes),
                 Base_Notes__c = stringToPicklist(baseNotes)
         );
-
         Insert prod;
 
-        Pricebook2 standard = [SELECT Id,Name FROM Pricebook2 WHERE isStandard = true LIMIT 1];
+        Pricebook2 standard = [
+                SELECT Id, Name
+                FROM Pricebook2
+                WHERE isStandard = true
+                LIMIT 1
+        ];
         PricebookEntry standardPBE = new PricebookEntry(Pricebook2Id = standard.Id, Product2Id = prod.Id, UnitPrice = prod.minPrice__c, IsActive = true);
         insert standardPBE;
 
-        for (String var : varts) {
+        for (String var : variantsList) {
             Variant__c variant = new Variant__c(
                     Product__c = prod.Id,
                     Capacity__c = PerfumesController.getCapacityFromVariant(var),
@@ -78,7 +101,6 @@ public class NewPerfumeController {
             );
             insert variant;
         }
-
         return prod.Id;
     }
 

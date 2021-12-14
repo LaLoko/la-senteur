@@ -3,8 +3,18 @@ public without sharing class ProfileController {
     @AuraEnabled
     public static ProfileWrapper getProfileInfo() {
         String userId = System.UserInfo.getUserId();
-        User user = [SELECT Id,Name,AboutMe,Address,ContactId,Phone,Username,SenderEmail FROM User WHERE Id = :userId].get(0);
-        Contact contact = [SELECT Id,Name,Email,Phone,MailingStreet,MailingCity,MailingState,MailingPostalCode,MailingCountry FROM Contact WHERE Id = :user.ContactId LIMIT 1];
+        User user = [
+                SELECT Id, Name, AboutMe, Address, ContactId, Phone, Username, SenderEmail
+                FROM User
+                WHERE Id = :userId
+                LIMIT 1
+        ];
+        Contact contact = [
+                SELECT Id, Name, Email, Phone, MailingStreet, MailingCity, MailingState, MailingPostalCode, MailingCountry
+                FROM Contact
+                WHERE Id = :user.ContactId
+                LIMIT 1
+        ];
 
         ProfileWrapper wrapper = new ProfileWrapper();
         wrapper.id = user.Id;
@@ -24,21 +34,36 @@ public without sharing class ProfileController {
     @AuraEnabled
     public static List<OrderWrapper> getAllOrders() {
         String userId = System.UserInfo.getUserId();
-        List<OrderWrapper> out = new List<OrderWrapper>();
+        List<OrderWrapper> orderWrappersList = new List<OrderWrapper>();
 
-        for (Order objOrder : [SELECT Id,Name,TotalAmount,ActivatedDate,OrderNumber FROM Order WHERE CreatedById = :userId]) {
+        for (Order objOrder : [
+                SELECT Id, Name, TotalAmount, ActivatedDate, OrderNumber
+                FROM Order
+                WHERE CreatedById = :userId
+        ]) {
             OrderWrapper wrapper = new OrderWrapper();
             wrapper.objOrder = objOrder;
             wrapper.hideBool = true;
-            out.add(wrapper);
+            orderWrappersList.add(wrapper);
         }
-        return out;
+        return orderWrappersList;
     }
+
     @AuraEnabled
     public static ProfileWrapper updateProfile(String pro) {
         String userId = System.UserInfo.getUserId();
-        User user = [SELECT Id,Name,AboutMe,Address,ContactId,Phone,Username,SenderEmail FROM User WHERE Id = :userId LIMIT 1];
-        Contact contact = [SELECT Id,Name,Email,Phone,MailingStreet,MailingCity,MailingState,MailingPostalCode,MailingCountry FROM Contact WHERE Id = :user.ContactId LIMIT 1];
+        User user = [
+                SELECT Id, Name, AboutMe, Address, ContactId, Phone, Username, SenderEmail
+                FROM User
+                WHERE Id = :userId
+                LIMIT 1
+        ];
+        Contact contact = [
+                SELECT Id, Name, Email, Phone, MailingStreet, MailingCity, MailingState, MailingPostalCode, MailingCountry
+                FROM Contact
+                WHERE Id = :user.ContactId
+                LIMIT 1
+        ];
 
         ProfileWrapper profile = ProfileWrapper.parse(pro);
         user.Phone = profile.phone;
@@ -56,26 +81,43 @@ public without sharing class ProfileController {
 
     @AuraEnabled
     public static Order getOrderDetails(Id orderId) {
-        return [SELECT Id,ActivatedDate,ShippingAddress,BillToContactId,TotalAmount,OrderNumber FROM Order WHERE Id = :orderId LIMIT 1];
+        return [
+                SELECT Id, ActivatedDate, ShippingAddress, BillToContactId, TotalAmount, OrderNumber
+                FROM Order
+                WHERE Id = :orderId
+                LIMIT 1
+        ];
     }
 
     @AuraEnabled
     public static List<OrderWrapper> getOrderedPerfumes(Id orderId) {
-        List<OrderItem> orderItems = [SELECT Id,ListPrice,OrderId,Capacity__c,Product2Id,TotalPrice,UnitPrice FROM OrderItem WHERE OrderId = :orderId];
+        List<OrderItem> orderItems = [
+                SELECT Id, ListPrice, OrderId, Capacity__c, Product2Id, TotalPrice, UnitPrice
+                FROM OrderItem
+                WHERE OrderId = :orderId
+        ];
 
         List<Id> pefumesIds = new List<Id>();
         for (OrderItem item : orderItems) {
             pefumesIds.add(item.Product2Id);
         }
-        List<Product2> perfumes = [SELECT Id, Name, Designer__c FROM Product2 WHERE Id IN :pefumesIds];
+        List<Product2> perfumes = [
+                SELECT Id, Name, Designer__c
+                FROM Product2
+                WHERE Id IN :pefumesIds
+        ];
 
         List<Id> designerIds = new List<Id>();
         for (Product2 item : perfumes) {
             designerIds.add(item.Designer__c);
         }
-        List<Designer__c> designers = [SELECT Id, Name FROM Designer__c WHERE Id IN :designerIds];
+        List<Designer__c> designers = [
+                SELECT Id, Name
+                FROM Designer__c
+                WHERE Id IN :designerIds
+        ];
 
-        List<OrderWrapper> out = new List<OrderWrapper>();
+        List<OrderWrapper> orderWrappersList = new List<OrderWrapper>();
 
         for (OrderItem item : orderItems) {
             OrderWrapper wrapper = new OrderWrapper();
@@ -93,16 +135,26 @@ public without sharing class ProfileController {
                     }
                 }
             }
-            out.add(wrapper);
+            orderWrappersList.add(wrapper);
         }
-        return out;
+        return orderWrappersList;
     }
 
     @AuraEnabled
     public static ShippmentInfo getShippmentInfo(id orderId) {
-        Order order = [SELECT Id, ShipToContactId FROM Order WHERE id = :orderId LIMIT 1];
+        Order order = [
+                SELECT Id, ShipToContactId
+                FROM Order
+                WHERE id = :orderId
+                LIMIT 1
+        ];
 
-        Contact contact = [SELECT Id,MailingStreet,MailingCity,MailingState,MailingPostalCode,MailingCountry FROM Contact WHERE Id = :order.ShipToContactId LIMIT 1];
+        Contact contact = [
+                SELECT Id, MailingStreet, MailingCity, MailingState, MailingPostalCode, MailingCountry
+                FROM Contact
+                WHERE Id = :order.ShipToContactId
+                LIMIT 1
+        ];
         ShippmentInfo info = new ShippmentInfo(contact.MailingState, contact.MailingCity, contact.MailingCountry, contact.MailingPostalCode, contact.MailingStreet);
         return info;
     }
